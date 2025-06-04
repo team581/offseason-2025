@@ -15,7 +15,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.robot_manager.collision_avoidance.CollisionAvoidance;
@@ -30,6 +29,13 @@ import java.util.OptionalDouble;
 
 public class ArmSubsystem extends StateMachine<ArmState> {
   public static final double ARM_LENGTH_METERS = Units.inchesToMeters(37.416);
+
+  private static final InterpolatingDoubleTreeMap CORAL_TX_TO_ARM_ANGLE_TABLE =
+      InterpolatingDoubleTreeMap.ofEntries(
+          Map.entry(2.66, 4.93),
+          Map.entry(0.0, 0.0),
+          Map.entry(-6.5, -2.37),
+          Map.entry(-11.0, -6.67));
 
   private static final double TOLERANCE = 2.0;
   private static final double NEAR_TOLERANCE = 35.0;
@@ -46,9 +52,6 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private final StaticBrake brakeNeutralRequest = new StaticBrake();
   private final CoastOut coastNeutralRequest = new CoastOut();
   private final VelocityVoltage spinToWin = new VelocityVoltage(0.6);
-  private static final InterpolatingDoubleTreeMap CORAL_TX_TO_ARM_ANGLE_TABLE =
-      InterpolatingDoubleTreeMap.ofEntries(
-          Map.entry(2.66, 5.0), Map.entry(3.89, 0.0), Map.entry(-10.9, -5.0));
   private boolean lollipopMode = false;
 
   public void setLollipopMode(boolean lollipopMode) {
@@ -85,7 +88,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
         newPositionDeg -> motor.setPosition(Units.degreesToRotations(newPositionDeg)));
   }
 
-  public void setCoralTx(OptionalDouble tx) {
+  public void setCoralHandoffOffset(OptionalDouble tx) {
     handoffOffset = CORAL_TX_TO_ARM_ANGLE_TABLE.get(tx.orElse(0));
   }
 
@@ -194,12 +197,8 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     DogLog.log("Arm/AppliedVoltage", motor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Arm/Angle", motorAngle);
     DogLog.log("Arm/RawAngle", rawMotorAngle);
-    DogLog.log("Arm/RangeOfMotionGood", rangeOfMotionGood());
 
     DogLog.log("Arm/AtGoal", atGoal());
-    DogLog.log(
-        "Arm/AfterHomingAngle",
-        RobotConfig.get().arm().homingPosition() + (rawMotorAngle - lowestSeenAngle));
 
     if (DriverStation.isDisabled()) {
       DogLog.log("Arm/LowestAngle", lowestSeenAngle);
@@ -240,14 +239,23 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   }
 
   @Override
-  protected void beforeTransition(ArmState oldState, ArmState newState) {
-    if (oldState == ArmState.PRE_MATCH_HOMING && newState != ArmState.PRE_MATCH_HOMING) {
-      var actualArmAngle =
-          RobotConfig.get().arm().homingPosition() + (rawMotorAngle - lowestSeenAngle);
-      motor.setPosition(Units.degreesToRotations(actualArmAngle));
-      // Refresh sensor data now that position is set
-      collectInputs();
-    }
+  protected ArmState getNextState(ArmState currentState) {
+    return switch (currentState) {
+      case PRE_MATCH_HOMING -> {
+        if (DriverStation.isEnabled()) {
+          var actualArmAngle =
+              RobotConfig.get().arm().homingPosition() + (rawMotorAngle - lowestSeenAngle);
+          motor.setPosition(Units.degreesToRotations(actualArmAngle));
+          // Refresh sensor data now that position is set
+          collectInputs();
+
+          yield currentState;
+        }
+
+        yield currentState;
+      }
+      default -> currentState;
+    };
   }
 
   public boolean rangeOfMotionGood() {
@@ -302,10 +310,8 @@ public class ArmSubsystem extends StateMachine<ArmState> {
 
   @Override
   public void disabledInit() {
-    if (RobotBase.isSimulation()) {
-      // reset position to be 0*
-      var motorSim = motor.getSimState();
-      motorSim.setRawRotorPosition(getRawAngleFromNormalAngle(0, rawMotorAngle));
-    }
+    // reset position to be 0*
+    var motorSim = motor.getSimState();
+    motorSim.setRawRotorPosition(getRawAngleFromNormalAngle(0, rawMotorAngle));
   }
 }

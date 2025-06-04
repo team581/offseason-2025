@@ -946,7 +946,7 @@ public class RobotManager extends StateMachine<RobotState> {
         } else {
           vision.setState(VisionState.TAGS);
         }
-        arm.setCoralTx(vision.getHandoffOffsetTx());
+        arm.setCoralHandoffOffset(vision.getHandoffOffsetTx());
       }
 
       case CORAL_L1_RELEASE_HANDOFF,
@@ -959,7 +959,7 @@ public class RobotManager extends StateMachine<RobotState> {
           CORAL_L4_AFTER_RELEASE_HANDOFF -> {
         // Do nothing, don't change the handoff angle when we are releasing
       }
-      default -> arm.setCoralTx(vision.getHandoffOffsetTx());
+      default -> arm.setCoralHandoffOffset(vision.getHandoffOffsetTx());
     }
 
     switch (getState()) {
