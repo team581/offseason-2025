@@ -19,27 +19,7 @@ public final class ControllerHelpers {
     return new Translation2d(x, y);
   }
 
-  private static Translation2d desaturate(double x, double y) {
-    double absX = Math.abs(x);
-    double absY = Math.abs(y);
-
-    if (absX > 1 && absX > absY) {
-      // X is too big and is the more problematic one
-
-      var ratio = 1 / absX;
-
-      return new Translation2d(x * ratio, y * ratio);
-    } else if (absY > 1 && absY > absX) {
-      // Y is too big and is the more problematic one
-      var ratio = 1 / absY;
-
-      return new Translation2d(x * ratio, y * ratio);
-
-    } else {
-      //  Everything fine
-      return new Translation2d(x, y);
-    }
-  }
+  
 
   private ControllerHelpers() {}
 }
