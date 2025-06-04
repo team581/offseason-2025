@@ -2,8 +2,6 @@ package frc.robot.arm;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -30,6 +28,7 @@ import java.util.OptionalDouble;
 
 public class ArmSubsystem extends StateMachine<ArmState> {
   public static final double ARM_LENGTH_METERS = Units.inchesToMeters(37.416);
+  private static final double LOOKAHEADTIME = 0.1;
 
   private static final double TOLERANCE = 2.0;
   private static final double NEAR_TOLERANCE = 35.0;
@@ -49,6 +48,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private static final InterpolatingDoubleTreeMap CORAL_TX_TO_ARM_ANGLE_TABLE =
       InterpolatingDoubleTreeMap.ofEntries(
           Map.entry(2.66, 5.0), Map.entry(3.89, 0.0), Map.entry(-10.9, -5.0));
+
   private boolean lollipopMode = false;
 
   public void setLollipopMode(boolean lollipopMode) {
@@ -56,10 +56,17 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     DogLog.log("Arm/LollipopMode", lollipopMode);
   }
 
-  private final MotionMagicVoltage motionMagicRequest =
-      new MotionMagicVoltage(0.0).withEnableFOC(false);
-  private final MotionMagicExpoVoltage autoMotionMagicExpoRequest =
-      new MotionMagicExpoVoltage(0.0).withEnableFOC(false);
+  private final TrapezoidProfile motionProfile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(
+              RobotConfig.get().elevator().leftMotorConfig().MotionMagic.MotionMagicCruiseVelocity,
+              RobotConfig.get().elevator().leftMotorConfig().MotionMagic.MotionMagicAcceleration));
+
+  TrapezoidProfile.State goalSetPoint = new TrapezoidProfile.State();
+  TrapezoidProfile.State currentSetPoint = new TrapezoidProfile.State();
+
+  private final PositionVoltage positionRequest = new PositionVoltage(0.0).withEnableFOC(false);
+  private final PositionVoltage autoPositionRequest = new PositionVoltage(0.0).withEnableFOC(false);
 
   // TODO: tune velocity
   private final PositionVoltage algaeFling =
@@ -109,11 +116,22 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   }
 
   private void makeGetMotionMagicRequest(double armRotations) {
+    goalSetPoint = new TrapezoidProfile.State(armRotations, 0);
+    currentSetPoint =
+        new TrapezoidProfile.State(
+            armRotations, motionProfile.calculate(0, currentSetPoint, goalSetPoint).velocity);
+
+    DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
+    DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
+//TODO: make the position request with position and velocity work
     if (DriverStation.isTeleop() || lollipopMode) {
-      motor.setControl(motionMagicRequest.withPosition(armRotations));
+      motor.setControl(
+          positionRequest
+              .withPosition(currentSetPoint.position)
+              .withVelocity(currentSetPoint.velocity));
       DogLog.log("Arm/MotionMagicStrategy", "Teleop");
     } else {
-      motor.setControl(autoMotionMagicExpoRequest.withPosition(armRotations));
+      motor.setControl(autoPositionRequest.withPosition(armRotations));
       DogLog.log("Arm/MotionMagicStrategy", "Expo");
     }
   }

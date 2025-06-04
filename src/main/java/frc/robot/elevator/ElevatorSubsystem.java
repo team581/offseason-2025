@@ -2,13 +2,14 @@ package frc.robot.elevator;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.ChassisReference;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
@@ -20,6 +21,7 @@ import frc.robot.util.tuning.TunablePid;
 public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private static final double TOLERANCE = 0.5;
   private static final double NEAR_TOLERANCE = 20.0;
+  private static final double LOOKAHEADTIME = 0.1;
 
   private static double clampHeight(double height) {
     return MathUtil.clamp(
@@ -34,8 +36,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
 
-  private final MotionMagicVoltage positionRequest =
-      new MotionMagicVoltage(ElevatorState.STOWED.getHeight());
+  private final PositionVoltage positionRequest =
+      new PositionVoltage(ElevatorState.STOWED.getHeight());
 
   // Homing
   private double leftHeight = 0;
@@ -48,6 +50,15 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   // Mid-match homing
   private double averageMotorCurrent;
   private final CoastOut coastRequest = new CoastOut();
+
+  private final TrapezoidProfile motionProfile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(
+              RobotConfig.get().elevator().leftMotorConfig().MotionMagic.MotionMagicCruiseVelocity,
+              RobotConfig.get().elevator().leftMotorConfig().MotionMagic.MotionMagicAcceleration));
+
+  TrapezoidProfile.State goalSetPoint = new TrapezoidProfile.State();
+  TrapezoidProfile.State currentSetPoint = new TrapezoidProfile.State();
 
   public ElevatorSubsystem(TalonFX leftMotor, TalonFX rightMotor) {
     super(SubsystemPriority.ELEVATOR, ElevatorState.PRE_MATCH_HOMING);
@@ -111,8 +122,19 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
         rightMotor.setVoltage(-0.0);
       }
       case COLLISION_AVOIDANCE -> {
-        leftMotor.setControl(positionRequest.withPosition(clampHeight(collisionAvoidanceGoal)));
-        rightMotor.setControl(positionRequest.withPosition(clampHeight(collisionAvoidanceGoal)));
+        goalSetPoint = new TrapezoidProfile.State(collisionAvoidanceGoal, 0);
+
+        currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
+//TODO: make the position request with position and velocity work
+
+        rightMotor.setControl(
+            positionRequest
+                .withPosition(currentSetPoint.position)
+                .withVelocity(currentSetPoint.velocity));
+        leftMotor.setControl(
+            positionRequest
+                .withPosition(currentSetPoint.position)
+                .withVelocity(currentSetPoint.velocity));
       }
       default -> {
         leftMotor.setControl(positionRequest.withPosition(clampHeight(newState.getHeight())));
@@ -135,8 +157,25 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
     switch (getState()) {
       case COLLISION_AVOIDANCE -> {
-        leftMotor.setControl(positionRequest.withPosition(clampHeight(collisionAvoidanceGoal)));
-        rightMotor.setControl(positionRequest.withPosition(clampHeight(collisionAvoidanceGoal)));
+        goalSetPoint =
+            new TrapezoidProfile.State(Units.degreesToRotations(collisionAvoidanceGoal), 0);
+
+        currentSetPoint =
+            new TrapezoidProfile.State(
+                Units.degreesToRotations(collisionAvoidanceGoal),
+                motionProfile.calculate(0, currentSetPoint, goalSetPoint).velocity);
+        DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
+        DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
+//TODO: make the position request with position and velocity work
+
+        rightMotor.setControl(
+            positionRequest
+                .withPosition(currentSetPoint.position)
+                .withVelocity(currentSetPoint.velocity));
+        leftMotor.setControl(
+            positionRequest
+                .withPosition(currentSetPoint.position)
+                .withVelocity(currentSetPoint.velocity));
       }
       default -> {}
     }
