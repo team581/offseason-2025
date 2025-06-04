@@ -9,17 +9,14 @@ public final class ControllerHelpers {
   }
 
   public static Translation2d fromCircularDiscCoordinates(double x, double y) {
-    var rawInputs = new Translation2d(x, y);
 
-    var magnitude = rawInputs.getNorm();
-
-    if (Math.abs(magnitude) > 0.9) {
-      magnitude = 1;
-    } else if (magnitude) {
-      magnitude = asdasd;
+    if (Math.abs(x) >= 0.9) {
+      x = Math.copySign(1, x);
     }
-
-    return new Translation2d(magnitude, rawInputs.getAngle());
+    if (Math.abs(y) >= 0.9) {
+      y = Math.copySign(1, y);
+    }
+    return new Translation2d(x, y);
   }
 
   private static Translation2d desaturate(double x, double y) {

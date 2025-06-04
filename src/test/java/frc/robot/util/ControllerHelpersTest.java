@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 public class ControllerHelpersTest {
   @Test
   void circularDiscCoordinateTest() {
-    var result = ControllerHelpers.fromCircularDiscCoordinates(-0.68, -0.58);
-    var expected = new Translation2d(-0.78, -0.7);
+    var result = ControllerHelpers.fromCircularDiscCoordinates(-0.9, -0.9);
+    var expected = new Translation2d(-1, -1);
 
     assertEquals(expected, MathHelpers.roundTo(result, 2));
   }
