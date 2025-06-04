@@ -123,7 +123,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
 
     DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
     DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
-//TODO: make the position request with position and velocity work
+    // TODO: make the position request with position and velocity work
     if (DriverStation.isTeleop() || lollipopMode) {
       motor.setControl(
           positionRequest

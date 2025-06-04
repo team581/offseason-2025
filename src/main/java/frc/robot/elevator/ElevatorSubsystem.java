@@ -125,7 +125,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
         goalSetPoint = new TrapezoidProfile.State(collisionAvoidanceGoal, 0);
 
         currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
-//TODO: make the position request with position and velocity work
+        // TODO: make the position request with position and velocity work
 
         rightMotor.setControl(
             positionRequest
@@ -166,7 +166,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
                 motionProfile.calculate(0, currentSetPoint, goalSetPoint).velocity);
         DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
         DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
-//TODO: make the position request with position and velocity work
+        // TODO: make the position request with position and velocity work
 
         rightMotor.setControl(
             positionRequest
