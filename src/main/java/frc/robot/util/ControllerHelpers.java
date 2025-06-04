@@ -19,7 +19,5 @@ public final class ControllerHelpers {
     return new Translation2d(x, y);
   }
 
-  
-
   private ControllerHelpers() {}
 }
