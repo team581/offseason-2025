@@ -28,7 +28,7 @@ import java.util.OptionalDouble;
 
 public class ArmSubsystem extends StateMachine<ArmState> {
   public static final double ARM_LENGTH_METERS = Units.inchesToMeters(37.416);
-  private static final double LOOKAHEADTIME = 0.1;
+  private static final double LOOKAHEADTIME = 0.2;
 
   private static final double TOLERANCE = 2.0;
   private static final double NEAR_TOLERANCE = 35.0;
@@ -66,7 +66,6 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   TrapezoidProfile.State currentSetPoint = new TrapezoidProfile.State();
 
   private final PositionVoltage positionRequest = new PositionVoltage(0.0).withEnableFOC(false);
-  private final PositionVoltage autoPositionRequest = new PositionVoltage(0.0).withEnableFOC(false);
 
   // TODO: tune velocity
   private final PositionVoltage algaeFling =
@@ -117,22 +116,23 @@ public class ArmSubsystem extends StateMachine<ArmState> {
 
   private void makeGetMotionMagicRequest(double armRotations) {
     goalSetPoint = new TrapezoidProfile.State(armRotations, 0);
-    currentSetPoint =
-        new TrapezoidProfile.State(
-            armRotations, motionProfile.calculate(0, currentSetPoint, goalSetPoint).velocity);
+    currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
 
     DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
     DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
-//TODO: make the position request with position and velocity work
+    // TODO: make the position request with position and velocity work
     if (DriverStation.isTeleop() || lollipopMode) {
       motor.setControl(
           positionRequest
               .withPosition(currentSetPoint.position)
               .withVelocity(currentSetPoint.velocity));
-      DogLog.log("Arm/MotionMagicStrategy", "Teleop");
+      DogLog.log("Arm/PositionVoltageStrategy", "Teleop");
     } else {
-      motor.setControl(autoPositionRequest.withPosition(armRotations));
-      DogLog.log("Arm/MotionMagicStrategy", "Expo");
+      motor.setControl(
+          positionRequest
+              .withPosition(currentSetPoint.position)
+              .withVelocity(currentSetPoint.velocity));
+      DogLog.log("PositionVoaltageStrategy", "Expo");
     }
   }
 

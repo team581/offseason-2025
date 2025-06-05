@@ -9,7 +9,6 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
@@ -21,7 +20,7 @@ import frc.robot.util.tuning.TunablePid;
 public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private static final double TOLERANCE = 0.5;
   private static final double NEAR_TOLERANCE = 20.0;
-  private static final double LOOKAHEADTIME = 0.1;
+  private static final double LOOKAHEADTIME = 0.2;
 
   private static double clampHeight(double height) {
     return MathUtil.clamp(
@@ -125,7 +124,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
         goalSetPoint = new TrapezoidProfile.State(collisionAvoidanceGoal, 0);
 
         currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
-//TODO: make the position request with position and velocity work
+        // TODO: make the position request with position and velocity work
 
         rightMotor.setControl(
             positionRequest
@@ -157,16 +156,12 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
     switch (getState()) {
       case COLLISION_AVOIDANCE -> {
-        goalSetPoint =
-            new TrapezoidProfile.State(Units.degreesToRotations(collisionAvoidanceGoal), 0);
+        goalSetPoint = new TrapezoidProfile.State(collisionAvoidanceGoal, 0);
 
-        currentSetPoint =
-            new TrapezoidProfile.State(
-                Units.degreesToRotations(collisionAvoidanceGoal),
-                motionProfile.calculate(0, currentSetPoint, goalSetPoint).velocity);
+        currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
         DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
         DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
-//TODO: make the position request with position and velocity work
+        // TODO: make the position request with position and velocity work
 
         rightMotor.setControl(
             positionRequest
