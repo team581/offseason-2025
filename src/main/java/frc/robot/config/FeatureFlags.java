@@ -46,5 +46,8 @@ public class FeatureFlags {
   public static final BooleanSupplier USE_ANY_REEF_TAG =
       FeatureFlag.of("Vision/UseAnyReefTag", true);
 
+  public static final BooleanSupplier ARM_ELEVATOR_SYNC =
+      FeatureFlag.of("Elevator/ElevatorSyncWithArm", false);
+
   private FeatureFlags() {}
 }

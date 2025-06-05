@@ -59,7 +59,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
   TrapezoidProfile.State goalSetPoint = new TrapezoidProfile.State();
   TrapezoidProfile.State currentSetPoint = new TrapezoidProfile.State();
-  TrapezoidProfile.State syncedSetPoint = new TrapezoidProfile.State();
+  double syncingCoeffecient = 1.0;
 
   public ElevatorSubsystem(TalonFX leftMotor, TalonFX rightMotor) {
     super(SubsystemPriority.ELEVATOR, ElevatorState.PRE_MATCH_HOMING);
@@ -127,15 +127,25 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
         currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
         // TODO: make the position request with position and velocity work
-
-        rightMotor.setControl(
-            positionRequest
-                .withPosition(currentSetPoint.position)
-                .withVelocity(currentSetPoint.velocity));
-        leftMotor.setControl(
-            positionRequest
-                .withPosition(currentSetPoint.position)
-                .withVelocity(currentSetPoint.velocity));
+        if (FeatureFlags.ARM_ELEVATOR_SYNC.getAsBoolean()) {
+          rightMotor.setControl(
+              positionRequest
+                  .withPosition(currentSetPoint.position)
+                  .withVelocity(currentSetPoint.velocity * syncingCoeffecient));
+          leftMotor.setControl(
+              positionRequest
+                  .withPosition(currentSetPoint.position)
+                  .withVelocity(currentSetPoint.velocity * syncingCoeffecient));
+        } else {
+          rightMotor.setControl(
+              positionRequest
+                  .withPosition(currentSetPoint.position)
+                  .withVelocity(currentSetPoint.velocity));
+          leftMotor.setControl(
+              positionRequest
+                  .withPosition(currentSetPoint.position)
+                  .withVelocity(currentSetPoint.velocity));
+        }
       }
       default -> {
         leftMotor.setControl(positionRequest.withPosition(clampHeight(newState.getHeight())));
@@ -144,16 +154,10 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
     }
   }
 
-  public void setSyncedSetPoint(double armRotations) {
-    goalSetPoint = new TrapezoidProfile.State(collisionAvoidanceGoal, 0);
-
-    currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
+  public void setSyncCoeffecient(double armRotations) {
     double armProfileTime = ArmSubsystem.getArmProfileTime(armRotations);
     double elevatorProfileTime = motionProfile.timeLeftUntil(collisionAvoidanceGoal);
-    syncedSetPoint =
-        new TrapezoidProfile.State(
-            currentSetPoint.position,
-            currentSetPoint.velocity * (elevatorProfileTime / armProfileTime));
+    syncingCoeffecient = elevatorProfileTime / armProfileTime;
   }
 
   public void customPeriodic() {
@@ -170,18 +174,32 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
     switch (getState()) {
       case COLLISION_AVOIDANCE -> {
+        goalSetPoint = new TrapezoidProfile.State(collisionAvoidanceGoal, 0);
+
+        currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
         DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
         DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
-        // TODO: make the position request with position and velocity work
 
-        rightMotor.setControl(
-            positionRequest
-                .withPosition(syncedSetPoint.position)
-                .withVelocity(syncedSetPoint.velocity));
-        leftMotor.setControl(
-            positionRequest
-                .withPosition(syncedSetPoint.position)
-                .withVelocity(syncedSetPoint.velocity));
+        // TODO: make the position request with position and velocity work
+        if (FeatureFlags.ARM_ELEVATOR_SYNC.getAsBoolean()) {
+          rightMotor.setControl(
+              positionRequest
+                  .withPosition(currentSetPoint.position) // change back to syncedSetPoint
+                  .withVelocity(currentSetPoint.velocity * syncingCoeffecient));
+          leftMotor.setControl(
+              positionRequest
+                  .withPosition(currentSetPoint.position)
+                  .withVelocity(currentSetPoint.velocity * syncingCoeffecient));
+        } else {
+          rightMotor.setControl(
+              positionRequest
+                  .withPosition(currentSetPoint.position) // change back to syncedSetPoint
+                  .withVelocity(currentSetPoint.velocity));
+          leftMotor.setControl(
+              positionRequest
+                  .withPosition(currentSetPoint.position)
+                  .withVelocity(currentSetPoint.velocity));
+        }
       }
       default -> {}
     }
