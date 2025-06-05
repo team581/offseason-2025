@@ -133,13 +133,13 @@ public class ArmSubsystem extends StateMachine<ArmState> {
           positionRequest
               .withPosition(currentSetPoint.position)
               .withVelocity(currentSetPoint.velocity));
-      DogLog.log("Arm/PositionVoltageStrategy", "Teleop");
+      DogLog.log("Arm/PositionVoltageStrategy", "Fast");
     } else {
       motor.setControl(
           positionRequest
               .withPosition(currentSetPoint.position)
               .withVelocity(currentSetPoint.velocity));
-      DogLog.log("PositionVoaltageStrategy", "Expo");
+      DogLog.log("Arm/PositionVoaltageStrategy", "Slow");
     }
   }
 
