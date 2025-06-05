@@ -21,7 +21,7 @@ import frc.robot.util.tuning.TunablePid;
 public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private static final double TOLERANCE = 0.5;
   private static final double NEAR_TOLERANCE = 20.0;
-  private static final double LOOKAHEADTIME = 0.2;
+  private static final double LOOKAHEADTIME = 0.02;
 
   private static double clampHeight(double height) {
     return MathUtil.clamp(

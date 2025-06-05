@@ -28,7 +28,7 @@ import java.util.OptionalDouble;
 
 public class ArmSubsystem extends StateMachine<ArmState> {
   public static final double ARM_LENGTH_METERS = Units.inchesToMeters(37.416);
-  private static final double LOOKAHEADTIME = 0.2;
+  private static final double LOOKAHEADTIME = 0.02;
 
   private static final double TOLERANCE = 2.0;
   private static final double NEAR_TOLERANCE = 35.0;
