@@ -56,14 +56,14 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     DogLog.log("Arm/LollipopMode", lollipopMode);
   }
 
-  private final TrapezoidProfile motionProfile =
+  private static final TrapezoidProfile motionProfile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
               RobotConfig.get().elevator().leftMotorConfig().MotionMagic.MotionMagicCruiseVelocity,
               RobotConfig.get().elevator().leftMotorConfig().MotionMagic.MotionMagicAcceleration));
 
-  TrapezoidProfile.State goalSetPoint = new TrapezoidProfile.State();
-  TrapezoidProfile.State currentSetPoint = new TrapezoidProfile.State();
+  static TrapezoidProfile.State goalSetPoint = new TrapezoidProfile.State();
+  static TrapezoidProfile.State currentSetPoint = new TrapezoidProfile.State();
 
   private final PositionVoltage positionRequest = new PositionVoltage(0.0).withEnableFOC(false);
 
@@ -114,10 +114,17 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     return rawMotorAngle;
   }
 
+  public double getCollisionAvoidanceGoal() {
+    return collisionAvoidanceGoal;
+  }
+
+  public static double getArmProfileTime(double armRotations) {
+    return motionProfile.timeLeftUntil(armRotations);
+  }
+
   private void makeGetMotionMagicRequest(double armRotations) {
     goalSetPoint = new TrapezoidProfile.State(armRotations, 0);
     currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
-
     DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
     DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
     // TODO: make the position request with position and velocity work

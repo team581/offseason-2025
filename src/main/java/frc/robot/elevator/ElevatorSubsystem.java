@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.arm.ArmSubsystem;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.util.MathHelpers;
@@ -58,6 +59,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
   TrapezoidProfile.State goalSetPoint = new TrapezoidProfile.State();
   TrapezoidProfile.State currentSetPoint = new TrapezoidProfile.State();
+  TrapezoidProfile.State syncedSetPoint = new TrapezoidProfile.State();
 
   public ElevatorSubsystem(TalonFX leftMotor, TalonFX rightMotor) {
     super(SubsystemPriority.ELEVATOR, ElevatorState.PRE_MATCH_HOMING);
@@ -142,6 +144,18 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
     }
   }
 
+  public void setSyncedSetPoint(double armRotations) {
+    goalSetPoint = new TrapezoidProfile.State(collisionAvoidanceGoal, 0);
+
+    currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
+    double armProfileTime = ArmSubsystem.getArmProfileTime(armRotations);
+    double elevatorProfileTime = motionProfile.timeLeftUntil(collisionAvoidanceGoal);
+    syncedSetPoint =
+        new TrapezoidProfile.State(
+            currentSetPoint.position,
+            currentSetPoint.velocity * (elevatorProfileTime / armProfileTime));
+  }
+
   public void customPeriodic() {
     DogLog.log("Elevator/Left/StatorCurrent", leftMotorCurrent);
     DogLog.log("Elevator/Right/StatorCurrent", rightMotorCurrent);
@@ -156,21 +170,18 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
     switch (getState()) {
       case COLLISION_AVOIDANCE -> {
-        goalSetPoint = new TrapezoidProfile.State(collisionAvoidanceGoal, 0);
-
-        currentSetPoint = motionProfile.calculate(LOOKAHEADTIME, currentSetPoint, goalSetPoint);
         DogLog.log("Arm/ProfilePosition", currentSetPoint.position);
         DogLog.log("Arm/ProfileVelocity", currentSetPoint.velocity);
         // TODO: make the position request with position and velocity work
 
         rightMotor.setControl(
             positionRequest
-                .withPosition(currentSetPoint.position)
-                .withVelocity(currentSetPoint.velocity));
+                .withPosition(syncedSetPoint.position)
+                .withVelocity(syncedSetPoint.velocity));
         leftMotor.setControl(
             positionRequest
-                .withPosition(currentSetPoint.position)
-                .withVelocity(currentSetPoint.velocity));
+                .withPosition(syncedSetPoint.position)
+                .withVelocity(syncedSetPoint.velocity));
       }
       default -> {}
     }
