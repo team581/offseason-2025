@@ -54,7 +54,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private final CoastOut coastNeutralRequest = new CoastOut();
   private final VelocityVoltage spinToWin = new VelocityVoltage(0.6);
   private boolean lollipopMode = false;
-  private LinearFilter handoffAdjustmentTxFilter = LinearFilter.movingAverage(7);
+  private final LinearFilter handoffAdjustmentTxFilter = LinearFilter.movingAverage(7);
 
   public void setLollipopMode(boolean lollipopMode) {
     this.lollipopMode = lollipopMode;
