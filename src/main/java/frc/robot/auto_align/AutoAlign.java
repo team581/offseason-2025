@@ -25,10 +25,8 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private static final Translation2d CENTER_OF_REEF_BLUE =
       new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.5));
 
-  private static final DoubleSubscriber OBSTRUCTION_LOOKAHEAD =
-      DogLog.tunable("AutoAlign/ObstructionLookahead", 0.2);
   private static final DoubleSubscriber OBSTRUCTION_DISTANCE =
-      DogLog.tunable("AutoAlign/ObstructionDistance", 1.0);
+      DogLog.tunable("AutoAlign/ObstructionDistance", 0.75);
 
   public static RobotScoringSide getNetScoringSideFromRobotPose(Pose2d robotPose) {
     double robotX = robotPose.getX();
@@ -150,7 +148,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   public ObstructionKind getObstruction() {
     // Account for distance we'll be at once we finish forward motion
-    var lookaheadPose = localization.getLookaheadPose(OBSTRUCTION_LOOKAHEAD.get());
+    var lookaheadPose = localization.getPose();
     var lookaheadPoseDistance =
         lookaheadPose
             .getTranslation()
