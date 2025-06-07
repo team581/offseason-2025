@@ -10,6 +10,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -53,6 +54,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private final CoastOut coastNeutralRequest = new CoastOut();
   private final VelocityVoltage spinToWin = new VelocityVoltage(0.6);
   private boolean lollipopMode = false;
+  private LinearFilter handoffAdjustmentTxFilter = LinearFilter.movingAverage(7);
 
   public void setLollipopMode(boolean lollipopMode) {
     this.lollipopMode = lollipopMode;
@@ -89,7 +91,8 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   }
 
   public void setCoralHandoffOffset(OptionalDouble tx) {
-    handoffOffset = CORAL_TX_TO_ARM_ANGLE_TABLE.get(tx.orElse(0));
+    handoffOffset =
+        CORAL_TX_TO_ARM_ANGLE_TABLE.get(handoffAdjustmentTxFilter.calculate(tx.orElse(0)));
   }
 
   public void setState(ArmState newState) {
