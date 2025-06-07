@@ -239,7 +239,6 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     }
   }
 
-
   public boolean rangeOfMotionGood() {
     return Math.abs(highestSeenAngle - lowestSeenAngle) > MINIMUM_EXPECTED_HOMING_ANGLE_CHANGE;
   }
@@ -252,13 +251,13 @@ public class ArmSubsystem extends StateMachine<ArmState> {
 
   @Override
   protected void beforeTransition(ArmState oldState, ArmState newState) {
-      if (oldState == ArmState.PRE_MATCH_HOMING && newState != ArmState.PRE_MATCH_HOMING) {
-        var actualArmAngle =
-        RobotConfig.get().arm().homingPosition() + (rawMotorAngle - lowestSeenAngle);
-        motor.setPosition(Units.degreesToRotations(actualArmAngle));
-        // Refresh sensor data now that position is set
-        collectInputs();
-      }
+    if (oldState == ArmState.PRE_MATCH_HOMING && newState != ArmState.PRE_MATCH_HOMING) {
+      var actualArmAngle =
+          RobotConfig.get().arm().homingPosition() + (rawMotorAngle - lowestSeenAngle);
+      motor.setPosition(Units.degreesToRotations(actualArmAngle));
+      // Refresh sensor data now that position is set
+      collectInputs();
+    }
   }
 
   @Override
