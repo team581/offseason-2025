@@ -66,8 +66,10 @@ public class Robot extends TimedRobot {
       new VisionSubsystem(
           imu, leftBackLimelight, leftFrontLimelight, rightLimelight, gamePieceDetectionLimelight);
   private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve);
+  private final ArmSubsystem arm = new ArmSubsystem(hardware.armMotor);
+
   private final ElevatorSubsystem elevator =
-      new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor);
+      new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor, arm);
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
   private final RumbleControllerSubsystem rumbleController =
       new RumbleControllerSubsystem(hardware.driverController, true);
@@ -76,7 +78,6 @@ public class Robot extends TimedRobot {
   private final IntakeSubsystem intake =
       new IntakeSubsystem(hardware.intakeMotor, hardware.intakeCandi);
 
-  private final ArmSubsystem arm = new ArmSubsystem(hardware.armMotor);
   private final LightsSubsystem lights = new LightsSubsystem(hardware.candle);
   private final ClimberSubsystem climber =
       new ClimberSubsystem(

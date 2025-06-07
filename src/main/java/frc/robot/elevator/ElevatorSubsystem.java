@@ -31,6 +31,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
 
+  private final ArmSubsystem arm;
+
   private double leftMotorCurrent;
   private double rightMotorCurrent;
 
@@ -61,10 +63,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   TrapezoidProfile.State currentSetPoint = new TrapezoidProfile.State();
   double syncingCoeffecient = 1.0;
 
-  public ElevatorSubsystem(TalonFX leftMotor, TalonFX rightMotor) {
+  public ElevatorSubsystem(TalonFX leftMotor, TalonFX rightMotor, ArmSubsystem arm) {
     super(SubsystemPriority.ELEVATOR, ElevatorState.PRE_MATCH_HOMING);
     this.leftMotor = leftMotor;
     this.rightMotor = rightMotor;
+    this.arm = arm;
     // Motor Configs
     leftMotor.getConfigurator().apply(RobotConfig.get().elevator().leftMotorConfig());
     rightMotor.getConfigurator().apply(RobotConfig.get().elevator().rightMotorConfig());
@@ -155,7 +158,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   }
 
   public void setSyncCoeffecient(double armRotations) {
-    double armProfileTime = ArmSubsystem.getArmProfileTime(armRotations);
+    double armProfileTime = arm.getArmProfileTime(armRotations);
     double elevatorProfileTime = motionProfile.timeLeftUntil(collisionAvoidanceGoal);
     syncingCoeffecient = elevatorProfileTime / armProfileTime;
   }

@@ -56,7 +56,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     DogLog.log("Arm/LollipopMode", lollipopMode);
   }
 
-  private static final TrapezoidProfile motionProfile =
+  private final TrapezoidProfile motionProfile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
               RobotConfig.get().elevator().leftMotorConfig().MotionMagic.MotionMagicCruiseVelocity,
@@ -118,7 +118,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     return collisionAvoidanceGoal;
   }
 
-  public static double getArmProfileTime(double armRotations) {
+  public double getArmProfileTime(double armRotations) {
     return motionProfile.timeLeftUntil(armRotations);
   }
 
