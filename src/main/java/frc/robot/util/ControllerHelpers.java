@@ -9,14 +9,16 @@ public final class ControllerHelpers {
   }
 
   public static Translation2d fromCircularDiscCoordinates(double x, double y) {
-
-    if (Math.abs(x) >= 0.9) {
-      x = Math.copySign(1, x);
+    var rawinputs = new Translation2d(x, y);
+    var magnitude = rawinputs.getNorm();
+    if (Math.abs(magnitude) <= 0.05) {
+      magnitude = 0;
+    } else {
+      if (Math.abs(magnitude) >= 0.9) {
+        magnitude = Math.copySign(1, magnitude);
+      }
     }
-    if (Math.abs(y) >= 0.9) {
-      y = Math.copySign(1, y);
-    }
-    return new Translation2d(x, y);
+    return new Translation2d(magnitude, rawinputs.getAngle());
   }
 
   private ControllerHelpers() {}

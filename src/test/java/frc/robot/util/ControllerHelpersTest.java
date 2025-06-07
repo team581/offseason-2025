@@ -7,9 +7,25 @@ import org.junit.jupiter.api.Test;
 
 public class ControllerHelpersTest {
   @Test
-  void circularDiscCoordinateTest() {
+  void circularDiscCoordinateTestHigh() {
     var result = ControllerHelpers.fromCircularDiscCoordinates(-0.9, -0.9);
     var expected = new Translation2d(-1, -1);
+
+    assertEquals(expected, MathHelpers.roundTo(result, 2));
+  }
+
+  @Test
+  void circularDiscCoordinateTestNormal() {
+    var result = ControllerHelpers.fromCircularDiscCoordinates(0.5, -0.6);
+    var expected = new Translation2d(0.5, -0.6);
+
+    assertEquals(expected, MathHelpers.roundTo(result, 2));
+  }
+
+  @Test
+  void circularDiscCoordinateTestLow() {
+    var result = ControllerHelpers.fromCircularDiscCoordinates(0.05, 0.05);
+    var expected = new Translation2d(0.0, 0.0);
 
     assertEquals(expected, MathHelpers.roundTo(result, 2));
   }

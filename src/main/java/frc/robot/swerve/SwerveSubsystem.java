@@ -339,12 +339,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         ControllerHelpers.fromCircularDiscCoordinates(rawControllerXValue, rawControllerYValue);
     var deadbandX = ControllerHelpers.deadbandJoystickValue(mappedValues.getX(), LEFT_X_DEADBAND);
     var deadbandY = ControllerHelpers.deadbandJoystickValue(mappedValues.getY(), LEFT_Y_DEADBAND);
-    // if(deadbandX > 0.91){
-    //   deadbandX = 1;
-    // }
-    // if(deadbandY > 0.91){
-    //   deadbandY = 1;
-    // }
     return new Translation2d(deadbandX, deadbandY);
   }
 
