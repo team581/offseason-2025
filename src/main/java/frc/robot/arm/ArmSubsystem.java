@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.robot_manager.collision_avoidance.CollisionAvoidance;
@@ -241,26 +242,6 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     }
   }
 
-  @Override
-  protected ArmState getNextState(ArmState currentState) {
-    return switch (currentState) {
-      case PRE_MATCH_HOMING -> {
-        if (DriverStation.isEnabled()) {
-          var actualArmAngle =
-              RobotConfig.get().arm().homingPosition() + (rawMotorAngle - lowestSeenAngle);
-          motor.setPosition(Units.degreesToRotations(actualArmAngle));
-          // Refresh sensor data now that position is set
-          collectInputs();
-
-          yield currentState;
-        }
-
-        yield currentState;
-      }
-      default -> currentState;
-    };
-  }
-
   public boolean rangeOfMotionGood() {
     return Math.abs(highestSeenAngle - lowestSeenAngle) > MINIMUM_EXPECTED_HOMING_ANGLE_CHANGE;
   }
@@ -270,6 +251,17 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private boolean simDidInit = false;
 
   private double usedHandoffAngle = ArmState.CORAL_HANDOFF.getAngle();
+
+  @Override
+  protected void beforeTransition(ArmState oldState, ArmState newState) {
+    if (oldState == ArmState.PRE_MATCH_HOMING && newState != ArmState.PRE_MATCH_HOMING) {
+      var actualArmAngle =
+          RobotConfig.get().arm().homingPosition() + (rawMotorAngle - lowestSeenAngle);
+      motor.setPosition(Units.degreesToRotations(actualArmAngle));
+      // Refresh sensor data now that position is set
+      collectInputs();
+    }
+  }
 
   @Override
   public void simulationPeriodic() {
@@ -313,8 +305,10 @@ public class ArmSubsystem extends StateMachine<ArmState> {
 
   @Override
   public void disabledInit() {
-    // reset position to be 0*
-    var motorSim = motor.getSimState();
-    motorSim.setRawRotorPosition(getRawAngleFromNormalAngle(0, rawMotorAngle));
+    if (RobotBase.isSimulation()) {
+      // reset position to be 0*
+      var motorSim = motor.getSimState();
+      motorSim.setRawRotorPosition(getRawAngleFromNormalAngle(0, rawMotorAngle));
+    }
   }
 }

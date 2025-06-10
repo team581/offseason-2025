@@ -35,7 +35,7 @@ public class FeatureFlags {
   public static final BooleanSupplier AUTO_STOW_ALGAE = FeatureFlag.of("AutoStowAlgaeScore", false);
 
   public static final BooleanSupplier AUTO_ALIGN_AUTO_SCORE =
-      FeatureFlag.of("AutoAlign/AutoScore", false);
+      FeatureFlag.of("AutoAlign/AutoScore", true);
 
   public static final BooleanSupplier SPIN_TO_WIN = FeatureFlag.of("Yapping/SpinToWin", false);
 
