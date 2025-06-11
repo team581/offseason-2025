@@ -104,8 +104,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private ReefPipe bestReefPipe = ReefPipe.PIPE_A;
   private Pose2d usedScoringPose = Pose2d.kZero;
   private ReefSideOffset reefSideOffset = ReefSideOffset.BASE;
-  private PoseErrorTolerance positionTolerance =
-      new PoseErrorTolerance(0.5, 5);
+  private final PoseErrorTolerance positionTolerance = new PoseErrorTolerance(0.5, 5);
 
   public AutoAlign(
       VisionSubsystem vision, LocalizationSubsystem localization, SwerveSubsystem swerve) {
@@ -142,7 +141,8 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   }
 
   public boolean isNearRaisingPoint() {
-   return positionTolerance.atPose(bestReefPipe.getPose(ReefPipeLevel.RAISING, robotScoringSide, robotPose), robotPose);
+    return positionTolerance.atPose(
+        bestReefPipe.getPose(ReefPipeLevel.RAISING, robotScoringSide, robotPose), robotPose);
   }
 
   @Override

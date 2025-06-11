@@ -1213,6 +1213,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
     return isFarEnoughFromReefSide;
   }
+
   private boolean drivingAwayFromReef() {
     var tagCameraOnline = vision.isAnyTagLimelightOnline();
 
@@ -1223,9 +1224,9 @@ public class RobotManager extends StateMachine<RobotState> {
     var isFarEnoughFromReefSide =
         !AutoAlign.isCloseToReefSide(robotPose, nearestReefSide.getPose(robotPose), 0.7);
 
-var speeds = swerve.getTeleopSpeeds();
+    var speeds = swerve.getTeleopSpeeds();
     var isDrivingAway = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > 0.08;
-    return isFarEnoughFromReefSide&&isDrivingAway;
+    return isFarEnoughFromReefSide && isDrivingAway;
   }
 
   public void forceIdleNoGp() {
