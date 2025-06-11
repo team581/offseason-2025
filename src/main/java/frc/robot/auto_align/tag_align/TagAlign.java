@@ -17,6 +17,8 @@ import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
+
+import java.util.Comparator;
 import java.util.Optional;
 
 public class TagAlign {
@@ -160,6 +162,12 @@ public class TagAlign {
       return reefPipeOverride.orElseThrow();
     }
     var level = pipeLevel;
+    var robotPose = localization.getPose();
+    if (pipeLevel.equals(ReefPipeLevel.BACK_AWAY)){
+      return ALL_REEF_PIPES.stream()
+      .min(Comparator.comparingDouble(pipe -> robotPose.getTranslation().getDistance(pipe.getPose(ReefPipeLevel.BACK_AWAY, robotScoringSide, robotPose).getTranslation())))
+      .orElseThrow();
+    }
     if (pipeLevel.equals(ReefPipeLevel.RAISING)) {
       level = preferedScoringLevel;
     }

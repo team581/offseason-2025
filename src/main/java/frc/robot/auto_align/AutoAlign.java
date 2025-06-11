@@ -15,6 +15,7 @@ import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.robot_manager.collision_avoidance.ObstructionKind;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.MathHelpers;
+import frc.robot.util.PoseErrorTolerance;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionSubsystem;
@@ -103,6 +104,8 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private ReefPipe bestReefPipe = ReefPipe.PIPE_A;
   private Pose2d usedScoringPose = Pose2d.kZero;
   private ReefSideOffset reefSideOffset = ReefSideOffset.BASE;
+  private PoseErrorTolerance positionTolerance =
+      new PoseErrorTolerance(0.5, 5);
 
   public AutoAlign(
       VisionSubsystem vision, LocalizationSubsystem localization, SwerveSubsystem swerve) {
@@ -136,6 +139,10 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
             ReefSide.fromPipe(bestReefPipe).getPose(reefSideOffset, robotScoringSide, robotPose));
     var controllerValues = swerve.getControllerValues();
     tagAlign.setControllerValues(controllerValues.getX(), controllerValues.getY());
+  }
+
+  public boolean isNearRaisingPoint() {
+   return positionTolerance.atPose(bestReefPipe.getPose(ReefPipeLevel.RAISING, robotScoringSide, robotPose), robotPose);
   }
 
   @Override

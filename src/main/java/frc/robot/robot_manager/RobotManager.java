@@ -198,6 +198,7 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L2)
                 && arm.nearGoal(ArmState.CORAL_SCORE_LEFT_LINEUP_L2)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
+                && autoAlign.isNearRaisingPoint()
             ? currentState.getLeftApproachToLineupState()
             : currentState;
       }
@@ -205,6 +206,7 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L3)
                 && arm.nearGoal(ArmState.CORAL_SCORE_LEFT_LINEUP_L3)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
+                && autoAlign.isNearRaisingPoint()
             ? currentState.getLeftApproachToLineupState()
             : currentState;
       }
@@ -212,6 +214,7 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L4)
                 && arm.nearGoal(ArmState.CORAL_SCORE_LEFT_LINEUP_L4)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
+                && autoAlign.isNearRaisingPoint()
             ? currentState.getLeftApproachToLineupState()
             : currentState;
       }
@@ -220,6 +223,7 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L2)
                 && arm.nearGoal(ArmState.CORAL_SCORE_RIGHT_LINEUP_L2)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
+                && autoAlign.isNearRaisingPoint()
             ? currentState.getRightApproachToLineupState()
             : currentState;
       }
@@ -227,6 +231,7 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L3)
                 && arm.nearGoal(ArmState.CORAL_SCORE_RIGHT_LINEUP_L3)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
+                && autoAlign.isNearRaisingPoint()
             ? currentState.getRightApproachToLineupState()
             : currentState;
       }
@@ -234,6 +239,7 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L4)
                 && arm.nearGoal(ArmState.CORAL_SCORE_RIGHT_LINEUP_L4)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
+                && autoAlign.isNearRaisingPoint()
             ? currentState.getRightApproachToLineupState()
             : currentState;
       }
@@ -247,7 +253,7 @@ public class RobotManager extends StateMachine<RobotState> {
           CORAL_L4_RIGHT_RELEASE -> {
         if (DriverStation.isTeleop()) {
           // In teleop, we go to CLAW_EMPTY when you drive away or if we know the score succeeded
-          if (cameraOnlineAndFarEnoughFromReef()) {
+          if (drivingAwayFromReef()) {
             yield RobotState.CLAW_EMPTY;
           }
         }
@@ -1203,9 +1209,23 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     var isFarEnoughFromReefSide =
-        !AutoAlign.isCloseToReefSide(robotPose, nearestReefSide.getPose(robotPose), 1.4);
+        !AutoAlign.isCloseToReefSide(robotPose, nearestReefSide.getPose(robotPose), 1.0);
 
     return isFarEnoughFromReefSide;
+  }
+  private boolean drivingAwayFromReef() {
+    var tagCameraOnline = vision.isAnyTagLimelightOnline();
+
+    if (!tagCameraOnline) {
+      return timeout(1.0);
+    }
+
+    var isFarEnoughFromReefSide =
+        !AutoAlign.isCloseToReefSide(robotPose, nearestReefSide.getPose(robotPose), 0.7);
+
+var speeds = swerve.getTeleopSpeeds();
+    var isDrivingAway = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > 0.08;
+    return isFarEnoughFromReefSide&&isDrivingAway;
   }
 
   public void forceIdleNoGp() {
