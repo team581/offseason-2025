@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
   private final IntakeSubsystem intake =
       new IntakeSubsystem(hardware.intakeMotor, hardware.intakeCandi);
 
-  private final ArmSubsystem arm = new ArmSubsystem(hardware.armMotor);
+  private final ArmSubsystem arm = new ArmSubsystem(hardware.armMotor, elevator);
   private final LightsSubsystem lights = new LightsSubsystem(hardware.candle);
   private final ClimberSubsystem climber =
       new ClimberSubsystem(
