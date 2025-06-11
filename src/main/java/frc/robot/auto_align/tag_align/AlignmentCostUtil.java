@@ -1,7 +1,5 @@
 package frc.robot.auto_align.tag_align;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.ReefPipe;
@@ -52,10 +50,8 @@ public class AlignmentCostUtil {
     if (vec.getNorm() == 0.0) {
       return target.getDistance(robotPose);
     }
-    var distanceCost =
-        target.getDistance(
-            robotPose.plus(vec.times(0.02)));
-                    // One loop of lookahead
+    var distanceCost = target.getDistance(robotPose.plus(vec.times(0.02)));
+    // One loop of lookahead
 
     if (target.equals(Translation2d.kZero) || robotPose.equals(Translation2d.kZero)) {
       return distanceCost;
