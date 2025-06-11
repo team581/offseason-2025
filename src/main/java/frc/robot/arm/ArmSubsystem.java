@@ -61,7 +61,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private boolean elevatorIsGoingDown = false;
   private boolean elevatorIsGoingDownDebounced = false;
   private double previousElevatorHeight = Double.POSITIVE_INFINITY;
-  private Debouncer debouncer = new Debouncer(0.5, DebounceType.kBoth);
+  private final Debouncer debouncer = new Debouncer(0.5, DebounceType.kBoth);
 
   public void setLollipopMode(boolean lollipopMode) {
     this.lollipopMode = lollipopMode;
