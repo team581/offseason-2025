@@ -68,8 +68,10 @@ public class CoralMap extends StateMachine<CoralMapState> {
   private final Comparator<Pose2d> bestCoralComparator =
       Comparator.comparingDouble(
           target ->
-              AlignmentCostUtil.getCoralAlignCost(
-                  target, localization.getPose(), swerve.getFieldRelativeSpeeds()));
+              AlignmentCostUtil.getAlignCostLookahead(
+                  target.getTranslation(),
+                  localization.getPose().getTranslation(),
+                  swerve.getFieldRelativeSpeeds()));
 
   private Optional<Pose2d> filteredLollipopPose = Optional.empty();
   private double lastLollipopTime = 0.0;

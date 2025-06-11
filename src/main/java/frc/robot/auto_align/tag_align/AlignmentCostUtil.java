@@ -1,6 +1,7 @@
 package frc.robot.auto_align.tag_align;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.ReefPipe;
@@ -45,24 +46,26 @@ public class AlignmentCostUtil {
     return distanceCost + driveAngleCost;
   }
 
-  public static double getCoralAlignCost(
-      Pose2d target, Pose2d robotPose, ChassisSpeeds robotVelocity) {
+  public static double getAlignCostLookahead(
+      Translation2d target, Translation2d robotPose, ChassisSpeeds robotVelocity) {
+    var vec = new Translation2d(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
+    if (vec.getNorm() == 0.0) {
+      return target.getDistance(robotPose);
+    }
+    var distanceCost =
+        target.getDistance(
+            robotPose.plus(vec.times(0.02)));
+                    // One loop of lookahead
 
-    var distanceCost = target.getTranslation().getDistance(robotPose.getTranslation());
-    if (target.getTranslation().equals(Translation2d.kZero)
-        || robotPose.getTranslation().equals(Translation2d.kZero)) {
+    if (target.equals(Translation2d.kZero) || robotPose.equals(Translation2d.kZero)) {
       return distanceCost;
     }
 
-    if (Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond) == 0.0) {
-      return distanceCost;
-    }
-
-    var targetRobotRelative = target.getTranslation().minus(robotPose.getTranslation());
+    var targetRobotRelative = target.minus(robotPose);
     var targetDirection = targetRobotRelative.getAngle();
 
     var driveAngleCost =
-        ANGLE_DIFFERENCE_SCALAR_CORAL
+        ANGLE_DIFFERENCE_SCALAR
             * Math.abs(
                 targetDirection.minus(MathHelpers.vectorDirection(robotVelocity)).getRadians());
     return distanceCost + driveAngleCost;
@@ -92,7 +95,7 @@ public class AlignmentCostUtil {
     alignCostComparator =
         Comparator.comparingDouble(
             translation ->
-                getAlignCost(
+                getAlignCostLookahead(
                     translation,
                     localization.getPose().getTranslation(),
                     swerve.getFieldRelativeSpeeds()));
@@ -116,7 +119,7 @@ public class AlignmentCostUtil {
   private Comparator<ReefPipe> createReefPipeComparator(ReefPipeLevel level) {
     return Comparator.comparingDouble(
         pipe ->
-            getAlignCost(
+            getAlignCostLookahead(
                     pipe.getPose(level, side, localization.getPose()).getTranslation(),
                     localization.getPose().getTranslation(),
                     swerve.getTeleopSpeeds())
