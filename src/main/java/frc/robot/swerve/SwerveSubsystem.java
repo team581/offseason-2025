@@ -271,9 +271,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
 
-      if(Timer.getFPGATimestamp()
-                  - (odometryCalibrationStartingTimestamp + ODOMETRY_CALIBRATION_SETTLE_TIME)
-              < ODOMETRY_CALIBRATION_TIME) {
+      if (Timer.getFPGATimestamp()
+              - (odometryCalibrationStartingTimestamp + ODOMETRY_CALIBRATION_SETTLE_TIME)
+          < ODOMETRY_CALIBRATION_TIME) {
 
         var rotation = Rotation2d.fromDegrees(drivetrainPigeon.getYaw().getValueAsDouble());
         gyroDelta += Math.abs(rotation.minus(lastGyroRotation).getRadians());
@@ -294,7 +294,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
         DogLog.log("Swerve/OdometryCalculation/RunningEstimates/WheelDelta", wheelDelta);
         DogLog.log("Swerve/OdometryCalculation/RunningEstimates/WheelRadius", wheelRadius);
-    } else if (!publishedOdomCalResult){
+      } else if (!publishedOdomCalResult) {
 
         double[] positions = new double[4];
         for (int i = 0; i < 4; i++) {
@@ -313,17 +313,17 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         DogLog.log("Swerve/OdometryCalculation/WheelRadiusMeters", wheelRadius);
         DogLog.log(
             "Swerve/OdometryCalculation/WheelRadiusInches", Units.metersToInches(wheelRadius));
-            publishedOdomCalResult=true;
+        publishedOdomCalResult = true;
       }
     } else {
       if (publishedOdomCalResult) {
-    odometryCalibrationSettled = false; // for odometry calibration
-     odometryCalibrationPositions = new double[4]; // for odometry calibration
-         lastGyroRotation = Rotation2d.kZero;
- gyroDelta = 0.0;
-    odometryCalibrationStartingTimestampUpdated = false;
- odometryCalibrationStartingTimestamp = 0.0;
-   publishedOdomCalResult = false;
+        odometryCalibrationSettled = false; // for odometry calibration
+        odometryCalibrationPositions = new double[4]; // for odometry calibration
+        lastGyroRotation = Rotation2d.kZero;
+        gyroDelta = 0.0;
+        odometryCalibrationStartingTimestampUpdated = false;
+        odometryCalibrationStartingTimestamp = 0.0;
+        publishedOdomCalResult = false;
       }
     }
   }
