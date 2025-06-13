@@ -14,10 +14,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.CompBotTunerConstants;
@@ -37,6 +39,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private static final double LEFT_X_DEADBAND = 0.05;
   private static final double LEFT_Y_DEADBAND = 0.05;
   private static final double RIGHT_X_DEADBAND = 0.15;
+  private static final DoubleSubscriber ODOMETRY_CALIBRAITON_ROTATION_SPEED =
+      DogLog.tunable("Swerve/OdomCalSpeed", 0.5); // in radians per second
 
   private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
 
@@ -45,6 +49,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   private static final InterpolatingDoubleTreeMap ELEVATOR_HEIGHT_TO_SLOW_MODE =
       InterpolatingDoubleTreeMap.ofEntries(Map.entry(0.0, 1.0));
+
+  private static final double ODOMETRY_CALIBRATION_SETTLE_TIME = 1.0; // seconds
+  private static final double ODOMETRY_CALIBRATION_TIME = 30.0; // seconds
 
   public final TunerSwerveDrivetrain drivetrain =
       RobotConfig.IS_PRACTICE_BOT
@@ -78,6 +85,14 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
           .withHeadingPID(
               ORIGINAL_HEADING_PID.getP(), ORIGINAL_HEADING_PID.getI(), ORIGINAL_HEADING_PID.getD())
           .withMaxAbsRotationalRate(maxAngularRate);
+
+  private boolean odometryCalibrationSettled = false; // for odometry calibration
+  private double[] odometryCalibrationPositions = new double[4]; // for odometry calibration
+  private Rotation2d lastGyroRotation = Rotation2d.kZero;
+  private double gyroDelta = 0.0;
+  private boolean odometryCalibrationStartingTimestampUpdated = false;
+  private double odometryCalibrationStartingTimestamp = 0.0;
+  private boolean publishedOdomCalResult = false;
 
   private double lastSimTime;
   private Notifier simNotifier = null;
@@ -159,6 +174,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   @Override
   protected SwerveState getNextState(SwerveState currentState) {
+    if (FeatureFlags.ODOMETRY_CALIBRATION_MODE.getAsBoolean()) {
+      return SwerveState.ODOMETRY_CALIBRATION;
+    }
     // Ensure that we are in an auto state during auto, and a teleop state during teleop
     return switch (currentState) {
       case AUTO, TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP;
@@ -167,6 +185,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       case AUTO_SNAPS, TELEOP_SNAPS ->
           DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.TELEOP_SNAPS;
       case CLIMBING -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.CLIMBING;
+      case ODOMETRY_CALIBRATION ->
+          FeatureFlags.ODOMETRY_CALIBRATION_MODE.getAsBoolean()
+              ? SwerveState.ODOMETRY_CALIBRATION
+              : (DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP);
     };
   }
 
@@ -208,14 +230,11 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/LeftX", leftX);
     DogLog.log("Swerve/LeftY", leftY);
     DogLog.log("Swerve/RightX", rightX);
-    Translation2d mappedpose = ControllerHelpers.fromCircularDiscCoordinates(leftX, leftY);
-    double mappedX = mappedpose.getX();
-    double mappedY = mappedpose.getY();
 
     teleopSpeeds =
         new ChassisSpeeds(
-            -1.0 * mappedY * MaxSpeed * teleopSlowModePercent,
-            mappedX * MaxSpeed * teleopSlowModePercent,
+            -1.0 * leftY * MaxSpeed * teleopSlowModePercent,
+            leftX * MaxSpeed * teleopSlowModePercent,
             rightX * TELEOP_MAX_ANGULAR_RATE.getRadians() * teleopSlowModePercent);
 
     sendSwerveRequest();
@@ -227,6 +246,86 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
     teleopSlowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
+
+    if (getState().equals(SwerveState.ODOMETRY_CALIBRATION)) {
+      if (!odometryCalibrationStartingTimestampUpdated) {
+        odometryCalibrationStartingTimestamp = Timer.getFPGATimestamp();
+        odometryCalibrationStartingTimestampUpdated = true;
+      }
+
+      if (!odometryCalibrationSettled) {
+
+        DogLog.log("Swerve/OdometryCalculation/Progress", "WARMING UP");
+        if (Timer.getFPGATimestamp() - odometryCalibrationStartingTimestamp
+            >= ODOMETRY_CALIBRATION_SETTLE_TIME) {
+
+          for (int i = 0; i < 4; i++) {
+            odometryCalibrationPositions[i] =
+                drivetrain.getModule(i).getDriveMotor().getPosition().getValueAsDouble();
+          }
+          lastGyroRotation = Rotation2d.fromDegrees(drivetrainPigeon.getYaw().getValueAsDouble());
+          gyroDelta = 0.0;
+          odometryCalibrationSettled = true;
+        } else {
+          return;
+        }
+      }
+
+      if(Timer.getFPGATimestamp()
+                  - (odometryCalibrationStartingTimestamp + ODOMETRY_CALIBRATION_SETTLE_TIME)
+              < ODOMETRY_CALIBRATION_TIME) {
+
+        var rotation = Rotation2d.fromDegrees(drivetrainPigeon.getYaw().getValueAsDouble());
+        gyroDelta += Math.abs(rotation.minus(lastGyroRotation).getRadians());
+        lastGyroRotation = rotation;
+
+        double[] positions = new double[4];
+        for (int i = 0; i < 4; i++) {
+          positions[i] = drivetrain.getModule(i).getDriveMotor().getPosition().getValueAsDouble();
+        }
+        double wheelDelta = 0.0;
+        for (int i = 0; i < 4; i++) {
+          wheelDelta += Math.abs(positions[i] - odometryCalibrationPositions[i]) / 4.0;
+        }
+        double wheelRadius =
+            (gyroDelta * RobotConfig.get().swerve().driveBaseRadius()) / wheelDelta;
+
+        DogLog.log("Swerve/OdometryCalculation/Progress", "CALIBRATING");
+
+        DogLog.log("Swerve/OdometryCalculation/RunningEstimates/WheelDelta", wheelDelta);
+        DogLog.log("Swerve/OdometryCalculation/RunningEstimates/WheelRadius", wheelRadius);
+    } else if (!publishedOdomCalResult){
+
+        double[] positions = new double[4];
+        for (int i = 0; i < 4; i++) {
+          positions[i] = drivetrain.getModule(i).getDriveMotor().getPosition().getValueAsDouble();
+        }
+        double wheelDelta = 0.0;
+        for (int i = 0; i < 4; i++) {
+          wheelDelta += Math.abs(positions[i] - odometryCalibrationPositions[i]) / 4.0;
+        }
+        double wheelRadius =
+            (gyroDelta * RobotConfig.get().swerve().driveBaseRadius()) / wheelDelta;
+
+        DogLog.log("Swerve/OdometryCalculation/Progress", "DONE");
+        DogLog.log("Swerve/OdometryCalculation/WheelDelta", wheelDelta);
+        DogLog.log("Swerve/OdometryCalculation/GyroDelta", Units.radiansToDegrees(gyroDelta));
+        DogLog.log("Swerve/OdometryCalculation/WheelRadiusMeters", wheelRadius);
+        DogLog.log(
+            "Swerve/OdometryCalculation/WheelRadiusInches", Units.metersToInches(wheelRadius));
+            publishedOdomCalResult=true;
+      }
+    } else {
+      if (publishedOdomCalResult) {
+    odometryCalibrationSettled = false; // for odometry calibration
+     odometryCalibrationPositions = new double[4]; // for odometry calibration
+         lastGyroRotation = Rotation2d.kZero;
+ gyroDelta = 0.0;
+    odometryCalibrationStartingTimestampUpdated = false;
+ odometryCalibrationStartingTimestamp = 0.0;
+   publishedOdomCalResult = false;
+      }
+    }
   }
 
   public ChassisSpeeds getTeleopSpeeds() {
@@ -321,10 +420,21 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
+      case ODOMETRY_CALIBRATION -> {
+        drivetrain.setControl(
+            drive
+                .withVelocityX(0)
+                .withVelocityY(0)
+                .withRotationalRate(ODOMETRY_CALIBRAITON_ROTATION_SPEED.get())
+                .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+      }
     }
   }
 
   public void normalDriveRequest() {
+    if (getState() == SwerveState.ODOMETRY_CALIBRATION) {
+      return;
+    }
     if (DriverStation.isAutonomous()) {
       setStateFromRequest(SwerveState.AUTO);
     } else {

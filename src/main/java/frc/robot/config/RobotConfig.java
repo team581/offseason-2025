@@ -49,7 +49,8 @@ public record RobotConfig(
       PhoenixPIDController snapController,
       boolean invertRotation,
       boolean invertX,
-      boolean invertY) {}
+      boolean invertY,
+      double driveBaseRadius) {}
 
   public record VisionConfig(
       double xyStdDev,

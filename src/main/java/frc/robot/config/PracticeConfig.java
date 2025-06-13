@@ -127,7 +127,7 @@ class PracticeConfig {
                       new TorqueCurrentConfigs()
                           .withPeakForwardTorqueCurrent(70.0)
                           .withPeakReverseTorqueCurrent(70.0))),
-          new SwerveConfig(new PhoenixPIDController(5.75, 0, 0), true, true, true),
+          new SwerveConfig(new PhoenixPIDController(5.75, 0, 0), true, true, true,0.4310522938119),
           new VisionConfig(
               0.01,
               Double.MAX_VALUE,
