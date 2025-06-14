@@ -81,7 +81,7 @@ public class TagAlign {
     if (pipeSwitchActive) {
       return;
     }
-    if ((Math.hypot(rawControllerXValue, rawControllerYValue)>0.5)) {
+    if ((Math.hypot(rawControllerXValue, rawControllerYValue) > 0.5)) {
       var storedPipe = getBestPipe();
       pipeSwitchActive = true;
       lastPipeSwitchTimestamp = Timer.getFPGATimestamp();
@@ -101,10 +101,9 @@ public class TagAlign {
             case PIPE_L -> ReefPipe.PIPE_K;
           };
 
-
-        setPipeOveride(partnerPipe);
-
-  }}
+      setPipeOveride(partnerPipe);
+    }
+  }
 
   public boolean isAligned(ReefPipe pipe) {
     if (pipeLevel.equals(ReefPipeLevel.RAISING) || pipeLevel.equals(ReefPipeLevel.BACK_AWAY)) {

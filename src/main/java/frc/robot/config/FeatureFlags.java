@@ -37,20 +37,19 @@ public class FeatureFlags {
   public static final BooleanSupplier AUTO_ALIGN_AUTO_SCORE =
       FeatureFlag.of("AutoAlign/AutoScore", true);
 
-      public static final BooleanSupplier AUTO_ALIGN_DISTANCE_COST =
+  public static final BooleanSupplier AUTO_ALIGN_DISTANCE_COST =
       FeatureFlag.of("AutoAlign/Costs/Distance", true);
-      public static final BooleanSupplier AUTO_ALIGN_DRIVE_DIRECTION_COST =
+  public static final BooleanSupplier AUTO_ALIGN_DRIVE_DIRECTION_COST =
       FeatureFlag.of("AutoAlign/Costs/DriveDirection", true);
-      public static final BooleanSupplier AUTO_ALIGN_HEADING_COST =
+  public static final BooleanSupplier AUTO_ALIGN_HEADING_COST =
       FeatureFlag.of("AutoAlign/Costs/Heading", true);
-      public static final BooleanSupplier AUTO_ALIGN_REEF_STATE_COST =
+  public static final BooleanSupplier AUTO_ALIGN_REEF_STATE_COST =
       FeatureFlag.of("AutoAlign/Costs/ReefState", true);
 
   public static final BooleanSupplier SPIN_TO_WIN = FeatureFlag.of("Yapping/SpinToWin", false);
 
   public static final BooleanSupplier USE_ANY_REEF_TAG =
       FeatureFlag.of("Vision/UseAnyReefTag", true);
-
 
   private FeatureFlags() {}
 }
