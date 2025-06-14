@@ -32,6 +32,7 @@ import frc.robot.util.state_machines.StateMachine;
 import java.util.Map;
 
 public class SwerveSubsystem extends StateMachine<SwerveState> {
+  private static final double ODOMETRY_CALIBRATION_STOPPED_TIME = 0.1;
   public static final double MaxSpeed = 4.75;
   private static final double maxAngularRate = Units.rotationsToRadians(4);
   private static final Rotation2d TELEOP_MAX_ANGULAR_RATE = Rotation2d.fromRotations(2);
@@ -51,7 +52,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       InterpolatingDoubleTreeMap.ofEntries(Map.entry(0.0, 1.0));
 
   private static final double ODOMETRY_CALIBRATION_SETTLE_TIME = 1.0; // seconds
-  private static final double ODOMETRY_CALIBRATION_TIME = 30.0; // seconds
+  private static final double ODOMETRY_CALIBRATION_TIME = 10.0; // seconds
 
   public final TunerSwerveDrivetrain drivetrain =
       RobotConfig.IS_PRACTICE_BOT
@@ -425,7 +426,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
             drive
                 .withVelocityX(0)
                 .withVelocityY(0)
-                .withRotationalRate(ODOMETRY_CALIBRAITON_ROTATION_SPEED.get())
+                .withRotationalRate((Timer.getFPGATimestamp()
+                - (odometryCalibrationStartingTimestamp + ODOMETRY_CALIBRATION_SETTLE_TIME)
+            < (ODOMETRY_CALIBRATION_TIME-ODOMETRY_CALIBRATION_STOPPED_TIME))?ODOMETRY_CALIBRAITON_ROTATION_SPEED.get(): 0.0)
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       }
     }
