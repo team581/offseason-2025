@@ -29,6 +29,9 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private static final DoubleSubscriber OBSTRUCTION_DISTANCE =
       DogLog.tunable("AutoAlign/ObstructionDistance", 0.75);
 
+      private final PoseErrorTolerance positionTolerance = new PoseErrorTolerance(0.2, 4);
+
+
   public static RobotScoringSide getNetScoringSideFromRobotPose(Pose2d robotPose) {
     double robotX = robotPose.getX();
     double theta = MathHelpers.angleModulus(robotPose.getRotation().getDegrees());
@@ -104,7 +107,6 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private ReefPipe bestReefPipe = ReefPipe.PIPE_A;
   private Pose2d usedScoringPose = Pose2d.kZero;
   private ReefSideOffset reefSideOffset = ReefSideOffset.BASE;
-  private final PoseErrorTolerance positionTolerance = new PoseErrorTolerance(0.5, 5);
 
   public AutoAlign(
       VisionSubsystem vision, LocalizationSubsystem localization, SwerveSubsystem swerve) {
