@@ -1,6 +1,6 @@
 package frc.robot;
 
-import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.CANrange;
