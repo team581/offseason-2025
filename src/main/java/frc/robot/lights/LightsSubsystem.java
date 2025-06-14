@@ -3,8 +3,6 @@ package frc.robot.lights;
 import com.ctre.phoenix6.controls.SolidColor;
 import com.ctre.phoenix6.controls.StrobeAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
-import com.ctre.phoenix6.signals.RGBWColor;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,8 +11,8 @@ import frc.robot.util.state_machines.StateMachine;
 
 public class LightsSubsystem extends StateMachine<LightsState> {
   private final CANdle candle;
-  private SolidColor solidColorRequest = new SolidColor(0, 0);
-  private StrobeAnimation blink = new StrobeAnimation(0, 399);
+  private final SolidColor solidColorRequest = new SolidColor(0, 0);
+  private final StrobeAnimation blink = new StrobeAnimation(0, 399);
 
   private final Timer blinkTimer = new Timer();
   private LightsState storedState = LightsState.IDLE_EMPTY;
@@ -53,7 +51,8 @@ public class LightsSubsystem extends StateMachine<LightsState> {
     if (usedState.pattern == BlinkPattern.SOLID) {
       candle.setControl(solidColorRequest.withColor(usedState.getRGBWColor()));
     } else {
-      candle.setControl(blink.withColor(usedState.getRGBWColor()).withFrameRate(1/usedState.pattern.duration));
+      candle.setControl(
+          blink.withColor(usedState.getRGBWColor()).withFrameRate(1 / usedState.pattern.duration));
     }
   }
 

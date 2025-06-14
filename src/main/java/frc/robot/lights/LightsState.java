@@ -1,7 +1,6 @@
 package frc.robot.lights;
 
 import com.ctre.phoenix6.signals.RGBWColor;
-
 import edu.wpi.first.wpilibj.util.Color;
 
 public enum LightsState {
