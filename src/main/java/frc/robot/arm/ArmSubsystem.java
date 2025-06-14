@@ -10,6 +10,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
+import frc.robot.elevator.ElevatorSubsystem;
 import frc.robot.robot_manager.collision_avoidance.CollisionAvoidance;
 import frc.robot.robot_manager.collision_avoidance.ObstructionKind;
 import frc.robot.robot_manager.collision_avoidance.ObstructionStrategy;
@@ -55,6 +58,11 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private final CoastOut coastNeutralRequest = new CoastOut();
   private final VelocityVoltage spinToWin = new VelocityVoltage(0.6);
   private boolean lollipopMode = false;
+  private final ElevatorSubsystem elevator;
+  private boolean elevatorIsGoingDown = false;
+  private boolean elevatorIsGoingDownDebounced = false;
+  private double previousElevatorHeight = Double.POSITIVE_INFINITY;
+  private final Debouncer debouncer = new Debouncer(0.5, DebounceType.kBoth);
   private final LinearFilter handoffAdjustmentTxFilter = LinearFilter.movingAverage(7);
 
   public void setLollipopMode(boolean lollipopMode) {
@@ -72,11 +80,12 @@ public class ArmSubsystem extends StateMachine<ArmState> {
       new PositionVoltage(Units.degreesToRotations(ArmState.ALGAE_FLING_SWING.getAngle()))
           .withVelocity(Units.degreesToRotations(90));
 
-  public ArmSubsystem(TalonFX motor) {
+  public ArmSubsystem(TalonFX motor, ElevatorSubsystem elevator) {
     super(SubsystemPriority.ARM, ArmState.PRE_MATCH_HOMING);
     motor.getConfigurator().apply(RobotConfig.get().arm().motorConfig());
 
     this.motor = motor;
+    this.elevator = elevator;
 
     // In field calibration mode, boot arm to lower hardstop angle
     if (FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
@@ -185,9 +194,20 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     usedHandoffAngle = ArmState.CORAL_HANDOFF.getAngle() + handoffOffset;
     rawMotorAngle = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
     motorAngle = MathHelpers.angleModulus(rawMotorAngle);
+
     if (DriverStation.isDisabled()) {
+      elevatorIsGoingDown = elevator.getHeight() < previousElevatorHeight;
+      elevatorIsGoingDownDebounced = debouncer.calculate(elevatorIsGoingDown);
+
+      // If elevator is going down, reset these values
+      if (elevatorIsGoingDownDebounced) {
+        lowestSeenAngle = Double.POSITIVE_INFINITY;
+      }
+
       lowestSeenAngle = Math.min(lowestSeenAngle, rawMotorAngle);
       highestSeenAngle = Math.max(highestSeenAngle, rawMotorAngle);
+
+      previousElevatorHeight = elevator.getHeight();
     }
 
     motorCurrent = motor.getStatorCurrent().getValueAsDouble();
@@ -207,6 +227,8 @@ public class ArmSubsystem extends StateMachine<ArmState> {
     if (DriverStation.isDisabled()) {
       DogLog.log("Arm/LowestAngle", lowestSeenAngle);
       DogLog.log("Arm/HighestAngle", highestSeenAngle);
+      DogLog.log("Arm/ElevatorIsGoingDown", elevatorIsGoingDown);
+      DogLog.log("Arm/ElevatorIsGoingDownDebounced", elevatorIsGoingDownDebounced);
     }
     if (rangeOfMotionGood()) {
       DogLog.clearFault("Arm not seen range of motion");
