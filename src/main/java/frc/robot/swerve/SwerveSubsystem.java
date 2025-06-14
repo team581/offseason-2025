@@ -426,9 +426,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
             drive
                 .withVelocityX(0)
                 .withVelocityY(0)
-                .withRotationalRate((Timer.getFPGATimestamp()
-                - (odometryCalibrationStartingTimestamp + ODOMETRY_CALIBRATION_SETTLE_TIME)
-            < (ODOMETRY_CALIBRATION_TIME-ODOMETRY_CALIBRATION_STOPPED_TIME))?ODOMETRY_CALIBRAITON_ROTATION_SPEED.get(): 0.0)
+                .withRotationalRate(
+                    (Timer.getFPGATimestamp()
+                                - (odometryCalibrationStartingTimestamp
+                                    + ODOMETRY_CALIBRATION_SETTLE_TIME)
+                            < (ODOMETRY_CALIBRATION_TIME - ODOMETRY_CALIBRATION_STOPPED_TIME))
+                        ? ODOMETRY_CALIBRAITON_ROTATION_SPEED.get()
+                        : 0.0)
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       }
     }
