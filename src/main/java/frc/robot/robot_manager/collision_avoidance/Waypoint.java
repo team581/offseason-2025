@@ -43,16 +43,16 @@ public enum Waypoint {
       new SuperstructurePosition(ElevatorState.CORAL_SCORE_LINEUP_L4, ArmState.HOLDING_UPRIGHT)),
   L2_RIGHT_ARM(
       new SuperstructurePosition(
-          ElevatorState.PRE_CORAL_HANDOFF, ArmState.CORAL_SCORE_RIGHT_LINEUP_L2.getAngle()-60)),
+          ElevatorState.PRE_CORAL_HANDOFF, ArmState.CORAL_SCORE_RIGHT_LINEUP_L2.getAngle() - 60)),
   L2_LEFT_ARM(
       new SuperstructurePosition(
-          ElevatorState.PRE_CORAL_HANDOFF, ArmState.CORAL_SCORE_LEFT_LINEUP_L2.getAngle()+60)),
+          ElevatorState.PRE_CORAL_HANDOFF, ArmState.CORAL_SCORE_LEFT_LINEUP_L2.getAngle() + 60)),
   L3_RIGHT_ARM(
       new SuperstructurePosition(
-          ElevatorState.PRE_CORAL_HANDOFF, ArmState.CORAL_SCORE_RIGHT_LINEUP_L3.getAngle()-60)),
+          ElevatorState.PRE_CORAL_HANDOFF, ArmState.CORAL_SCORE_RIGHT_LINEUP_L3.getAngle() - 60)),
   L3_LEFT_ARM(
       new SuperstructurePosition(
-          ElevatorState.PRE_CORAL_HANDOFF, ArmState.CORAL_SCORE_LEFT_LINEUP_L3.getAngle()+60)),
+          ElevatorState.PRE_CORAL_HANDOFF, ArmState.CORAL_SCORE_LEFT_LINEUP_L3.getAngle() + 60)),
 
   L1_RIGHT_LINEUP(
       new SuperstructurePosition(

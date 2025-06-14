@@ -29,8 +29,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private static final DoubleSubscriber OBSTRUCTION_DISTANCE =
       DogLog.tunable("AutoAlign/ObstructionDistance", 0.75);
 
-      private final PoseErrorTolerance positionTolerance = new PoseErrorTolerance(0.2, 4);
-
+  private final PoseErrorTolerance positionTolerance = new PoseErrorTolerance(0.2, 4);
 
   public static RobotScoringSide getNetScoringSideFromRobotPose(Pose2d robotPose) {
     double robotX = robotPose.getX();
