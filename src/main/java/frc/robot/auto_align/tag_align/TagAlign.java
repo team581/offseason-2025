@@ -17,6 +17,7 @@ import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
+import java.util.Comparator;
 import java.util.Optional;
 
 public class TagAlign {
@@ -30,7 +31,7 @@ public class TagAlign {
   private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedRotation", 5.0);
 
-  private static final double PIPE_SWITCH_TIMEOUT = 1.0;
+  private static final double PIPE_SWITCH_TIMEOUT = 0.5;
 
   private final AlignmentCostUtil alignmentCostUtil;
   private final LocalizationSubsystem localization;
@@ -80,46 +81,27 @@ public class TagAlign {
     if (pipeSwitchActive) {
       return;
     }
-    if ((rawControllerXValue < -0.98 || rawControllerXValue > 0.98)) {
+    if ((Math.hypot(rawControllerXValue, rawControllerYValue) > 0.5)) {
       var storedPipe = getBestPipe();
       pipeSwitchActive = true;
       lastPipeSwitchTimestamp = Timer.getFPGATimestamp();
-      ReefPipe leftPipe =
-          switch (storedPipe) {
-            case PIPE_A -> ReefPipe.PIPE_L;
-            case PIPE_B -> ReefPipe.PIPE_A;
-            case PIPE_C -> ReefPipe.PIPE_B;
-            case PIPE_D -> ReefPipe.PIPE_C;
-            case PIPE_E -> ReefPipe.PIPE_F;
-            case PIPE_F -> ReefPipe.PIPE_G;
-            case PIPE_G -> ReefPipe.PIPE_H;
-            case PIPE_H -> ReefPipe.PIPE_I;
-            case PIPE_I -> ReefPipe.PIPE_J;
-            case PIPE_J -> ReefPipe.PIPE_K;
-            case PIPE_K -> ReefPipe.PIPE_J;
-            case PIPE_L -> ReefPipe.PIPE_K;
-          };
-      ReefPipe rightPipe =
+      ReefPipe partnerPipe =
           switch (storedPipe) {
             case PIPE_A -> ReefPipe.PIPE_B;
-            case PIPE_B -> ReefPipe.PIPE_C;
+            case PIPE_B -> ReefPipe.PIPE_A;
             case PIPE_C -> ReefPipe.PIPE_D;
-            case PIPE_D -> ReefPipe.PIPE_E;
-            case PIPE_E -> ReefPipe.PIPE_D;
+            case PIPE_D -> ReefPipe.PIPE_C;
+            case PIPE_E -> ReefPipe.PIPE_F;
             case PIPE_F -> ReefPipe.PIPE_E;
-            case PIPE_G -> ReefPipe.PIPE_F;
+            case PIPE_G -> ReefPipe.PIPE_H;
             case PIPE_H -> ReefPipe.PIPE_G;
-            case PIPE_I -> ReefPipe.PIPE_H;
+            case PIPE_I -> ReefPipe.PIPE_J;
             case PIPE_J -> ReefPipe.PIPE_I;
             case PIPE_K -> ReefPipe.PIPE_L;
-            case PIPE_L -> ReefPipe.PIPE_A;
+            case PIPE_L -> ReefPipe.PIPE_K;
           };
 
-      if (rawControllerXValue < -0.98) {
-        setPipeOveride(leftPipe);
-      } else if (rawControllerXValue > 0.98) {
-        setPipeOveride(rightPipe);
-      }
+      setPipeOveride(partnerPipe);
     }
   }
 
@@ -160,6 +142,19 @@ public class TagAlign {
       return reefPipeOverride.orElseThrow();
     }
     var level = pipeLevel;
+    var robotPose = localization.getPose();
+    if (pipeLevel.equals(ReefPipeLevel.BACK_AWAY)) {
+      return ALL_REEF_PIPES.stream()
+          .min(
+              Comparator.comparingDouble(
+                  pipe ->
+                      robotPose
+                          .getTranslation()
+                          .getDistance(
+                              pipe.getPose(ReefPipeLevel.BACK_AWAY, robotScoringSide, robotPose)
+                                  .getTranslation())))
+          .orElseThrow();
+    }
     if (pipeLevel.equals(ReefPipeLevel.RAISING)) {
       level = preferedScoringLevel;
     }

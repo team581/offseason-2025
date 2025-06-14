@@ -12,6 +12,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -62,6 +63,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private boolean elevatorIsGoingDownDebounced = false;
   private double previousElevatorHeight = Double.POSITIVE_INFINITY;
   private final Debouncer debouncer = new Debouncer(0.5, DebounceType.kBoth);
+  private final LinearFilter handoffAdjustmentTxFilter = LinearFilter.movingAverage(7);
 
   public void setLollipopMode(boolean lollipopMode) {
     this.lollipopMode = lollipopMode;
@@ -99,7 +101,8 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   }
 
   public void setCoralHandoffOffset(OptionalDouble tx) {
-    handoffOffset = CORAL_TX_TO_ARM_ANGLE_TABLE.get(tx.orElse(0));
+    handoffOffset =
+        CORAL_TX_TO_ARM_ANGLE_TABLE.get(handoffAdjustmentTxFilter.calculate(tx.orElse(0)));
   }
 
   public void setState(ArmState newState) {

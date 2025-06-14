@@ -1,5 +1,6 @@
 package frc.robot.auto_align.tag_align;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -7,14 +8,17 @@ import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
+import frc.robot.config.FeatureFlags;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.MathHelpers;
 import java.util.Comparator;
 
 public class AlignmentCostUtil {
-  private static final double ANGLE_DIFFERENCE_SCALAR = 0.02;
-  private static final double ANGLE_DIFFERENCE_SCALAR_CORAL = 0.07;
+  private static final double REEF_STATE_COST = 0.4;
+  private static final double DRIVE_DIRECTION_SCALAR = 0.02;
+  private static final double DRIVE_DIRECTION_SCALAR_CORAL = 0.07;
+  private static final double ANGLE_ERROR_SCALAR = 0.5;
 
   /**
    * Returns the "cost" (a dimensionless number) of aligning to a given pose based on the robot's
@@ -24,25 +28,37 @@ public class AlignmentCostUtil {
    * @param robotPose The robot's current pose
    * @param robotVelocity The robot's current velocity (field relative)
    */
-  public static double getAlignCost(
-      Translation2d target, Translation2d robotPose, ChassisSpeeds robotVelocity) {
-    var distanceCost = target.getDistance(robotPose);
-    if (target.equals(Translation2d.kZero) || robotPose.equals(Translation2d.kZero)) {
+  public static double getAlignCost(Pose2d target, Pose2d robotPose, ChassisSpeeds robotVelocity) {
+    var distanceCost =
+        FeatureFlags.AUTO_ALIGN_DISTANCE_COST.getAsBoolean()
+            ? target.getTranslation().getDistance(robotPose.getTranslation())
+            : 0.0;
+    if (target.equals(Pose2d.kZero) || robotPose.equals(Pose2d.kZero)) {
       return distanceCost;
     }
 
+    var angleToAim = target.getRotation().getRadians();
+
+    var angleError =
+        Math.abs(MathUtil.angleModulus(angleToAim - robotPose.getRotation().getRadians()));
+
+    var angleErrorCost =
+        FeatureFlags.AUTO_ALIGN_HEADING_COST.getAsBoolean() ? angleError * ANGLE_ERROR_SCALAR : 0.0;
+
     if (Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond) == 0.0) {
-      return distanceCost;
+      return distanceCost + angleErrorCost;
     }
 
     var targetRobotRelative = target.minus(robotPose);
-    var targetDirection = targetRobotRelative.getAngle();
+    var targetDirection = targetRobotRelative.getTranslation().getAngle();
 
     var driveAngleCost =
-        ANGLE_DIFFERENCE_SCALAR
-            * Math.abs(
-                targetDirection.minus(MathHelpers.vectorDirection(robotVelocity)).getRadians());
-    return distanceCost + driveAngleCost;
+        FeatureFlags.AUTO_ALIGN_DRIVE_DIRECTION_COST.getAsBoolean()
+            ? DRIVE_DIRECTION_SCALAR
+                * Math.abs(
+                    targetDirection.minus(MathHelpers.vectorDirection(robotVelocity)).getRadians())
+            : 0.0;
+    return distanceCost + angleErrorCost + driveAngleCost;
   }
 
   public static double getCoralAlignCost(
@@ -62,13 +78,11 @@ public class AlignmentCostUtil {
     var targetDirection = targetRobotRelative.getAngle();
 
     var driveAngleCost =
-        ANGLE_DIFFERENCE_SCALAR_CORAL
+        DRIVE_DIRECTION_SCALAR_CORAL
             * Math.abs(
                 targetDirection.minus(MathHelpers.vectorDirection(robotVelocity)).getRadians());
     return distanceCost + driveAngleCost;
   }
-
-  public final Comparator<Translation2d> alignCostComparator;
 
   private final LocalizationSubsystem localization;
   private final SwerveSubsystem swerve;
@@ -88,14 +102,6 @@ public class AlignmentCostUtil {
     this.swerve = swerve;
     this.reefState = reefState;
     this.side = side;
-
-    alignCostComparator =
-        Comparator.comparingDouble(
-            translation ->
-                getAlignCost(
-                    translation,
-                    localization.getPose().getTranslation(),
-                    swerve.getFieldRelativeSpeeds()));
   }
 
   public Comparator<ReefPipe> getReefPipeComparator(ReefPipeLevel level) {
@@ -117,9 +123,12 @@ public class AlignmentCostUtil {
     return Comparator.comparingDouble(
         pipe ->
             getAlignCost(
-                    pipe.getPose(level, side, localization.getPose()).getTranslation(),
-                    localization.getPose().getTranslation(),
+                    pipe.getPose(level, side, localization.getPose()),
+                    localization.getPose(),
                     swerve.getTeleopSpeeds())
-                + (reefState.isScored(pipe, level) ? 0.4 : 0));
+                + (reefState.isScored(pipe, level)
+                        && FeatureFlags.AUTO_ALIGN_REEF_STATE_COST.getAsBoolean()
+                    ? REEF_STATE_COST
+                    : 0.0));
   }
 }
