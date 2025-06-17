@@ -198,7 +198,6 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L2)
                 && arm.nearGoal(ArmState.CORAL_SCORE_LEFT_LINEUP_L2)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
-                
             ? currentState.getLeftApproachToLineupState()
             : currentState;
       }
@@ -206,7 +205,6 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L3)
                 && arm.nearGoal(ArmState.CORAL_SCORE_LEFT_LINEUP_L3)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
-                
             ? currentState.getLeftApproachToLineupState()
             : currentState;
       }
@@ -214,7 +212,6 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L4)
                 && arm.nearGoal(ArmState.CORAL_SCORE_LEFT_LINEUP_L4)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
-                
             ? currentState.getLeftApproachToLineupState()
             : currentState;
       }
@@ -223,7 +220,6 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L2)
                 && arm.nearGoal(ArmState.CORAL_SCORE_RIGHT_LINEUP_L2)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
-                
             ? currentState.getRightApproachToLineupState()
             : currentState;
       }
@@ -231,7 +227,6 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L3)
                 && arm.nearGoal(ArmState.CORAL_SCORE_RIGHT_LINEUP_L3)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
-                
             ? currentState.getRightApproachToLineupState()
             : currentState;
       }
@@ -239,7 +234,6 @@ public class RobotManager extends StateMachine<RobotState> {
         yield elevator.nearGoal(ElevatorState.CORAL_SCORE_LINEUP_L4)
                 && arm.nearGoal(ArmState.CORAL_SCORE_RIGHT_LINEUP_L4)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
-                
             ? currentState.getRightApproachToLineupState()
             : currentState;
       }
