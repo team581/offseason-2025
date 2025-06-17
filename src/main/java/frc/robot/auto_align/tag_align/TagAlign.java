@@ -11,25 +11,39 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
+import frc.robot.util.MathHelpers;
+import frc.robot.util.trailblazer.constraints.AutoConstraintCalculator;
+import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
+import frc.robot.util.trailblazer.trackers.pure_pursuit.PurePursuitUtils;
+
 import java.util.Comparator;
 import java.util.Optional;
 
 public class TagAlign {
-  private static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
-      ImmutableList.copyOf(ReefPipe.values());
+  private static final double SIDEWAYS_NOT_ALIGNED_FORWARD_SCALAR_ROTATION = 2.0;
+  private static final double SIDEWAYS_NOT_ALIGNED_FORWARD_SCALAR_SIDEWAYS = 3.5;
 
-  private static final PIDController TAG_SIDEWAYS_PID = new PIDController(5.0, 0.0, 0.0);
-  private static final PIDController TAG_FORWARD_PID = new PIDController(4.5, 0.0, 0.0);
-  private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
-      DogLog.tunable("AutoAlign/IsAlignedTranslation", 0.03);
-  private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
-      DogLog.tunable("AutoAlign/IsAlignedRotation", 5.0);
+
+  private static final int DRIVE_IN_ROTATION_THRESHOLD = 5;
+
+  private static final double SIDEWAYS_ALIGNED_THRESHOLD = 0.05;
+  private  final AutoConstraintOptions CONSTRAINT_OPTIONS =
+      new AutoConstraintOptions(3.0,3,4.5,10);
+
+  private static final ImmutableList<ReefPipe> ALL_REEF_PIPES = ImmutableList.copyOf(ReefPipe.values());
+
+  private static final PIDController TRANSLATION_PID = new PIDController(5.0, 0.0, 0.0);
+  private static final PIDController ROTATION_PID = new PIDController(7.0, 0.0, 0.0);
+  private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD = DogLog.tunable("AutoAlign/IsAlignedTranslation",
+      0.03);
+  private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD = DogLog.tunable("AutoAlign/IsAlignedRotation", 3.0);
 
   private static final double PIPE_SWITCH_TIMEOUT = 0.5;
 
@@ -50,6 +64,7 @@ public class TagAlign {
   public TagAlign(SwerveSubsystem swerve, LocalizationSubsystem localization) {
     this.localization = localization;
     alignmentCostUtil = new AlignmentCostUtil(localization, swerve, reefState, robotScoringSide);
+    ROTATION_PID.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   public void setLevel(ReefPipeLevel level, ReefPipeLevel preferredLevel, RobotScoringSide side) {
@@ -85,21 +100,20 @@ public class TagAlign {
       var storedPipe = getBestPipe();
       pipeSwitchActive = true;
       lastPipeSwitchTimestamp = Timer.getFPGATimestamp();
-      ReefPipe partnerPipe =
-          switch (storedPipe) {
-            case PIPE_A -> ReefPipe.PIPE_B;
-            case PIPE_B -> ReefPipe.PIPE_A;
-            case PIPE_C -> ReefPipe.PIPE_D;
-            case PIPE_D -> ReefPipe.PIPE_C;
-            case PIPE_E -> ReefPipe.PIPE_F;
-            case PIPE_F -> ReefPipe.PIPE_E;
-            case PIPE_G -> ReefPipe.PIPE_H;
-            case PIPE_H -> ReefPipe.PIPE_G;
-            case PIPE_I -> ReefPipe.PIPE_J;
-            case PIPE_J -> ReefPipe.PIPE_I;
-            case PIPE_K -> ReefPipe.PIPE_L;
-            case PIPE_L -> ReefPipe.PIPE_K;
-          };
+      ReefPipe partnerPipe = switch (storedPipe) {
+        case PIPE_A -> ReefPipe.PIPE_B;
+        case PIPE_B -> ReefPipe.PIPE_A;
+        case PIPE_C -> ReefPipe.PIPE_D;
+        case PIPE_D -> ReefPipe.PIPE_C;
+        case PIPE_E -> ReefPipe.PIPE_F;
+        case PIPE_F -> ReefPipe.PIPE_E;
+        case PIPE_G -> ReefPipe.PIPE_H;
+        case PIPE_H -> ReefPipe.PIPE_G;
+        case PIPE_I -> ReefPipe.PIPE_J;
+        case PIPE_J -> ReefPipe.PIPE_I;
+        case PIPE_K -> ReefPipe.PIPE_L;
+        case PIPE_L -> ReefPipe.PIPE_K;
+      };
 
       setPipeOveride(partnerPipe);
     }
@@ -111,16 +125,14 @@ public class TagAlign {
     }
     var robotPose = localization.getPose();
     var scoringPoseFieldRelative = getUsedScoringPose(pipe);
-    var translationGood =
-        (robotPose.getTranslation().getDistance(scoringPoseFieldRelative.getTranslation())
-            <= TRANSLATION_GOOD_THRESHOLD.get());
-    var rotationGood =
-        MathUtil.isNear(
-            scoringPoseFieldRelative.getRotation().getDegrees(),
-            robotPose.getRotation().getDegrees(),
-            ROTATION_GOOD_THRESHOLD.get(),
-            -180.0,
-            180.0);
+    var translationGood = (robotPose.getTranslation()
+        .getDistance(scoringPoseFieldRelative.getTranslation()) <= TRANSLATION_GOOD_THRESHOLD.get());
+    var rotationGood = MathUtil.isNear(
+        scoringPoseFieldRelative.getRotation().getDegrees(),
+        robotPose.getRotation().getDegrees(),
+        ROTATION_GOOD_THRESHOLD.get(),
+        -180.0,
+        180.0);
     return translationGood && rotationGood;
   }
 
@@ -136,7 +148,9 @@ public class TagAlign {
     return pipe.getPose(pipeLevel, robotScoringSide, localization.getPose());
   }
 
-  /** Returns the best reef pipe for scoring, based on the robot's current state. */
+  /**
+   * Returns the best reef pipe for scoring, based on the robot's current state.
+   */
   public ReefPipe getBestPipe() {
     if ((DriverStation.isAutonomous() || pipeSwitchActive) && reefPipeOverride.isPresent()) {
       return reefPipeOverride.orElseThrow();
@@ -147,12 +161,11 @@ public class TagAlign {
       return ALL_REEF_PIPES.stream()
           .min(
               Comparator.comparingDouble(
-                  pipe ->
-                      robotPose
-                          .getTranslation()
-                          .getDistance(
-                              pipe.getPose(ReefPipeLevel.BACK_AWAY, robotScoringSide, robotPose)
-                                  .getTranslation())))
+                  pipe -> robotPose
+                      .getTranslation()
+                      .getDistance(
+                          pipe.getPose(ReefPipeLevel.BACK_AWAY, robotScoringSide, robotPose)
+                              .getTranslation())))
           .orElseThrow();
     }
     if (pipeLevel.equals(ReefPipeLevel.RAISING)) {
@@ -166,20 +179,31 @@ public class TagAlign {
   public ChassisSpeeds getPoseAlignmentChassisSpeeds(Pose2d usedScoringPose) {
     var robotPose = localization.getPose();
 
-    var scoringTranslationRobotRelative =
-        usedScoringPose
-            .getTranslation()
-            .minus(robotPose.getTranslation())
-            .rotateBy(Rotation2d.fromDegrees(360 - usedScoringPose.getRotation().getDegrees()));
+    var scoringTranslationRobotRelative = usedScoringPose
+        .getTranslation()
+        .minus(robotPose.getTranslation())
+        .rotateBy(Rotation2d.fromDegrees(360 - usedScoringPose.getRotation().getDegrees()));
 
-    var goalTranslationWithP =
-        new Translation2d(
-            TAG_SIDEWAYS_PID.calculate(scoringTranslationRobotRelative.getX()),
-            TAG_FORWARD_PID.calculate(scoringTranslationRobotRelative.getY()));
+    var goalTranslationWithP = new Translation2d(
+        TRANSLATION_PID.calculate(scoringTranslationRobotRelative.getX()),
+        TRANSLATION_PID.calculate(scoringTranslationRobotRelative.getY()));
+
+    if (Math.abs(scoringTranslationRobotRelative.getX()) > SIDEWAYS_ALIGNED_THRESHOLD
+        || !MathUtil.isNear(usedScoringPose.getRotation().getDegrees(), robotPose.getRotation().getDegrees(),
+            DRIVE_IN_ROTATION_THRESHOLD)) {
+      goalTranslationWithP = new Translation2d(
+          TRANSLATION_PID.calculate(scoringTranslationRobotRelative.getX()),
+          TRANSLATION_PID.calculate(scoringTranslationRobotRelative.getY() / MathUtil.clamp((Math.abs(scoringTranslationRobotRelative.getY()* SIDEWAYS_NOT_ALIGNED_FORWARD_SCALAR_SIDEWAYS)+(Math.abs(usedScoringPose.getRotation().minus(robotPose.getRotation()).getRadians())* SIDEWAYS_NOT_ALIGNED_FORWARD_SCALAR_ROTATION)) , 1.0, Double.MAX_VALUE)));
+    }
     var goalTranslation = goalTranslationWithP.rotateBy(usedScoringPose.getRotation());
 
-    var goalSpeeds = new ChassisSpeeds(-goalTranslation.getX(), -goalTranslation.getY(), 0.0);
+    var goalSpeeds = new ChassisSpeeds(-goalTranslation.getX(), -goalTranslation.getY(),
+        ROTATION_PID.calculate(robotPose.getRotation().getRadians(),
+            usedScoringPose.getRotation().getRadians()));
+    var constrainedSpeeds = AutoConstraintCalculator.constrainLinearVelocity(new ChassisSpeeds(goalSpeeds.vxMetersPerSecond, goalSpeeds.vyMetersPerSecond, MathUtil.clamp(goalSpeeds.omegaRadiansPerSecond, -CONSTRAINT_OPTIONS.maxAngularVelocity(), CONSTRAINT_OPTIONS.maxAngularVelocity())), CONSTRAINT_OPTIONS);
     DogLog.log("AutoAlign/GoalSpeeds", goalSpeeds);
-    return goalSpeeds;
+    DogLog.log("AutoAlign/ConstrainedSpeeds", constrainedSpeeds);
+
+    return constrainedSpeeds;
   }
 }

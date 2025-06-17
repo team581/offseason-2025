@@ -268,7 +268,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
       case REEF_ALIGN_TELEOP -> {
-        if (teleopSpeeds.omegaRadiansPerSecond == 0) {
+        if (autoAlignSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
               driveToAngle
                   .withVelocityX(autoAlignSpeeds.vxMetersPerSecond)
