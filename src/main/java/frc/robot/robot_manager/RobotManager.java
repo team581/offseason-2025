@@ -1624,8 +1624,16 @@ public class RobotManager extends StateMachine<RobotState> {
         setStateFromRequest(getState().getPlaceToReleaseState());
       }
 
-      case CLAW_EMPTY, CLAW_ALGAE, STARTING_POSITION -> {
+      case CLAW_ALGAE -> {
         if (groundManager.hasCoral()) {
+          groundManager.l1Request();
+        } else {
+          setStateFromRequest(RobotState.ALGAE_OUTTAKE);
+        }
+      }
+      case CLAW_EMPTY, STARTING_POSITION -> {
+        if (groundManager.hasCoral()) {
+          endgameStowRequest();
           groundManager.l1Request();
         } else {
           setStateFromRequest(RobotState.ALGAE_OUTTAKE);
