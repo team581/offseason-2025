@@ -32,7 +32,7 @@ import frc.robot.util.state_machines.StateMachine;
 import java.util.Map;
 
 public class SwerveSubsystem extends StateMachine<SwerveState> {
-  private static final double ODOMETRY_CALIBRATION_STOPPED_TIME = 0.1;
+  private static final double ODOMETRY_CALIBRATION_STOPPED_TIME = 1.0;
   public static final double MaxSpeed = 4.75;
   private static final double maxAngularRate = Units.rotationsToRadians(4);
   private static final Rotation2d TELEOP_MAX_ANGULAR_RATE = Rotation2d.fromRotations(2);
@@ -52,7 +52,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       InterpolatingDoubleTreeMap.ofEntries(Map.entry(0.0, 1.0));
 
   private static final double ODOMETRY_CALIBRATION_SETTLE_TIME = 1.0; // seconds
-  private static final double ODOMETRY_CALIBRATION_TIME = 10.0; // seconds
+  private static final double ODOMETRY_CALIBRATION_TOTAL_ANGLE_DIFFERENCE = 360.0; // seconds
 
   public final TunerSwerveDrivetrain drivetrain =
       RobotConfig.IS_PRACTICE_BOT
@@ -94,6 +94,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private boolean odometryCalibrationStartingTimestampUpdated = false;
   private double odometryCalibrationStartingTimestamp = 0.0;
   private boolean publishedOdomCalResult = false;
+  private boolean updatedFinishedTimestamp = false;
+  private double finishedTimestamp = 0.0;
 
   private double lastSimTime;
   private Notifier simNotifier = null;
@@ -249,6 +251,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     teleopSlowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
 
     if (getState().equals(SwerveState.ODOMETRY_CALIBRATION)) {
+      DogLog.log("Swerve/OdometryCalculation/GyroDelta", Units.radiansToDegrees(gyroDelta));
       if (!odometryCalibrationStartingTimestampUpdated) {
         odometryCalibrationStartingTimestamp = Timer.getFPGATimestamp();
         odometryCalibrationStartingTimestampUpdated = true;
@@ -272,13 +275,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
 
-      if (Timer.getFPGATimestamp()
-              - (odometryCalibrationStartingTimestamp + ODOMETRY_CALIBRATION_SETTLE_TIME)
-          < ODOMETRY_CALIBRATION_TIME) {
-
-        var rotation = Rotation2d.fromDegrees(drivetrainPigeon.getYaw().getValueAsDouble());
-        gyroDelta += Math.abs(rotation.minus(lastGyroRotation).getRadians());
-        lastGyroRotation = rotation;
+      var rotation = Rotation2d.fromDegrees(drivetrainPigeon.getYaw().getValueAsDouble());
+      gyroDelta += Math.abs(rotation.minus(lastGyroRotation).getRadians());
+      lastGyroRotation = rotation;
+      if (Units.radiansToDegrees(gyroDelta) < ODOMETRY_CALIBRATION_TOTAL_ANGLE_DIFFERENCE) {
 
         double[] positions = new double[4];
         for (int i = 0; i < 4; i++) {
@@ -295,26 +295,33 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
         DogLog.log("Swerve/OdometryCalculation/RunningEstimates/WheelDelta", wheelDelta);
         DogLog.log("Swerve/OdometryCalculation/RunningEstimates/WheelRadius", wheelRadius);
-      } else if (!publishedOdomCalResult) {
-
-        double[] positions = new double[4];
-        for (int i = 0; i < 4; i++) {
-          positions[i] = drivetrain.getModule(i).getDriveMotor().getPosition().getValueAsDouble();
+      } else {
+        if (!updatedFinishedTimestamp) {
+          DogLog.log("Swerve/OdometryCalculation/Progress", "WAITING_FOR_SENSORS");
+          finishedTimestamp = Timer.getFPGATimestamp();
+          updatedFinishedTimestamp = true;
         }
-        double wheelDelta = 0.0;
-        for (int i = 0; i < 4; i++) {
-          wheelDelta += Math.abs(positions[i] - odometryCalibrationPositions[i]) / 4.0;
-        }
-        double wheelRadius =
-            (gyroDelta * RobotConfig.get().swerve().driveBaseRadius()) / wheelDelta;
+        if (!publishedOdomCalResult
+            && Timer.getFPGATimestamp() - finishedTimestamp >= ODOMETRY_CALIBRATION_STOPPED_TIME) {
 
-        DogLog.log("Swerve/OdometryCalculation/Progress", "DONE");
-        DogLog.log("Swerve/OdometryCalculation/WheelDelta", wheelDelta);
-        DogLog.log("Swerve/OdometryCalculation/GyroDelta", Units.radiansToDegrees(gyroDelta));
-        DogLog.log("Swerve/OdometryCalculation/WheelRadiusMeters", wheelRadius);
-        DogLog.log(
-            "Swerve/OdometryCalculation/WheelRadiusInches", Units.metersToInches(wheelRadius));
-        publishedOdomCalResult = true;
+          double[] positions = new double[4];
+          for (int i = 0; i < 4; i++) {
+            positions[i] = drivetrain.getModule(i).getDriveMotor().getPosition().getValueAsDouble();
+          }
+          double wheelDelta = 0.0;
+          for (int i = 0; i < 4; i++) {
+            wheelDelta += Math.abs(positions[i] - odometryCalibrationPositions[i]) / 4.0;
+          }
+          double wheelRadius =
+              (gyroDelta * RobotConfig.get().swerve().driveBaseRadius()) / wheelDelta;
+
+          DogLog.log("Swerve/OdometryCalculation/Progress", "DONE");
+          DogLog.log("Swerve/OdometryCalculation/WheelDelta", wheelDelta);
+          DogLog.log("Swerve/OdometryCalculation/WheelRadiusMeters", wheelRadius);
+          DogLog.log(
+              "Swerve/OdometryCalculation/WheelRadiusInches", Units.metersToInches(wheelRadius));
+          publishedOdomCalResult = true;
+        }
       }
     } else {
       if (publishedOdomCalResult) {
@@ -324,6 +331,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         gyroDelta = 0.0;
         odometryCalibrationStartingTimestampUpdated = false;
         odometryCalibrationStartingTimestamp = 0.0;
+        updatedFinishedTimestamp = false;
+        finishedTimestamp = 0.0;
         publishedOdomCalResult = false;
       }
     }
@@ -427,10 +436,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                 .withVelocityX(0)
                 .withVelocityY(0)
                 .withRotationalRate(
-                    (Timer.getFPGATimestamp()
-                                - (odometryCalibrationStartingTimestamp
-                                    + ODOMETRY_CALIBRATION_SETTLE_TIME)
-                            < (ODOMETRY_CALIBRATION_TIME - ODOMETRY_CALIBRATION_STOPPED_TIME))
+                    (Units.radiansToDegrees(gyroDelta) < ODOMETRY_CALIBRATION_TOTAL_ANGLE_DIFFERENCE)
                         ? ODOMETRY_CALIBRAITON_ROTATION_SPEED.get()
                         : 0.0)
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
