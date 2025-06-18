@@ -436,7 +436,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                 .withVelocityX(0)
                 .withVelocityY(0)
                 .withRotationalRate(
-                    (Units.radiansToDegrees(gyroDelta) < ODOMETRY_CALIBRATION_TOTAL_ANGLE_DIFFERENCE)
+                    (Units.radiansToDegrees(gyroDelta)
+                            < ODOMETRY_CALIBRATION_TOTAL_ANGLE_DIFFERENCE)
                         ? ODOMETRY_CALIBRAITON_ROTATION_SPEED.get()
                         : 0.0)
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
