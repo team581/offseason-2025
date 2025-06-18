@@ -116,7 +116,7 @@ public final class CompBotTunerConstants {
 
   private static final double kDriveGearRatio = (6.48 / 1.0);
   private static final double kSteerGearRatio = (12.1 / 1.0);
-  private static final Distance kWheelRadius = Inches.of(2.0);
+  private static final Distance kWheelRadius = Inches.of(1.9029832953654533);
 
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;
