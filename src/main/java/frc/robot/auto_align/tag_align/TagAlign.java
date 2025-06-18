@@ -29,14 +29,11 @@ public class TagAlign {
   private static final int DRIVE_IN_ROTATION_THRESHOLD = 5;
 
   private static final double SIDEWAYS_ALIGNED_THRESHOLD = 0.05;
-  private static final AutoConstraintOptions CONSTRAINT_OPTIONS =
-      new AutoConstraintOptions(3.0, 3, 4.5, 10);
-
   private static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
       ImmutableList.copyOf(ReefPipe.values());
 
-  private static final PIDController TRANSLATION_PID = new PIDController(5.0, 0.0, 0.0);
-  private static final PIDController ROTATION_PID = new PIDController(7.0, 0.0, 0.0);
+  private static final PIDController TRANSLATION_PID = new PIDController(3.0, 0.0, 0.0);
+  private static final PIDController ROTATION_PID = new PIDController(4.0, 0.0, 0.0);
   private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedTranslation", 0.03);
   private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
@@ -220,19 +217,9 @@ public class TagAlign {
             -goalTranslation.getY(),
             ROTATION_PID.calculate(
                 robotPose.getRotation().getRadians(), usedScoringPose.getRotation().getRadians()));
-    var constrainedSpeeds =
-        AutoConstraintCalculator.constrainLinearVelocity(
-            new ChassisSpeeds(
-                goalSpeeds.vxMetersPerSecond,
-                goalSpeeds.vyMetersPerSecond,
-                MathUtil.clamp(
-                    goalSpeeds.omegaRadiansPerSecond,
-                    -CONSTRAINT_OPTIONS.maxAngularVelocity(),
-                    CONSTRAINT_OPTIONS.maxAngularVelocity())),
-            CONSTRAINT_OPTIONS);
-    DogLog.log("AutoAlign/GoalSpeeds", goalSpeeds);
-    DogLog.log("AutoAlign/ConstrainedSpeeds", constrainedSpeeds);
 
-    return constrainedSpeeds;
+    DogLog.log("AutoAlign/GoalSpeeds", goalSpeeds);
+
+    return goalSpeeds;
   }
 }
