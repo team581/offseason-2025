@@ -52,7 +52,9 @@ public class LightsSubsystem extends StateMachine<LightsState> {
       candle.setControl(solidColorRequest.withColor(usedState.getRGBWColor()));
     } else {
       candle.setControl(
-          blinkRequest.withColor(usedState.getRGBWColor()).withFrameRate(1 / usedState.pattern.duration));
+          blinkRequest
+              .withColor(usedState.getRGBWColor())
+              .withFrameRate(1 / usedState.pattern.duration));
     }
   }
 
