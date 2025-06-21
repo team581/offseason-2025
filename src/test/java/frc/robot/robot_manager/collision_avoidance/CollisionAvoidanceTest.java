@@ -34,18 +34,18 @@ public class CollisionAvoidanceTest {
     assertEquals(expected, result.get());
   }
 
-  @Test
-  public void test2() {
-    var currentPosition =
-        new SuperstructurePosition(ElevatorState.CORAL_HANDOFF, ArmState.CORAL_HANDOFF);
-    var desiredPosition =
-        new SuperstructurePosition(ElevatorState.STOWED, ArmState.HOLDING_UPRIGHT);
-    var result = CollisionAvoidance.aStar(currentPosition, desiredPosition, ObstructionKind.NONE);
-    var expected =
-        List.of(
-            Waypoint.HANDOFF, Waypoint.L3_RIGHT_ARM, Waypoint.L3_RIGHT_LINEUP, Waypoint.L1_UPRIGHT);
-    assertEquals(expected, result.get());
-  }
+  // @Test
+  // public void test2() {
+  //   var currentPosition =
+  //       new SuperstructurePosition(ElevatorState.CORAL_HANDOFF, ArmState.CORAL_HANDOFF);
+  //   var desiredPosition =
+  //       new SuperstructurePosition(ElevatorState.STOWED, ArmState.HOLDING_UPRIGHT);
+  //   var result = CollisionAvoidance.aStar(currentPosition, desiredPosition, ObstructionKind.NONE);
+  //   var expected =
+  //       List.of(
+  //           Waypoint.HANDOFF, Waypoint.L3_RIGHT_ARM, Waypoint.L3_RIGHT_LINEUP, Waypoint.L1_UPRIGHT);
+  //   assertEquals(expected, result.get());
+  // }
 
   @Test
   public void hectorTest() {

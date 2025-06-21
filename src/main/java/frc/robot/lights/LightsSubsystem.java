@@ -11,8 +11,8 @@ import frc.robot.util.state_machines.StateMachine;
 
 public class LightsSubsystem extends StateMachine<LightsState> {
   private final CANdle candle;
-  private final SolidColor solidColorRequest = new SolidColor(0, 0);
-  private final StrobeAnimation blink = new StrobeAnimation(0, 399);
+  private final SolidColor solidColorRequest = new SolidColor(0, 399).withUpdateFreqHz(50.0);
+  private final StrobeAnimation blinkRequest = new StrobeAnimation(0, 399).withUpdateFreqHz(50.0);
 
   private final Timer blinkTimer = new Timer();
   private LightsState storedState = LightsState.IDLE_EMPTY;
@@ -52,7 +52,7 @@ public class LightsSubsystem extends StateMachine<LightsState> {
       candle.setControl(solidColorRequest.withColor(usedState.getRGBWColor()));
     } else {
       candle.setControl(
-          blink.withColor(usedState.getRGBWColor()).withFrameRate(1 / usedState.pattern.duration));
+          blinkRequest.withColor(usedState.getRGBWColor()).withFrameRate(1 / usedState.pattern.duration));
     }
   }
 

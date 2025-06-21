@@ -1337,6 +1337,11 @@ public class RobotManager extends StateMachine<RobotState> {
     scoringAlignActive = false;
   }
 
+  public void intakeGroundRequest() {
+    groundManager.intakeRequest();
+    lights.setState(LightsState.INTAKING_CORAL);
+  }
+
   public void l4CoralLeftAutoApproachRequest() {
     if (DriverStation.isAutonomous()) {
       setStateFromRequest(RobotState.CORAL_L4_LEFT_APPROACH);
