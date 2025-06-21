@@ -5,7 +5,7 @@ import com.ctre.phoenix6.controls.StrobeAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
+import frc.robot.config.RobotConfig;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
@@ -14,15 +14,13 @@ public class LightsSubsystem extends StateMachine<LightsState> {
   private final SolidColor solidColorRequest = new SolidColor(0, 399).withUpdateFreqHz(50.0);
   private final StrobeAnimation blinkRequest = new StrobeAnimation(0, 399).withUpdateFreqHz(50.0);
 
-  private final Timer blinkTimer = new Timer();
   private LightsState storedState = LightsState.IDLE_EMPTY;
   private LightsState disabledState = LightsState.HOMED_SEES_TAGS;
-  private LightsState usedState = LightsState.IDLE_EMPTY;
 
   public LightsSubsystem(CANdle candle) {
     super(SubsystemPriority.LIGHTS, LightsState.IDLE_EMPTY);
+    candle.getConfigurator().apply(RobotConfig.get().lights().config());
     this.candle = candle;
-    blinkTimer.start();
   }
 
   public void setState(LightsState newState) {
@@ -47,7 +45,10 @@ public class LightsSubsystem extends StateMachine<LightsState> {
   }
 
   @Override
-  protected void afterTransition(LightsState newState) {
+  public void robotPeriodic() {
+    super.robotPeriodic();
+    var usedState = DriverStation.isDisabled() ? disabledState : getState();
+
     if (usedState.pattern == BlinkPattern.SOLID) {
       candle.setControl(solidColorRequest.withColor(usedState.getRGBWColor()));
     } else {
@@ -56,12 +57,6 @@ public class LightsSubsystem extends StateMachine<LightsState> {
               .withColor(usedState.getRGBWColor())
               .withFrameRate(1 / usedState.pattern.duration));
     }
-  }
-
-  @Override
-  public void robotPeriodic() {
-    super.robotPeriodic();
-    usedState = DriverStation.isDisabled() ? disabledState : getState();
 
     DogLog.log("Lights/Color", usedState.color.toString());
     DogLog.log("Lights/Pattern", usedState.pattern);
