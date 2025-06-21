@@ -17,8 +17,6 @@ import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
-import frc.robot.util.trailblazer.constraints.AutoConstraintCalculator;
-import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 import java.util.Comparator;
 import java.util.Optional;
 
