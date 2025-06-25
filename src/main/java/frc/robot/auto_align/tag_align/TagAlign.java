@@ -186,5 +186,6 @@ public class TagAlign {
             constraints.getAngularConstraints()));
   }
 
-  private final double lastMaxLinearAcceleration = new AutoConstraintOptions().maxLinearAcceleration();
+  private final double lastMaxLinearAcceleration =
+      new AutoConstraintOptions().maxLinearAcceleration();
 }
