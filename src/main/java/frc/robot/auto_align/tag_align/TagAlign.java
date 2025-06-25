@@ -5,7 +5,6 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -13,12 +12,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
-import frc.robot.util.MathHelpers;
-import frc.robot.util.kinematics.PolarChassisSpeeds;
 import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
+import frc.robot.util.MathHelpers;
+import frc.robot.util.kinematics.PolarChassisSpeeds;
 import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 import java.util.Comparator;
 import java.util.Optional;
@@ -28,7 +27,8 @@ public class TagAlign {
       ImmutableList.copyOf(ReefPipe.values());
 
   private static final PIDController VELOCITY_CONTROLLER = new PIDController(3.5, 0.0, 0.0);
-  private static final ProfiledPIDController ROTATION_CONTROLLER = new ProfiledPIDController(4.0, 0.0, 0.0, new AutoConstraintOptions().getAngularConstraints());
+  private static final ProfiledPIDController ROTATION_CONTROLLER =
+      new ProfiledPIDController(4.0, 0.0, 0.0, new AutoConstraintOptions().getAngularConstraints());
   private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedTranslation", 0.03);
   private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
@@ -177,7 +177,6 @@ public class TagAlign {
             VELOCITY_CONTROLLER.calculate(
                 currentPose.getTranslation().getDistance(targetPose.getTranslation()), 0));
 
-
     return new PolarChassisSpeeds(
         rawLinearVelocity,
         MathHelpers.getDriveDirection(targetPose, currentPose),
@@ -187,7 +186,5 @@ public class TagAlign {
             constraints.getAngularConstraints()));
   }
 
-
-  private double lastMaxLinearAcceleration = new AutoConstraintOptions().maxLinearAcceleration();
-
+  private final double lastMaxLinearAcceleration = new AutoConstraintOptions().maxLinearAcceleration();
 }

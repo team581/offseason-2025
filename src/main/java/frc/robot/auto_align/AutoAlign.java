@@ -23,7 +23,8 @@ import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 import frc.robot.vision.VisionSubsystem;
 
 public class AutoAlign extends StateMachine<AutoAlignState> {
-  private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(3.0, 10.0, 2.0, 5.0);
+  private static final AutoConstraintOptions CONSTRAINTS =
+      new AutoConstraintOptions(3.0, 10.0, 2.0, 5.0);
   private static final Translation2d CENTER_OF_REEF_RED =
       new Translation2d(Units.inchesToMeters(514.13), Units.inchesToMeters(158.5));
   private static final Translation2d CENTER_OF_REEF_BLUE =
