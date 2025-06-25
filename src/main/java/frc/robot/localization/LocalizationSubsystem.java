@@ -7,6 +7,9 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,6 +26,8 @@ import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.results.TagResult;
 
+// TODO: Get the odometry to work with WPILIB(Swerve Drive Odometry class) instead of CTRE(Swerve Drivetrain class)
+
 public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private static final Vector<N3> MT1_VISION_STD_DEVS =
       VecBuilder.fill(
@@ -38,6 +43,9 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private final VisionSubsystem vision;
   private final SwerveSubsystem swerve;
   private Pose2d robotPose = Pose2d.kZero;
+
+  // Use comp bot tuner constants for distance to middle; 12
+  private SwerveDriveOdometry odometry = new SwerveDriveOdometry(new SwerveDriveKinematics(new Translation2d[], new Translation2d[], new Translation2d[], new Translation2d[], ), null, null);
 
   public LocalizationSubsystem(ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve) {
     super(SubsystemPriority.LOCALIZATION, LocalizationState.DEFAULT_STATE);
@@ -70,6 +78,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     vision.getRightTagResult().ifPresent(this::ingestTagResult);
 
     robotPose = swerve.drivetrain.getState().Pose;
+    robotPose = odometry.update(swerve, null)
   }
 
   public Pose2d getPose() {
