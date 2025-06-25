@@ -4,34 +4,31 @@ import com.google.common.collect.ImmutableList;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
+import frc.robot.util.MathHelpers;
+import frc.robot.util.kinematics.PolarChassisSpeeds;
 import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
+import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 import java.util.Comparator;
 import java.util.Optional;
 
 public class TagAlign {
-  private static final double SIDEWAYS_NOT_ALIGNED_FORWARD_SCALAR_ROTATION = 2.0;
-  private static final double SIDEWAYS_NOT_ALIGNED_FORWARD_SCALAR_SIDEWAYS = 3.5;
-
-  private static final int DRIVE_IN_ROTATION_THRESHOLD = 5;
-
-  private static final double SIDEWAYS_ALIGNED_THRESHOLD = 0.05;
   private static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
       ImmutableList.copyOf(ReefPipe.values());
 
-  private static final PIDController TRANSLATION_PID = new PIDController(3.0, 0.0, 0.0);
-  private static final PIDController ROTATION_PID = new PIDController(4.0, 0.0, 0.0);
+  private static final PIDController VELOCITY_CONTROLLER = new PIDController(3.5, 0.0, 0.0);
+  private static final ProfiledPIDController ROTATION_CONTROLLER = new ProfiledPIDController(4.0, 0.0, 0.0, new AutoConstraintOptions().getAngularConstraints());
   private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedTranslation", 0.03);
   private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
@@ -56,7 +53,7 @@ public class TagAlign {
   public TagAlign(SwerveSubsystem swerve, LocalizationSubsystem localization) {
     this.localization = localization;
     alignmentCostUtil = new AlignmentCostUtil(localization, swerve, reefState, robotScoringSide);
-    ROTATION_PID.enableContinuousInput(-Math.PI, Math.PI);
+    ROTATION_CONTROLLER.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   public void setLevel(ReefPipeLevel level, ReefPipeLevel preferredLevel, RobotScoringSide side) {
@@ -170,54 +167,27 @@ public class TagAlign {
         .orElseThrow();
   }
 
-  public ChassisSpeeds getPoseAlignmentChassisSpeeds(Pose2d usedScoringPose) {
-    var robotPose = localization.getPose();
+  public PolarChassisSpeeds getPoseAlignmentChassisSpeeds(
+      Pose2d targetPose,
+      Pose2d currentPose,
+      AutoConstraintOptions constraints,
+      PolarChassisSpeeds currentSpeeds) {
+    var rawLinearVelocity =
+        Math.abs(
+            VELOCITY_CONTROLLER.calculate(
+                currentPose.getTranslation().getDistance(targetPose.getTranslation()), 0));
 
-    var scoringTranslationRobotRelative =
-        usedScoringPose
-            .getTranslation()
-            .minus(robotPose.getTranslation())
-            .rotateBy(Rotation2d.fromDegrees(360 - usedScoringPose.getRotation().getDegrees()));
 
-    var goalTranslationWithP =
-        new Translation2d(
-            TRANSLATION_PID.calculate(scoringTranslationRobotRelative.getX()),
-            TRANSLATION_PID.calculate(scoringTranslationRobotRelative.getY()));
-
-    if (Math.abs(scoringTranslationRobotRelative.getX()) > SIDEWAYS_ALIGNED_THRESHOLD
-        || !MathUtil.isNear(
-            usedScoringPose.getRotation().getDegrees(),
-            robotPose.getRotation().getDegrees(),
-            DRIVE_IN_ROTATION_THRESHOLD)) {
-      goalTranslationWithP =
-          new Translation2d(
-              TRANSLATION_PID.calculate(scoringTranslationRobotRelative.getX()),
-              TRANSLATION_PID.calculate(
-                  scoringTranslationRobotRelative.getY()
-                      / MathUtil.clamp(
-                          (Math.abs(
-                                  scoringTranslationRobotRelative.getY()
-                                      * SIDEWAYS_NOT_ALIGNED_FORWARD_SCALAR_SIDEWAYS)
-                              + (Math.abs(
-                                      usedScoringPose
-                                          .getRotation()
-                                          .minus(robotPose.getRotation())
-                                          .getRadians())
-                                  * SIDEWAYS_NOT_ALIGNED_FORWARD_SCALAR_ROTATION)),
-                          1.0,
-                          Double.MAX_VALUE)));
-    }
-    var goalTranslation = goalTranslationWithP.rotateBy(usedScoringPose.getRotation());
-
-    var goalSpeeds =
-        new ChassisSpeeds(
-            -goalTranslation.getX(),
-            -goalTranslation.getY(),
-            ROTATION_PID.calculate(
-                robotPose.getRotation().getRadians(), usedScoringPose.getRotation().getRadians()));
-
-    DogLog.log("AutoAlign/GoalSpeeds", goalSpeeds);
-
-    return goalSpeeds;
+    return new PolarChassisSpeeds(
+        rawLinearVelocity,
+        MathHelpers.getDriveDirection(targetPose, currentPose),
+        ROTATION_CONTROLLER.calculate(
+            currentPose.getRotation().getRadians(),
+            new TrapezoidProfile.State(targetPose.getRotation().getRadians(), 0),
+            constraints.getAngularConstraints()));
   }
+
+
+  private double lastMaxLinearAcceleration = new AutoConstraintOptions().maxLinearAcceleration();
+
 }

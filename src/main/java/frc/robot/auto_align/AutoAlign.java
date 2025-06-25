@@ -16,11 +16,14 @@ import frc.robot.robot_manager.collision_avoidance.ObstructionKind;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.MathHelpers;
 import frc.robot.util.PoseErrorTolerance;
+import frc.robot.util.kinematics.PolarChassisSpeeds;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
+import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 import frc.robot.vision.VisionSubsystem;
 
 public class AutoAlign extends StateMachine<AutoAlignState> {
+  private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(3.0, 10.0, 2.0, 5.0);
   private static final Translation2d CENTER_OF_REEF_RED =
       new Translation2d(Units.inchesToMeters(514.13), Units.inchesToMeters(158.5));
   private static final Translation2d CENTER_OF_REEF_BLUE =
@@ -133,10 +136,18 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
     isAligned = tagAlign.isAligned(bestReefPipe);
     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
-    tagAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose);
+    tagAlignSpeeds =
+        tagAlign.getPoseAlignmentChassisSpeeds(
+            usedScoringPose,
+            robotPose,
+            CONSTRAINTS,
+            new PolarChassisSpeeds(swerve.getFieldRelativeSpeeds()));
     algaeAlignSpeeds =
         tagAlign.getPoseAlignmentChassisSpeeds(
-            ReefSide.fromPipe(bestReefPipe).getPose(reefSideOffset, robotScoringSide, robotPose));
+            ReefSide.fromPipe(bestReefPipe).getPose(reefSideOffset, robotScoringSide, robotPose),
+            robotPose,
+            CONSTRAINTS,
+            new PolarChassisSpeeds(swerve.getFieldRelativeSpeeds()));
     var controllerValues = swerve.getControllerValues();
     tagAlign.setControllerValues(controllerValues.getX(), controllerValues.getY());
   }
