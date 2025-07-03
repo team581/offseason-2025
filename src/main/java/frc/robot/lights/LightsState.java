@@ -1,5 +1,6 @@
 package frc.robot.lights;
 
+import com.ctre.phoenix6.signals.RGBWColor;
 import edu.wpi.first.wpilibj.util.Color;
 
 public enum LightsState {
@@ -48,5 +49,9 @@ public enum LightsState {
   LightsState(Color color, BlinkPattern pattern) {
     this.pattern = pattern;
     this.color = color;
+  }
+
+  public RGBWColor getRGBWColor() {
+    return new RGBWColor(color);
   }
 }

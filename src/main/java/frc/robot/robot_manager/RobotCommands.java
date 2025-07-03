@@ -108,7 +108,7 @@ public class RobotCommands {
   }
 
   public Command floorIntakeCommand() {
-    return Commands.runOnce(robot.groundManager::intakeRequest, gmRequirements)
+    return Commands.runOnce(robot::intakeGroundRequest, gmRequirements)
         .withName("FloorIntakeCommand");
   }
 
