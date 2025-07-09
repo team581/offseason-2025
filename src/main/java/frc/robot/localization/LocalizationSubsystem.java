@@ -23,7 +23,8 @@ import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.results.TagResult;
 
-// TODO: Get the odometry to work with WPILIB(Swerve Drive Odometry class) instead of CTRE(Swerve Drivetrain class)
+// TODO: Get the odometry to work with WPILIB(Swerve Drive Odometry class) instead of CTRE(Swerve
+// Drivetrain class)
 
 public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private static final Vector<N3> MT1_VISION_STD_DEVS =
