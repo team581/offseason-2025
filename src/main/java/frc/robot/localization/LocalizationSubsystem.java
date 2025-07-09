@@ -7,9 +7,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,9 +41,6 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private final SwerveSubsystem swerve;
   private Pose2d robotPose = Pose2d.kZero;
 
-  // Use comp bot tuner constants for distance to middle; 12
-  private SwerveDriveOdometry odometry = new SwerveDriveOdometry(new SwerveDriveKinematics(new Translation2d[], new Translation2d[], new Translation2d[], new Translation2d[], ), null, null);
-
   public LocalizationSubsystem(ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve) {
     super(SubsystemPriority.LOCALIZATION, LocalizationState.DEFAULT_STATE);
     this.swerve = swerve;
@@ -78,7 +72,6 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     vision.getRightTagResult().ifPresent(this::ingestTagResult);
 
     robotPose = swerve.drivetrain.getState().Pose;
-    robotPose = odometry.update(swerve, null)
   }
 
   public Pose2d getPose() {
