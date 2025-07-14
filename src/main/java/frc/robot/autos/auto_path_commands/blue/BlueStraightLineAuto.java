@@ -14,7 +14,7 @@ import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 
 public class BlueStraightLineAuto extends BaseAuto {
   private static final AutoConstraintOptions CONSTRAINTS =
-      new AutoConstraintOptions(4.75, 71.5, 8.5, 35.2);
+      new AutoConstraintOptions().withMaxLinearVelocity(4.75).withMaxLinearAcceleration(8.5);
 
   public BlueStraightLineAuto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);

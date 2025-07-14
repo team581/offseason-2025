@@ -25,6 +25,7 @@ import frc.robot.generated.PracticeBotTunerConstants;
 import frc.robot.generated.PracticeBotTunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.ControllerHelpers;
 import frc.robot.util.MathHelpers;
+import frc.robot.util.kinematics.PolarChassisSpeeds;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import java.util.Map;
@@ -83,8 +84,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private Notifier simNotifier = null;
 
   private SwerveDriveState drivetrainState = new SwerveDriveState();
-  private ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds();
-  private ChassisSpeeds fieldRelativeSpeeds = new ChassisSpeeds();
+  private PolarChassisSpeeds robotRelativeSpeeds = new PolarChassisSpeeds();
+  private PolarChassisSpeeds fieldRelativeSpeeds = new PolarChassisSpeeds();
   private double goalSnapAngle = 0;
 
   /** The latest requested teleop speeds. */
@@ -92,22 +93,18 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
 
-  private ChassisSpeeds coralAssistSpeedsOffset = new ChassisSpeeds();
-
   private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
 
-  private final ChassisSpeeds previousSpeeds = new ChassisSpeeds();
-  private static final double PREVIOUS_TIMESTAMP = 0.0;
   private final Timer timeSinceAutoSpeeds = new Timer();
   private double teleopSlowModePercent = 0.0;
   private double rawControllerXValue = 0.0;
   private double rawControllerYValue = 0.0;
 
-  public ChassisSpeeds getRobotRelativeSpeeds() {
+  public PolarChassisSpeeds getRobotRelativeSpeeds() {
     return robotRelativeSpeeds;
   }
 
-  public ChassisSpeeds getFieldRelativeSpeeds() {
+  public PolarChassisSpeeds getFieldRelativeSpeeds() {
     return fieldRelativeSpeeds;
   }
 
@@ -146,10 +143,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   public void setRobotRelativeAutoSpeeds(ChassisSpeeds speeds) {
     setFieldRelativeAutoSpeeds(
         ChassisSpeeds.fromRobotRelativeSpeeds(speeds, drivetrainState.Pose.getRotation()));
-  }
-
-  public void setFieldRelativeCoralAssistSpeedsOffset(ChassisSpeeds speeds) {
-    coralAssistSpeedsOffset = speeds;
   }
 
   public void setAutoAlignSpeeds(ChassisSpeeds speeds) {
@@ -224,7 +217,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   @Override
   protected void collectInputs() {
     drivetrainState = drivetrain.getState();
-    robotRelativeSpeeds = drivetrainState.Speeds;
+    robotRelativeSpeeds = new PolarChassisSpeeds(drivetrainState.Speeds);
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
     teleopSlowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
   }
@@ -233,9 +226,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     return teleopSpeeds;
   }
 
-  private ChassisSpeeds calculateFieldRelativeSpeeds() {
-    return ChassisSpeeds.fromRobotRelativeSpeeds(
-        robotRelativeSpeeds, drivetrainState.Pose.getRotation());
+  private PolarChassisSpeeds calculateFieldRelativeSpeeds() {
+    return new PolarChassisSpeeds(
+        ChassisSpeeds.fromRobotRelativeSpeeds(
+            robotRelativeSpeeds, drivetrainState.Pose.getRotation()));
   }
 
   private void sendSwerveRequest() {

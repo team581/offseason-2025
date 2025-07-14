@@ -13,7 +13,8 @@ import frc.robot.util.trailblazer.Trailblazer;
 import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 
 public class BlueDoNothingAuto extends BaseAuto {
-  private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(2, 57, 4, 30);
+  private static final AutoConstraintOptions CONSTRAINTS =
+      new AutoConstraintOptions().withMaxLinearVelocity(2).withMaxLinearAcceleration(4);
 
   public BlueDoNothingAuto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);

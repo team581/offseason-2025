@@ -50,15 +50,22 @@ public class AutoBlocks {
           0.0,
           -Units.inchesToMeters(RobotConfig.get().arm().inchesFromCenter()),
           Rotation2d.fromDegrees(90));
-  public static final AutoConstraintOptions MAX_CONSTRAINTS =
-      new AutoConstraintOptions(4.75, 57, 4.0, 30);
+  public static final AutoConstraintOptions MAX_CONSTRAINTS = new AutoConstraintOptions();
   public static final AutoConstraintOptions LOLLIPOP_RACE_CONSTRAINTS =
-      MAX_CONSTRAINTS.withMaxLinearVelocity(5).withMaxLinearAcceleration(4.5);
+      MAX_CONSTRAINTS.withMaxLinearAcceleration(Double.MAX_VALUE);
   public static final AutoConstraintOptions BASE_CONSTRAINTS =
-      new AutoConstraintOptions(4.0, 30, 2.5, 25);
+      new AutoConstraintOptions()
+          .withMaxLinearVelocity(4)
+          .withMaxLinearAcceleration(3)
+          .withMaxAngularVelocity(Math.toRadians(360))
+          .withMaxAngularAcceleration(Math.toRadians(360));
 
   public static final AutoConstraintOptions CORAL_MAP_CONSTRAINTS =
-      new AutoConstraintOptions(4.0, 10, 2.5, 10);
+      new AutoConstraintOptions()
+          .withMaxLinearVelocity(4)
+          .withMaxLinearAcceleration(2.5)
+          .withMaxAngularVelocity(10)
+          .withMaxAngularAcceleration(Math.toRadians(360 * 1.5));
   private static final AutoConstraintOptions SCORING_CONSTRAINTS =
       BASE_CONSTRAINTS.withMaxLinearVelocity(3.0).withMaxLinearAcceleration(1.75);
   private static final AutoConstraintOptions L2_SCORING_CONSTRAINTS =
@@ -70,7 +77,7 @@ public class AutoBlocks {
       BASE_CONSTRAINTS.withMaxLinearAcceleration(3.0).withMaxLinearVelocity(4.5);
 
   public static final AutoConstraintOptions BASE_CONSTRAINTS_FOR_GROUND_AUTOS =
-      new AutoConstraintOptions(3.75, 57, 1.75, 25);
+      new AutoConstraintOptions().withMaxLinearVelocity(3.75).withMaxLinearAcceleration(1.75);
   private static final AutoConstraintOptions SCORING_CONSTRAINTS_FOR_GROUND_AUTOS =
       BASE_CONSTRAINTS_FOR_GROUND_AUTOS.withMaxLinearAcceleration(1.25).withMaxLinearVelocity(3);
 
@@ -114,7 +121,7 @@ public class AutoBlocks {
                         robotManager.autoAlign.getUsedScoringPose(
                             pipe, ReefPipeLevel.L4, RobotScoringSide.LEFT),
                     SCORING_CONSTRAINTS))),
-        //          .withDeadline(
+        // .withDeadline(
         //
         // autoCommands.waitForAlignedForScore().andThen(autoCommands.l4LeftReleaseCommand())),
         trailblazer.followSegment(
