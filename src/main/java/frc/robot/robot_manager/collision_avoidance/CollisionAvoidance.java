@@ -483,6 +483,7 @@ public class CollisionAvoidance {
         graph, ObstructionStrategy.LONG_WAY_IF_BLOCKED, Waypoint.L2_LEFT_ARM, Waypoint.L3_LEFT_ARM);
 
     Waypoint.L2_LEFT_ARM.alwaysSafe(graph, Waypoint.L2_LEFT_LINEUP);
+
     Waypoint.L3_LEFT_ARM.alwaysSafe(graph, Waypoint.L3_LEFT_LINEUP);
     Waypoint.L2_RIGHT_ARM.alwaysSafe(graph, Waypoint.L2_RIGHT_LINEUP);
     Waypoint.L3_RIGHT_ARM.alwaysSafe(graph, Waypoint.L3_RIGHT_LINEUP);
@@ -518,10 +519,10 @@ public class CollisionAvoidance {
     /* Reef algae */
     Waypoint.HANDOFF_CLEARS_CLIMBER.alwaysSafe(
         graph,
-        Waypoint.REEF_ALGAE_L2_LEFT,
-        Waypoint.REEF_ALGAE_L3_LEFT,
-        Waypoint.REEF_ALGAE_L2_RIGHT,
-        Waypoint.REEF_ALGAE_L3_RIGHT);
+        Waypoint.L2_LEFT_ARM_ALGAE,
+        Waypoint.L2_RIGHT_ARM_ALGAE,
+        Waypoint.L3_LEFT_ARM_ALGAE,
+        Waypoint.L3_RIGHT_ARM_ALGAE);
     // Algae stow position can go directly to any of the intake states
     Waypoint.L1_UPRIGHT.avoidClimberAlwaysSafe(
         graph,
@@ -529,6 +530,18 @@ public class CollisionAvoidance {
         Waypoint.REEF_ALGAE_L2_RIGHT,
         Waypoint.REEF_ALGAE_L3_RIGHT,
         Waypoint.REEF_ALGAE_L3_LEFT);
+
+    Waypoint.L2_LEFT_ARM_ALGAE.avoidClimberAlwaysSafe(
+        graph, Waypoint.REEF_ALGAE_L2_LEFT, Waypoint.REEF_ALGAE_L3_LEFT);
+
+    Waypoint.L3_LEFT_ARM_ALGAE.avoidClimberAlwaysSafe(
+        graph, Waypoint.REEF_ALGAE_L2_LEFT, Waypoint.REEF_ALGAE_L3_LEFT);
+
+    Waypoint.L3_RIGHT_ARM_ALGAE.avoidClimberAlwaysSafe(
+        graph, Waypoint.REEF_ALGAE_L2_RIGHT, Waypoint.REEF_ALGAE_L3_RIGHT);
+
+    Waypoint.L3_RIGHT_ARM_ALGAE.avoidClimberAlwaysSafe(
+        graph, Waypoint.REEF_ALGAE_L2_RIGHT, Waypoint.REEF_ALGAE_L3_RIGHT);
     // Create an immutable copy of the graph now that we've added all the nodes
     var immutableGraph = ImmutableValueGraph.copyOf(graph);
 

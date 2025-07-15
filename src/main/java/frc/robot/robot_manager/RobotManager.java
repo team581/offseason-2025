@@ -1183,7 +1183,11 @@ public class RobotManager extends StateMachine<RobotState> {
                 ALGAE_INTAKE_L2_LEFT,
                 ALGAE_INTAKE_L3_LEFT,
                 ALGAE_INTAKE_L2_RIGHT,
-                ALGAE_INTAKE_L3_RIGHT ->
+                ALGAE_INTAKE_L3_RIGHT,
+                ALGAE_INTAKE_L2_LEFT_HOLDING,
+                ALGAE_INTAKE_L2_RIGHT_HOLDING,
+                ALGAE_INTAKE_L3_LEFT_HOLDING,
+                ALGAE_INTAKE_L3_RIGHT_HOLDING ->
                 autoAlign.getAlgaeAlignSpeeds();
             default -> autoAlign.getTagAlignSpeeds();
           };
@@ -1216,10 +1220,10 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     var isFarEnoughFromReefSide =
-        !AutoAlign.isCloseToReefSide(robotPose, nearestReefSide.getPose(robotPose), 0.7);
+        !AutoAlign.isCloseToReefSide(robotPose, nearestReefSide.getPose(robotPose), 1.0);
 
     var speeds = swerve.getTeleopSpeeds();
-    var isDrivingAway = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > 0.08;
+    var isDrivingAway = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > 0.5;
     return isFarEnoughFromReefSide && isDrivingAway;
   }
 
