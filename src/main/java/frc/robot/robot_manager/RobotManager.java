@@ -171,7 +171,7 @@ public class RobotManager extends StateMachine<RobotState> {
           elevator.atGoal()
                   && arm.atGoal()
                   && groundManager.deploy.atGoal()
-                  && (DriverStation.isTeleop() || groundManager.intake.getHasGP())
+                  && groundManager.intake.getHasGP()
               ? currentState.getHandoffPrepareToReleaseState()
               : currentState;
 
