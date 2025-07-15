@@ -113,7 +113,7 @@ class CompConfig {
               18,
               27,
               true,
-              new Debouncer(0.1, DebounceType.kBoth),
+              new Debouncer(0.02, DebounceType.kBoth),
               new TalonFXConfiguration()
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
