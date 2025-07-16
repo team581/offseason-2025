@@ -171,6 +171,7 @@ public class RobotManager extends StateMachine<RobotState> {
           elevator.atGoal()
                   && arm.atGoal()
                   && groundManager.deploy.atGoal()
+                  && groundManager.getState().equals(GroundState.HANDOFF_WAIT)
                   && groundManager.intake.getHasGP()
               ? currentState.getHandoffPrepareToReleaseState()
               : currentState;
@@ -304,7 +305,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
       case CORAL_INTAKE_LOLLIPOP_GRAB ->
           claw.getHasGP() ? RobotState.CORAL_INTAKE_LOLLIPOP_PUSH : currentState;
-      case CORAL_INTAKE_LOLLIPOP_PUSH -> timeout(0.45) ? RobotState.CLAW_CORAL : currentState;
+      case CORAL_INTAKE_LOLLIPOP_PUSH -> timeout(0.6) ? RobotState.CLAW_CORAL : currentState;
 
       case CLIMBING_1_LINEUP ->
           climber.holdingCage() ? RobotState.CLIMBING_2_HANGING : currentState;
@@ -409,6 +410,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.INTAKING_ALGAE);
+
         climber.setState(ClimberState.STOPPED);
       }
       case ALGAE_INTAKE_L2_RIGHT, ALGAE_INTAKE_L2_RIGHT_HOLDING -> {
@@ -431,6 +433,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.INTAKING_ALGAE);
+
         climber.setState(ClimberState.STOPPED);
       }
       case ALGAE_INTAKE_L3_LEFT, ALGAE_INTAKE_L3_LEFT_HOLDING -> {
@@ -453,6 +456,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.INTAKING_ALGAE);
+
         climber.setState(ClimberState.STOPPED);
       }
       case ALGAE_INTAKE_L3_RIGHT, ALGAE_INTAKE_L3_RIGHT_HOLDING -> {
@@ -620,6 +624,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.TAGS);
         lights.setState(getLightStateForScoring());
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L2_LEFT_LINEUP -> {
@@ -628,6 +633,7 @@ public class RobotManager extends StateMachine<RobotState> {
             ElevatorState.CORAL_SCORE_LINEUP_L2, ArmState.CORAL_SCORE_LEFT_LINEUP_L2);
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
+
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOPPED);
       }
@@ -645,6 +651,7 @@ public class RobotManager extends StateMachine<RobotState> {
             ElevatorState.CORAL_SCORE_RELEASE_L2, ArmState.CORAL_SCORE_LEFT_RELEASE_L2, true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.SCORING_CORAL);
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L2_RIGHT_APPROACH -> {
@@ -655,6 +662,7 @@ public class RobotManager extends StateMachine<RobotState> {
         vision.setState(VisionState.TAGS);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOPPED);
+
       }
       case CORAL_L2_RIGHT_LINEUP -> {
         claw.setState(ClawState.IDLE_W_CORAL);
@@ -663,6 +671,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L2_RIGHT_PLACE -> {
@@ -680,6 +689,7 @@ public class RobotManager extends StateMachine<RobotState> {
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.SCORING_CORAL);
         climber.setState(ClimberState.STOPPED);
+
       }
       // L3
       case CORAL_L3_LEFT_APPROACH -> {
@@ -690,6 +700,7 @@ public class RobotManager extends StateMachine<RobotState> {
         vision.setState(VisionState.TAGS);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOPPED);
+
       }
       case CORAL_L3_LEFT_LINEUP -> {
         claw.setState(ClawState.IDLE_W_CORAL);
@@ -698,6 +709,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L3_LEFT_PLACE -> {
@@ -714,6 +726,7 @@ public class RobotManager extends StateMachine<RobotState> {
             ElevatorState.CORAL_SCORE_RELEASE_L3, ArmState.CORAL_SCORE_LEFT_RELEASE_L3, true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.SCORING_CORAL);
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L3_RIGHT_APPROACH -> {
@@ -723,6 +736,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.TAGS);
         lights.setState(getLightStateForScoring());
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L3_RIGHT_LINEUP -> {
@@ -731,6 +745,7 @@ public class RobotManager extends StateMachine<RobotState> {
             ElevatorState.CORAL_SCORE_LINEUP_L3, ArmState.CORAL_SCORE_RIGHT_LINEUP_L3);
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
+
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOPPED);
       }
@@ -748,6 +763,7 @@ public class RobotManager extends StateMachine<RobotState> {
             ElevatorState.CORAL_SCORE_RELEASE_L3, ArmState.CORAL_SCORE_RIGHT_RELEASE_L3, true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.SCORING_CORAL);
+
         climber.setState(ClimberState.STOPPED);
       }
       // L4
@@ -758,6 +774,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.TAGS);
         lights.setState(getLightStateForScoring());
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L4_LEFT_LINEUP -> {
@@ -767,6 +784,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L4_LEFT_PLACE -> {
@@ -783,6 +801,7 @@ public class RobotManager extends StateMachine<RobotState> {
             ElevatorState.CORAL_SCORE_RELEASE_L4, ArmState.CORAL_SCORE_LEFT_RELEASE_L4, true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.SCORING_CORAL);
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L4_RIGHT_APPROACH -> {
@@ -792,6 +811,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.TAGS);
         lights.setState(getLightStateForScoring());
+
         climber.setState(ClimberState.STOPPED);
       }
       case CORAL_L4_RIGHT_LINEUP -> {
@@ -800,6 +820,7 @@ public class RobotManager extends StateMachine<RobotState> {
             ElevatorState.CORAL_SCORE_LINEUP_L4, ArmState.CORAL_SCORE_RIGHT_LINEUP_L4);
         swerve.setSnapToAngle(reefSnapAngle);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
+
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOPPED);
       }
@@ -816,6 +837,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_SCORE_RELEASE_L4, ArmState.CORAL_SCORE_RIGHT_RELEASE_L4, true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
+
         lights.setState(LightsState.SCORING_CORAL);
         climber.setState(ClimberState.STOPPED);
       }
@@ -1388,7 +1410,9 @@ public class RobotManager extends StateMachine<RobotState> {
       return;
     }
     scoringAlignActive = true;
+
     if (claw.getHasGP() || RobotState.isLineupOrApproachState(getState())) {
+
       switch (robotScoringSide) {
         case LEFT -> setStateFromRequest(RobotState.CORAL_L4_LEFT_APPROACH);
         case RIGHT -> setStateFromRequest(RobotState.CORAL_L4_RIGHT_APPROACH);
@@ -1404,6 +1428,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     scoringAlignActive = true;
+
     if (claw.getHasGP() || RobotState.isLineupOrApproachState(getState())) {
       switch (robotScoringSide) {
         case LEFT -> setStateFromRequest(RobotState.CORAL_L3_LEFT_APPROACH);
@@ -1420,6 +1445,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     scoringAlignActive = true;
+
     if (claw.getHasGP() || RobotState.isLineupOrApproachState(getState())) {
       switch (robotScoringSide) {
         case LEFT -> setStateFromRequest(RobotState.CORAL_L2_LEFT_APPROACH);

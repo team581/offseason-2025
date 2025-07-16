@@ -185,6 +185,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   }
 
   public ChassisSpeeds getTagAlignSpeeds() {
+    DogLog.log("AutoAlign/TagAlignSpeeds", tagAlignSpeeds);
     return tagAlignSpeeds;
   }
 
@@ -225,6 +226,12 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   public Pose2d getUsedScoringPose(ReefPipe pipe) {
     return tagAlign.getUsedScoringPose(pipe);
   }
+
+
+  public Pose2d getUsedScoringPose(ReefPipe pipe, RobotScoringSide scoringSide) {
+    return tagAlign.getUsedScoringPose(pipe, scoringSide);
+  }
+
 
   public Pose2d getUsedScoringPose(ReefPipe pipe, ReefPipeLevel level, RobotScoringSide side) {
     if (DriverStation.isAutonomous()) {
