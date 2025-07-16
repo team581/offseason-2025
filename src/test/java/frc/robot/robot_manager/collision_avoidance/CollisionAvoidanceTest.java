@@ -34,7 +34,6 @@ public class CollisionAvoidanceTest {
     assertEquals(expected, result.get());
   }
 
-
   @Test
   public void hectorTest() {
     var currentRawAngle = 720;
@@ -372,7 +371,6 @@ public class CollisionAvoidanceTest {
     assertEquals(expected, result.orElseThrow());
   }
 
-
   @Test
   void handoffToLollipop() {
     var result =
@@ -554,6 +552,4 @@ public class CollisionAvoidanceTest {
 
     assertEquals(expected, result.orElseThrow());
   }
-
- 
 }

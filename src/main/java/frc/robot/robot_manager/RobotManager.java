@@ -662,7 +662,6 @@ public class RobotManager extends StateMachine<RobotState> {
         vision.setState(VisionState.TAGS);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOPPED);
-
       }
       case CORAL_L2_RIGHT_LINEUP -> {
         claw.setState(ClawState.IDLE_W_CORAL);
@@ -689,7 +688,6 @@ public class RobotManager extends StateMachine<RobotState> {
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.SCORING_CORAL);
         climber.setState(ClimberState.STOPPED);
-
       }
       // L3
       case CORAL_L3_LEFT_APPROACH -> {
@@ -700,7 +698,6 @@ public class RobotManager extends StateMachine<RobotState> {
         vision.setState(VisionState.TAGS);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOPPED);
-
       }
       case CORAL_L3_LEFT_LINEUP -> {
         claw.setState(ClawState.IDLE_W_CORAL);

@@ -211,6 +211,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   public boolean nearGoal(ElevatorState state) {
     return nearGoal(state, NEAR_TOLERANCE);
   }
+
   public boolean nearGoal(ElevatorState state, double tolerance) {
     return MathUtil.isNear(state.getHeight(), averageMeasuredHeight, tolerance);
   }

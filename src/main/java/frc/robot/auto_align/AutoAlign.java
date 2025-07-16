@@ -227,11 +227,9 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     return tagAlign.getUsedScoringPose(pipe);
   }
 
-
   public Pose2d getUsedScoringPose(ReefPipe pipe, RobotScoringSide scoringSide) {
     return tagAlign.getUsedScoringPose(pipe, scoringSide);
   }
-
 
   public Pose2d getUsedScoringPose(ReefPipe pipe, ReefPipeLevel level, RobotScoringSide side) {
     if (DriverStation.isAutonomous()) {

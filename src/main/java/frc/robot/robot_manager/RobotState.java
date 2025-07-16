@@ -247,12 +247,13 @@ public enum RobotState {
 
   public static boolean isReleaseState(RobotState state) {
     return switch (state) {
-      case
-      CORAL_L1_RIGHT_RELEASE,
-      CORAL_L2_LEFT_RELEASE,
-      CORAL_L2_RIGHT_RELEASE,
-      CORAL_L3_LEFT_RELEASE,
-      CORAL_L3_RIGHT_RELEASE,CORAL_L4_LEFT_RELEASE,CORAL_L4_RIGHT_RELEASE ->
+      case CORAL_L1_RIGHT_RELEASE,
+          CORAL_L2_LEFT_RELEASE,
+          CORAL_L2_RIGHT_RELEASE,
+          CORAL_L3_LEFT_RELEASE,
+          CORAL_L3_RIGHT_RELEASE,
+          CORAL_L4_LEFT_RELEASE,
+          CORAL_L4_RIGHT_RELEASE ->
           true;
       default -> false;
     };

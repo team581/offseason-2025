@@ -1,31 +1,20 @@
 package frc.robot.auto_align.tag_align;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import com.google.common.collect.ImmutableList;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
-import frc.robot.config.FeatureFlags;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
-import frc.robot.util.FeatureFlag;
 import frc.robot.util.MathHelpers;
 import frc.robot.util.kinematics.PolarChassisSpeeds;
 import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
@@ -36,15 +25,13 @@ public class TagAlign {
   private static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
       ImmutableList.copyOf(ReefPipe.values());
 
-  private static final PIDController ROTATION_CONTROLLER =
-      new PIDController(6.0, 0.0, 0.0);
+  private static final PIDController ROTATION_CONTROLLER = new PIDController(6.0, 0.0, 0.0);
   private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedTranslation", Units.inchesToMeters(1.0));
   private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedRotation", 3.0);
 
-  private static final PIDController VELOCITY_CONTROLLER =
-      new PIDController(3.7, 0.0, 0.0);
+  private static final PIDController VELOCITY_CONTROLLER = new PIDController(3.7, 0.0, 0.0);
   private static final double PIPE_SWITCH_TIMEOUT = 0.5;
 
   private final AlignmentCostUtil alignmentCostUtil;
@@ -59,7 +46,7 @@ public class TagAlign {
   private double rawControllerYValue = 0.0;
   private double lastPipeSwitchTimestamp = 0.0;
 
-  private static final DoubleSubscriber FEED_FORWARD =DogLog.tunable("AutoAlign/FeedForward", 0.0);
+  private static final DoubleSubscriber FEED_FORWARD = DogLog.tunable("AutoAlign/FeedForward", 0.0);
 
   private boolean pipeSwitchActive = false;
 
@@ -184,34 +171,33 @@ public class TagAlign {
         .orElseThrow();
   }
 
-
-
-
   public PolarChassisSpeeds getPoseAlignmentChassisSpeeds(
       Pose2d targetPose,
       Pose2d currentPose,
       AutoConstraintOptions constraints,
       PolarChassisSpeeds currentSpeeds) {
 
-        // Calculate x and y velocities
-        double distanceToGoalMeters = currentPose.getTranslation().getDistance(targetPose.getTranslation());
+    // Calculate x and y velocities
+    double distanceToGoalMeters =
+        currentPose.getTranslation().getDistance(targetPose.getTranslation());
 
-        var driveVelocityMagnitude = VELOCITY_CONTROLLER.calculate(distanceToGoalMeters);
+    var driveVelocityMagnitude = VELOCITY_CONTROLLER.calculate(distanceToGoalMeters);
 
-        if (distanceToGoalMeters > TRANSLATION_GOOD_THRESHOLD.get()) {
-          driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
-        }
+    if (distanceToGoalMeters > TRANSLATION_GOOD_THRESHOLD.get()) {
+      driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
+    }
 
+    DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
+    DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
 
-        DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
-        DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
+    PolarChassisSpeeds speeds =
+        new PolarChassisSpeeds(
+            driveVelocityMagnitude,
+            MathHelpers.getDriveDirection(currentPose, targetPose),
+            ROTATION_CONTROLLER.calculate(
+                currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians()));
 
-
-        PolarChassisSpeeds speeds = new PolarChassisSpeeds(driveVelocityMagnitude, MathHelpers.getDriveDirection(currentPose, targetPose), ROTATION_CONTROLLER.calculate(
-            currentPose.getRotation().getRadians(),
-            targetPose.getRotation().getRadians()));
-
-        return speeds;
+    return speeds;
   }
 
   private final double lastMaxLinearAcceleration =
