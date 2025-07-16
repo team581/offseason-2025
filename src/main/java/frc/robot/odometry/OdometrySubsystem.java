@@ -30,8 +30,8 @@ public class OdometrySubsystem extends StateMachine<OdometryState> {
     this.imu = imu;
     this.swerve = swerve;
 
-     Rotation2d initialHeading = Rotation2d.fromDegrees(imu.getRobotHeading());
-     SwerveModulePosition[] fieldRelativeModulePositions =
+    Rotation2d initialHeading = Rotation2d.fromDegrees(imu.getRobotHeading());
+    SwerveModulePosition[] fieldRelativeModulePositions =
         swerve.drivetrain.getState().ModulePositions;
     this.wpiOdometry =
         new SwerveDriveOdometry(kinematics, initialHeading, fieldRelativeModulePositions);
