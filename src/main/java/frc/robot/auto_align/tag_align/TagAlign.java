@@ -27,7 +27,6 @@ import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.FeatureFlag;
 import frc.robot.util.MathHelpers;
-import frc.robot.util.kinematics.PhoenixProfiledPIDController;
 import frc.robot.util.kinematics.PolarChassisSpeeds;
 import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 import java.util.Comparator;
