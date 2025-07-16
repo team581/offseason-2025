@@ -62,7 +62,7 @@ public class ArmSubsystem extends StateMachine<ArmState> {
   private boolean elevatorIsGoingDown = false;
   private boolean elevatorIsGoingDownDebounced = false;
   private double previousElevatorHeight = Double.POSITIVE_INFINITY;
-  private final Debouncer debouncer = new Debouncer(0.5, DebounceType.kBoth);
+  private final Debouncer debouncer = new Debouncer(1.0, DebounceType.kBoth);
   private final LinearFilter handoffAdjustmentTxFilter = LinearFilter.movingAverage(7);
 
   public void setLollipopMode(boolean lollipopMode) {
@@ -231,9 +231,9 @@ public class ArmSubsystem extends StateMachine<ArmState> {
       DogLog.log("Arm/ElevatorIsGoingDownDebounced", elevatorIsGoingDownDebounced);
     }
     if (rangeOfMotionGood()) {
-      DogLog.clearFault("Arm not seen range of motion");
-    } else if (RobotConfig.IS_PRACTICE_BOT) {
-      DogLog.logFault("Arm not seen range of motion", AlertType.kWarning);
+      DogLog.clearFault("ARM NOT HOMED");
+    } else {
+      DogLog.logFault("ARM NOT HOMED", AlertType.kWarning);
     }
 
     switch (getState()) {

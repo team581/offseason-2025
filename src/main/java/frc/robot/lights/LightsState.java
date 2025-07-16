@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public enum LightsState {
   ERROR(Color.kRed, BlinkPattern.BLINK_FAST),
-  UNHOMED(Color.kYellow, BlinkPattern.BLINK_SLOW),
-  HOMED_NO_TAGS(Color.kYellow, BlinkPattern.BLINK_FAST),
+  UNHOMED(Color.kOrangeRed, BlinkPattern.BLINK_SLOW),
+  HOMED_NO_TAGS(Color.kYellow, BlinkPattern.SOLID),
   HOMED_SEES_TAGS(Color.kGreen, BlinkPattern.SOLID),
 
   BLINK(Color.kWhite, BlinkPattern.BLINK_FAST),
