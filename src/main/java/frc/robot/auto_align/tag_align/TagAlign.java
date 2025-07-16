@@ -190,7 +190,7 @@ public class TagAlign {
     DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
     DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
 
-    PolarChassisSpeeds speeds =
+    var speeds =
         new PolarChassisSpeeds(
             driveVelocityMagnitude,
             MathHelpers.getDriveDirection(currentPose, targetPose),
