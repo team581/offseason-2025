@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class CoralMap extends StateMachine<CoralMapState> {
-  private static final int LOLLIPOP_FILTER_TAPS = 7;
+  private static final int LOLLIPOP_FILTER_TAPS = 9;
   private static final double SWERVE_MAX_LINEAR_SPEED_TRACKING = 3.0;
   private static final double SWERVE_MAX_ANGULAR_SPEED_TRACKING = 3.0;
 
