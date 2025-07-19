@@ -12,9 +12,8 @@ public enum SubsystemPriority {
 
   // 10-19 is for sensor subsystems
   // Auto align inputs run after localization pose is updated
-  AUTO_ALIGN(13),
-  LOCALIZATION(12),
-  ODOMETRY(11),
+  AUTO_ALIGN(12),
+  LOCALIZATION(11),
   FMS(10),
   IMU(10),
   // Vision inputs run before localization so that it has fresh vision data for pose estimator

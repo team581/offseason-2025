@@ -223,7 +223,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   @Override
   protected void collectInputs() {
-    // TODO: add "SwerveDriveOdometry" here, maybe..
     drivetrainState = drivetrain.getState();
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
