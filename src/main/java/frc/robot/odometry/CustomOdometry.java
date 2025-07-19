@@ -36,10 +36,8 @@ public class CustomOdometry extends Odometry {
     this.swerve = swerve;
 
     this.gyroAngle = Rotation2d.fromDegrees(imu.getRobotHeading());
-    this.fieldRelativeModulePositions =
-        swerve.drivetrain.getState().ModulePositions;
-    this.wpiOdometry =
-        new SwerveDriveOdometry(kinematics, gyroAngle, fieldRelativeModulePositions);
+    this.fieldRelativeModulePositions = swerve.drivetrain.getState().ModulePositions;
+    this.wpiOdometry = new SwerveDriveOdometry(kinematics, gyroAngle, fieldRelativeModulePositions);
   }
 
   public SwerveDriveKinematics getKinematics() {
@@ -51,6 +49,8 @@ public class CustomOdometry extends Odometry {
   }
 
   public void updatePose() {
-    wpiOdometry.update(Rotation2d.fromDegrees(imu.getRobotHeading()), swerve.drivetrain.getState().ModulePositions);
+    wpiOdometry.update(
+        Rotation2d.fromDegrees(imu.getRobotHeading()),
+        swerve.drivetrain.getState().ModulePositions);
   }
 }

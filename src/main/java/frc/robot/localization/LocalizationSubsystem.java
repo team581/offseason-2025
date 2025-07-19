@@ -5,7 +5,6 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N3;
@@ -42,7 +41,9 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private final VisionSubsystem vision;
   private final SwerveSubsystem swerve;
   private Pose2d robotPose = Pose2d.kZero;
-  // private final PoseEstimator estimator = new PoseEstimator(odometry.kinematics, odometry, stateStds, visionStds);
+
+  // private final PoseEstimator estimator = new PoseEstimator(odometry.kinematics, odometry,
+  // stateStds, visionStds);
 
   public LocalizationSubsystem(ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve) {
     super(SubsystemPriority.LOCALIZATION, LocalizationState.DEFAULT_STATE);
