@@ -39,13 +39,14 @@ public class RedLollipopLeftABAuto extends BaseAuto {
                         new AutoSegment(
                             AutoBlocks.LOLLIPOP_RACE_CONSTRAINTS,
                             AutoBlocks.APPROACH_REEF_TOLERANCE,
-                            new AutoPoint(new Pose2d(12.836, 1.085,
-                            Rotation2d.fromDegrees(90.0))),
-                            new AutoPoint(new Pose2d(14.6, 2.240, Rotation2d.fromDegrees(90.0)),
-                            Commands.waitSeconds(0.25).andThen(autoCommands.l4ApproachCommand(
-                                ReefPipe.PIPE_A, RobotScoringSide.LEFT))),
+                            new AutoPoint(new Pose2d(12.836, 1.085, Rotation2d.fromDegrees(90.0))),
                             new AutoPoint(
-                                new Pose2d(15.5, 3.69, Rotation2d.fromDegrees(90.0))),
+                                new Pose2d(14.6, 2.240, Rotation2d.fromDegrees(90.0)),
+                                Commands.waitSeconds(0.25)
+                                    .andThen(
+                                        autoCommands.l4ApproachCommand(
+                                            ReefPipe.PIPE_A, RobotScoringSide.LEFT))),
+                            new AutoPoint(new Pose2d(15.5, 3.69, Rotation2d.fromDegrees(90.0))),
                             new AutoPoint(
                                 ReefPipe.PIPE_A.getPose(
                                     ReefPipeLevel.L4, RobotScoringSide.LEFT))))),
