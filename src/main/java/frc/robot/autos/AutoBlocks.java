@@ -41,9 +41,9 @@ public class AutoBlocks {
       new Transform2d(0, Units.inchesToMeters(-60), Rotation2d.kZero);
 
   private static final Transform2d CENTER_LOLLIPOP_OFFSET =
-      new Transform2d(0, Units.inchesToMeters(15), Rotation2d.kZero);
+      new Transform2d(0, Units.inchesToMeters(8), Rotation2d.kZero);
   private static final Transform2d APPROACH_LOLLIPOP_OFFSET =
-      new Transform2d(0, Units.inchesToMeters(15), Rotation2d.kZero);
+      new Transform2d(0, Units.inchesToMeters(35), Rotation2d.kZero);
 
   public static final Transform2d LOLLIPOP_OFFSET =
       new Transform2d(
