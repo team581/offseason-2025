@@ -5,7 +5,7 @@ import java.util.function.BooleanSupplier;
 
 public class FeatureFlags {
   public static final BooleanSupplier PURE_PURSUIT_USE_DYNAMIC_LOOKAHEAD =
-      FeatureFlag.of("PurePursuit/UseDynamicLookahead", true);
+      FeatureFlag.of("PurePursuit/UseDynamicLookahead", false);
 
   public static final BooleanSupplier PURE_PURSUIT_ROTATE_IMMEDIATELY =
       FeatureFlag.of("PurePursuit/RotateImmediately", false);

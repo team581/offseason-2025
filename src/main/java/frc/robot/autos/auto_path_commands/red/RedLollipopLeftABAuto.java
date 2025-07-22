@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto_align.ReefPipe;
+import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.autos.AutoBlocks;
 import frc.robot.autos.BaseAuto;
@@ -38,12 +39,16 @@ public class RedLollipopLeftABAuto extends BaseAuto {
                         new AutoSegment(
                             AutoBlocks.LOLLIPOP_RACE_CONSTRAINTS,
                             AutoBlocks.APPROACH_REEF_TOLERANCE,
-                            new AutoPoint(new Pose2d(12.836, 1.085, Rotation2d.fromDegrees(90.0))),
-                            new AutoPoint(new Pose2d(14.644, 2.240, Rotation2d.fromDegrees(90.0))),
+                            new AutoPoint(new Pose2d(12.836, 1.085,
+                            Rotation2d.fromDegrees(90.0))),
+                            new AutoPoint(new Pose2d(14.6, 2.240, Rotation2d.fromDegrees(90.0)),
+                            Commands.waitSeconds(0.25).andThen(autoCommands.l4ApproachCommand(
+                                ReefPipe.PIPE_A, RobotScoringSide.LEFT))),
                             new AutoPoint(
-                                new Pose2d(15.034, 3.629, Rotation2d.fromDegrees(90.0)),
-                                autoCommands.l4ApproachCommand(
-                                    ReefPipe.PIPE_A, RobotScoringSide.LEFT))))),
+                                new Pose2d(15.5, 3.69, Rotation2d.fromDegrees(90.0))),
+                            new AutoPoint(
+                                ReefPipe.PIPE_A.getPose(
+                                    ReefPipeLevel.L4, RobotScoringSide.LEFT))))),
                 blocks.scoreL4(ReefPipe.PIPE_A, RobotScoringSide.LEFT),
                 autoCommands.intakeLollipopCommand())),
         // LOLLIPOP 2 (MIDDLE)

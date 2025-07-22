@@ -1,5 +1,6 @@
 package frc.robot.autos;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -32,7 +33,7 @@ public class AutoBlocks {
 
   private static final PoseErrorTolerance SUPER_FAST_LOLLIPOP_APPROACH_TOLERANCE =
       new PoseErrorTolerance(0.8, 20);
-  public static final PoseErrorTolerance APPROACH_REEF_TOLERANCE = new PoseErrorTolerance(0.6, 10);
+  public static final PoseErrorTolerance APPROACH_REEF_TOLERANCE = new PoseErrorTolerance(0.3, 10);
 
   public static final Transform2d INTAKE_CORAL_GROUND_LINEUP_OFFSET =
       new Transform2d(-0.6, -0.9, Rotation2d.kZero);
@@ -41,9 +42,9 @@ public class AutoBlocks {
       new Transform2d(0, Units.inchesToMeters(-60), Rotation2d.kZero);
 
   private static final Transform2d CENTER_LOLLIPOP_OFFSET =
-      new Transform2d(0, Units.inchesToMeters(8), Rotation2d.kZero);
+      new Transform2d(0, Units.inchesToMeters(10), Rotation2d.kZero);
   private static final Transform2d APPROACH_LOLLIPOP_OFFSET =
-      new Transform2d(0, Units.inchesToMeters(35), Rotation2d.kZero);
+      new Transform2d(0, Units.inchesToMeters(30), Rotation2d.kZero);
 
   public static final Transform2d LOLLIPOP_OFFSET =
       new Transform2d(
@@ -135,7 +136,8 @@ public class AutoBlocks {
   }
 
   public Command scoreL4(ReefPipe pipe, RobotScoringSide scoringSide) {
-    if (!robotManager.claw.getHasGP() && robotManager.groundManager.hasCoral()) {
+    if (!robotManager.claw.getHasGP() && !robotManager.groundManager.hasCoral()) {
+      DogLog.timestamp("AAAAAA");
       return Commands.none();
     }
     return Commands.sequence(
@@ -168,7 +170,7 @@ public class AutoBlocks {
   }
 
   public Command scoreL4AfterGroundIntake(ReefPipe pipe, RobotScoringSide scoringSide) {
-    if (!robotManager.claw.getHasGP() && robotManager.groundManager.hasCoral()) {
+    if (!robotManager.claw.getHasGP() && !robotManager.groundManager.hasCoral()) {
       return Commands.none();
     }
     return Commands.sequence(
@@ -239,7 +241,7 @@ public class AutoBlocks {
   }
 
   public Command scoreL3(ReefPipe pipe, RobotScoringSide scoringSide, Command onFinish) {
-    if (!robotManager.claw.getHasGP() && robotManager.groundManager.hasCoral()) {
+    if (!robotManager.claw.getHasGP() && !robotManager.groundManager.hasCoral()) {
       return Commands.none();
     }
     return Commands.sequence(
@@ -275,7 +277,7 @@ public class AutoBlocks {
   }
 
   public Command scoreL2(ReefPipe pipe, RobotScoringSide scoringSide) {
-    if (!robotManager.claw.getHasGP() && robotManager.groundManager.hasCoral()) {
+    if (!robotManager.claw.getHasGP() && !robotManager.groundManager.hasCoral()) {
       return Commands.none();
     }
     return Commands.sequence(

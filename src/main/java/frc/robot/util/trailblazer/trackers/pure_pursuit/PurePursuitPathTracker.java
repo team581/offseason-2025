@@ -11,7 +11,7 @@ import frc.robot.util.trailblazer.trackers.PathTracker;
 import java.util.List;
 
 public class PurePursuitPathTracker implements PathTracker {
-  private static final double NON_DYNAMIC_LOOKAHEAD_DISTANCE = 1.5;
+  private static final double NON_DYNAMIC_LOOKAHEAD_DISTANCE = 1.0;
   private static final double DYNAMIC_LOOKAHEAD_TRANSITION_TIME = 0.5;
   private static final double STARTING_ROBOT_POSE_FAR_FROM_PATH_THRESHOLD = 0.5;
 
