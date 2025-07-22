@@ -35,6 +35,7 @@ public class ReefState {
       default -> {}
     }
   }
+
   public void markScored(ReefPipe pipe, ReefPipeLevel level) {
     switch (level) {
       case L2 -> scoredL2Pipes.add(pipe);

@@ -45,14 +45,14 @@ public class RedLollipop4L4Auto extends BaseAuto {
                                     ReefPipe.PIPE_K, RobotScoringSide.LEFT))))),
                 blocks.scoreL4(ReefPipe.PIPE_K, RobotScoringSide.LEFT),
                 autoCommands.intakeLollipopCommand())),
-                // LOLLIPOP 1
-                timing.time(
-                    "Piece 1",
-                    blocks.intakeLollipop(
-                        new Pose2d(15.767, 2.368, Rotation2d.fromDegrees(-18.186))
-                            .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
-                    blocks.scoreL4(ReefPipe.PIPE_L, RobotScoringSide.LEFT),
-                    autoCommands.intakeLollipopCommand()),
+        // LOLLIPOP 1
+        timing.time(
+            "Piece 1",
+            blocks.intakeLollipop(
+                new Pose2d(15.767, 2.368, Rotation2d.fromDegrees(-18.186))
+                    .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
+            blocks.scoreL4(ReefPipe.PIPE_L, RobotScoringSide.LEFT),
+            autoCommands.intakeLollipopCommand()),
         // LOLLIPOP 2 (MIDDLE)
         timing.time(
             "Piece 2",
