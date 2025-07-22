@@ -54,6 +54,7 @@ public class TagAlign {
     this.localization = localization;
     alignmentCostUtil = new AlignmentCostUtil(localization, swerve, reefState, robotScoringSide);
     ROTATION_CONTROLLER.enableContinuousInput(-Math.PI, Math.PI);
+    ROTATION_CONTROLLER.setTolerance(0.01);
   }
 
   public void setLevel(ReefPipeLevel level, ReefPipeLevel preferredLevel, RobotScoringSide side) {

@@ -268,24 +268,14 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
       case REEF_ALIGN_TELEOP -> {
-        if (autoAlignSpeeds.omegaRadiansPerSecond == 0) {
-          drivetrain.setControl(
-              driveToAngle
-                  .withVelocityX(autoAlignSpeeds.vxMetersPerSecond)
-                  .withVelocityY(autoAlignSpeeds.vyMetersPerSecond)
-                  .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
-                  .withMaxAbsRotationalRate(
-                      TELEOP_MAX_ANGULAR_RATE.getRadians() * teleopSlowModePercent)
-                  .withDriveRequestType(DriveRequestType.Velocity));
-        } else {
-          drivetrain.setControl(
-              drive
-                  .withVelocityX(autoAlignSpeeds.vxMetersPerSecond)
-                  .withVelocityY(autoAlignSpeeds.vyMetersPerSecond)
-                  .withRotationalRate(autoAlignSpeeds.omegaRadiansPerSecond)
-                  .withDriveRequestType(DriveRequestType.Velocity));
-        }
+        drivetrain.setControl(
+            drive
+                .withVelocityX(autoAlignSpeeds.vxMetersPerSecond)
+                .withVelocityY(autoAlignSpeeds.vyMetersPerSecond)
+                .withRotationalRate(autoAlignSpeeds.omegaRadiansPerSecond)
+                .withDriveRequestType(DriveRequestType.Velocity));
       }
+
       case AUTO ->
           drivetrain.setControl(
               drive
