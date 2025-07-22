@@ -27,6 +27,14 @@ public class ReefState {
     DogLog.log("ReefState/L4", scoredL4Pipes.toArray(ReefPipe[]::new));
   }
 
+  public void remove(ReefPipe pipe, ReefPipeLevel level) {
+    switch (level) {
+      case L2 -> scoredL2Pipes.remove(pipe);
+      case L3 -> scoredL3Pipes.remove(pipe);
+      case L4 -> scoredL4Pipes.remove(pipe);
+      default -> {}
+    }
+  }
   public void markScored(ReefPipe pipe, ReefPipeLevel level) {
     switch (level) {
       case L2 -> scoredL2Pipes.add(pipe);

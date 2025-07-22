@@ -104,7 +104,8 @@ public class TagAlign {
             case PIPE_K -> ReefPipe.PIPE_L;
             case PIPE_L -> ReefPipe.PIPE_K;
           };
-
+          reefState.remove(partnerPipe, preferedScoringLevel);
+          reefState.markScored(storedPipe, preferedScoringLevel);
       setPipeOveride(partnerPipe);
     }
   }
