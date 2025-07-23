@@ -46,7 +46,8 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private final PoseEstimator estimator;
   private Pose2d robotPose = Pose2d.kZero;
 
-  public LocalizationSubsystem(ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve, CustomOdometry odometry) {
+  public LocalizationSubsystem(
+      ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve, CustomOdometry odometry) {
     super(SubsystemPriority.LOCALIZATION, LocalizationState.DEFAULT_STATE);
     this.swerve = swerve;
     this.imu = imu;
