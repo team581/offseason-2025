@@ -5,6 +5,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N3;
@@ -16,6 +17,7 @@ import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.imu.ImuSubsystem;
+import frc.robot.odometry.CustomOdometry;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
@@ -40,16 +42,19 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private final ImuSubsystem imu;
   private final VisionSubsystem vision;
   private final SwerveSubsystem swerve;
+  private final CustomOdometry odometry;
+  private final PoseEstimator estimator;
   private Pose2d robotPose = Pose2d.kZero;
 
-  // private final PoseEstimator estimator = new PoseEstimator(odometry.kinematics, odometry,
-  // stateStds, visionStds);
-
-  public LocalizationSubsystem(ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve) {
+  public LocalizationSubsystem(ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve, CustomOdometry odometry) {
     super(SubsystemPriority.LOCALIZATION, LocalizationState.DEFAULT_STATE);
     this.swerve = swerve;
     this.imu = imu;
     this.vision = vision;
+    this.odometry = odometry;
+
+    // TODO: Finish initializing pose estimator
+    this.estimator = new PoseEstimator<>(odometry.getKinematics(), odometry, null, null);
 
     if (FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
       SmartDashboard.putData(
