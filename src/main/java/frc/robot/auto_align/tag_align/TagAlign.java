@@ -30,21 +30,20 @@ public class TagAlign {
 
   private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedTranslation", Units.inchesToMeters(1.0));
-        private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
-            DogLog.tunable("AutoAlign/IsAlignedRotation", 3.0);
+  private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
+      DogLog.tunable("AutoAlign/IsAlignedRotation", 3.0);
 
-      private static final DoubleSubscriber NEED_TO_MOVE_TRANSLATION_THRESHOLD =
+  private static final DoubleSubscriber NEED_TO_MOVE_TRANSLATION_THRESHOLD =
       DogLog.tunable("AutoAlign/NeedMoveTranslation", Units.inchesToMeters(1.5));
-      private static final DoubleSubscriber NEED_TO_MOVE_ROTATION_THRESHOLD =
+  private static final DoubleSubscriber NEED_TO_MOVE_ROTATION_THRESHOLD =
       DogLog.tunable("AutoAlign/NeedMoveRotation", 3.0);
 
-      private static final DoubleSubscriber IN_RANGE_TRANSLATION_THRESHOLD =
+  private static final DoubleSubscriber IN_RANGE_TRANSLATION_THRESHOLD =
       DogLog.tunable("AutoAlign/InRangeTranslation", Units.inchesToMeters(1.5));
-      private static final DoubleSubscriber IN_RANGE_ROTATION_THRESHOLD =
+  private static final DoubleSubscriber IN_RANGE_ROTATION_THRESHOLD =
       DogLog.tunable("AutoAlign/InRangeRotation", 3.0);
 
-
-      private static final double MAX_SPEED = 2.0;
+  private static final double MAX_SPEED = 2.0;
   private static final PIDController VELOCITY_CONTROLLER = new PIDController(3.7, 0.0, 0.0);
   private static final double PIPE_SWITCH_TIMEOUT = 0.5;
 
@@ -145,12 +144,11 @@ public class TagAlign {
     return translationGood && rotationGood;
   }
 
-
   public boolean needToMove(Pose2d goal) {
-   var robotPose = localization.getPose();
+    var robotPose = localization.getPose();
     var translationBad =
         (robotPose.getTranslation().getDistance(goal.getTranslation())
-            >NEED_TO_MOVE_TRANSLATION_THRESHOLD.get());
+            > NEED_TO_MOVE_TRANSLATION_THRESHOLD.get());
     var rotationBad =
         !MathUtil.isNear(
             goal.getRotation().getDegrees(),
@@ -163,19 +161,18 @@ public class TagAlign {
 
   public boolean inRange(Pose2d goal) {
     var robotPose = localization.getPose();
-     var translationGood =
-         (robotPose.getTranslation().getDistance(goal.getTranslation())
-             <=IN_RANGE_TRANSLATION_THRESHOLD.get());
-     var rotationGood =
-         MathUtil.isNear(
-             goal.getRotation().getDegrees(),
-             robotPose.getRotation().getDegrees(),
-             IN_RANGE_ROTATION_THRESHOLD.get(),
-             -180.0,
-             180.0);
-     return translationGood && rotationGood;
-   }
-
+    var translationGood =
+        (robotPose.getTranslation().getDistance(goal.getTranslation())
+            <= IN_RANGE_TRANSLATION_THRESHOLD.get());
+    var rotationGood =
+        MathUtil.isNear(
+            goal.getRotation().getDegrees(),
+            robotPose.getRotation().getDegrees(),
+            IN_RANGE_ROTATION_THRESHOLD.get(),
+            -180.0,
+            180.0);
+    return translationGood && rotationGood;
+  }
 
   public void markScored(ReefPipe pipe) {
     reefState.markScored(pipe, preferedScoringLevel);
@@ -226,16 +223,16 @@ public class TagAlign {
       AutoConstraintOptions constraints,
       PolarChassisSpeeds currentSpeeds) {
 
-if (FeatureFlags.AUTO_ALIGN_DEADBAND.getAsBoolean()) {
-  if (aligned||inRange(targetPose)) {
-    if (needToMove(targetPose)) {
-      aligned = false;
-    } else {
-      aligned = true;
-      return new PolarChassisSpeeds();
+    if (FeatureFlags.AUTO_ALIGN_DEADBAND.getAsBoolean()) {
+      if (aligned || inRange(targetPose)) {
+        if (needToMove(targetPose)) {
+          aligned = false;
+        } else {
+          aligned = true;
+          return new PolarChassisSpeeds();
+        }
+      }
     }
-  }
-}
 
     // Calculate x and y velocities
     double distanceToGoalMeters =

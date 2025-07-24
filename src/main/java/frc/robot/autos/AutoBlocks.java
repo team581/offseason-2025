@@ -420,4 +420,3 @@ public class AutoBlocks {
         .withDeadline(autoCommands.waitForIntakeDone());
   }
 }
-

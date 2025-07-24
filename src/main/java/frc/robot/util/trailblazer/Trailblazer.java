@@ -155,4 +155,3 @@ public class Trailblazer {
     return constrainedVelocityGoal;
   }
 }
-

@@ -9,10 +9,8 @@ import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.autos.AutoBlocks;
 import frc.robot.autos.BaseAuto;
 import frc.robot.autos.Points;
-import frc.robot.util.trailblazer.AutoPoint;
-
-
 import frc.robot.robot_manager.RobotManager;
+import frc.robot.util.trailblazer.AutoPoint;
 import frc.robot.util.trailblazer.AutoSegment;
 import frc.robot.util.trailblazer.Trailblazer;
 
@@ -74,4 +72,3 @@ public class RedLollipopLeftABAuto extends BaseAuto {
             Commands.none()));
   }
 }
-
