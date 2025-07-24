@@ -136,7 +136,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     bestReefPipe = tagAlign.getBestPipe();
     usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
     isAligned = tagAlign.isAligned(bestReefPipe);
-    isAlignedDebounced = isAligned;
+    isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
     tagAlignSpeeds =
         tagAlign.getPoseAlignmentChassisSpeeds(
             usedScoringPose,

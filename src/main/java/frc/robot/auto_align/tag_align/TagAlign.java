@@ -44,6 +44,7 @@ public class TagAlign {
       DogLog.tunable("AutoAlign/InRangeRotation", 3.0);
 
 
+      private static final double MAX_SPEED = 2.0;
   private static final PIDController VELOCITY_CONTROLLER = new PIDController(3.7, 0.0, 0.0);
   private static final double PIPE_SWITCH_TIMEOUT = 0.5;
 
@@ -246,6 +247,7 @@ if (FeatureFlags.AUTO_ALIGN_DEADBAND.getAsBoolean()) {
       driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
     }
 
+    MathUtil.clamp(driveVelocityMagnitude, -MAX_SPEED, MAX_SPEED);
     DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
     DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
 
