@@ -117,6 +117,7 @@ public class CoralMap extends StateMachine<CoralMapState> {
                   Rotation2d.fromDegrees(newPose.getRotation().getDegrees())));
       lastLollipopTime = Timer.getFPGATimestamp();
     } else {
+      if (!isLollipopInSafeSpotForAuto(newPose.getTranslation()))
       if (Timer.getFPGATimestamp() - lastLollipopTime >= LOLLIPOP_LIFTEIME_SECONDS) {
         filteredLollipopPose = Optional.empty();
         lollipopXFilter.reset();
@@ -214,8 +215,12 @@ public class CoralMap extends StateMachine<CoralMapState> {
 
   public static boolean isLollipopInSafeSpotForAuto(Translation2d coralPose) {
 
-    if ((FmsSubsystem.isRedAlliance() && coralPose.getX() < Units.inchesToMeters(603))
-        || (!FmsSubsystem.isRedAlliance() && coralPose.getX() > Units.inchesToMeters(72))) {
+    if ((FmsSubsystem.isRedAlliance()
+            && (coralPose.getX() < Units.inchesToMeters(603) || coralPose.getX() > 16.4))
+        || (!FmsSubsystem.isRedAlliance()
+                && (coralPose.getX() > Units.inchesToMeters(72) || coralPose.getX() < 1.1)
+            || coralPose.getY() > 6.5
+            || coralPose.getY() < 1.5)) {
       return false;
     }
 
