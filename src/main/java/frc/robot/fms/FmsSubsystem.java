@@ -10,10 +10,9 @@ public class FmsSubsystem extends LifecycleSubsystem {
   }
 
   public static boolean isRedAlliance() {
-    return false;
-    // Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
 
-    // return alliance == Alliance.Red;
+    return alliance == Alliance.Red;
   }
 
   @Override

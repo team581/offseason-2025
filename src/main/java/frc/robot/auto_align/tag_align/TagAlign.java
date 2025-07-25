@@ -44,6 +44,7 @@ public class TagAlign {
       DogLog.tunable("AutoAlign/InRangeRotation", 3.0);
 
   private static final double MAX_SPEED = 2.0;
+  private static final double MAX_ROTATION_SPEED = Units.rotationsToRadians(0.5);
   private static final PIDController VELOCITY_CONTROLLER = new PIDController(3.7, 0.0, 0.0);
   private static final double PIPE_SWITCH_TIMEOUT = 0.5;
 
@@ -69,6 +70,7 @@ public class TagAlign {
     alignmentCostUtil = new AlignmentCostUtil(localization, swerve, reefState, robotScoringSide);
     ROTATION_CONTROLLER.enableContinuousInput(-Math.PI, Math.PI);
     ROTATION_CONTROLLER.setTolerance(0.01);
+
   }
 
   public void setLevel(ReefPipeLevel level, ReefPipeLevel preferredLevel, RobotScoringSide side) {
@@ -244,16 +246,26 @@ public class TagAlign {
       driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
     }
 
-    MathUtil.clamp(driveVelocityMagnitude, -MAX_SPEED, MAX_SPEED);
+    var rotationSpeed =ROTATION_CONTROLLER.calculate(
+      currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+    driveVelocityMagnitude = MathUtil.clamp(driveVelocityMagnitude, -MAX_SPEED, MAX_SPEED);
+
+    if (FeatureFlags.AUTO_ALIGN_MAX_ROTATION_LIMIT.getAsBoolean()) {
+      rotationSpeed = MathUtil.clamp(rotationSpeed, -MAX_ROTATION_SPEED, MAX_ROTATION_SPEED);
+    }
+
+
     DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
     DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
+
 
     var speeds =
         new PolarChassisSpeeds(
             driveVelocityMagnitude,
             MathHelpers.getDriveDirection(currentPose, targetPose),
-            ROTATION_CONTROLLER.calculate(
-                currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians()));
+            rotationSpeed
+            );
 
     return speeds;
   }
