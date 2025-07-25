@@ -14,8 +14,8 @@ import frc.robot.util.trailblazer.AutoPoint;
 import frc.robot.util.trailblazer.AutoSegment;
 import frc.robot.util.trailblazer.Trailblazer;
 
-public class BlueLollipopLeftL4Auto extends BaseAuto {
-  public BlueLollipopLeftL4Auto(RobotManager robotManager, Trailblazer trailblazer) {
+public class BlueLollipop4L4Auto extends BaseAuto {
+  public BlueLollipop4L4Auto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);
   }
 
@@ -38,29 +38,36 @@ public class BlueLollipopLeftL4Auto extends BaseAuto {
                         new AutoSegment(
                             AutoBlocks.LOLLIPOP_RACE_CONSTRAINTS,
                             AutoBlocks.APPROACH_REEF_TOLERANCE,
-                            new AutoPoint(new Pose2d(4.714, 6.965, Rotation2d.fromDegrees(-90))),
-                            new AutoPoint(new Pose2d(2.906, 5.81, Rotation2d.fromDegrees(-90))),
+                            new AutoPoint(new Pose2d(3.734, 6.669, Rotation2d.fromDegrees(-150))),
                             new AutoPoint(
-                                new Pose2d(2.516, 4.421, Rotation2d.fromDegrees(-90)),
+                                new Pose2d(3.85, 5.55, Rotation2d.fromDegrees(-150)),
                                 autoCommands.l4ApproachCommand(
-                                    ReefPipe.PIPE_A, RobotScoringSide.LEFT))))),
-                blocks.scoreL4(ReefPipe.PIPE_A, RobotScoringSide.LEFT),
+                                    ReefPipe.PIPE_K, RobotScoringSide.LEFT))))),
+                blocks.scoreL4(ReefPipe.PIPE_K, RobotScoringSide.LEFT),
                 autoCommands.intakeLollipopCommand())),
-        // LOLLIPOP 2 (MIDDLE)
+        // LOLLIPOP 1
         timing.time(
             "Piece 1",
             blocks.intakeLollipop(
-                new Pose2d(1.85, 4.05, Rotation2d.fromDegrees(180))
+                new Pose2d(1.783, 5.682, Rotation2d.fromDegrees(161.814))
                     .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
-            blocks.scoreL4(ReefPipe.PIPE_B, RobotScoringSide.LEFT)),
-        autoCommands.intakeLollipopCommand(),
-        // LOLLIPOP 1
+            blocks.scoreL4(ReefPipe.PIPE_L, RobotScoringSide.LEFT),
+            autoCommands.intakeLollipopCommand()),
+        // LOLLIPOP 2 (MIDDLE)
         timing.time(
             "Piece 2",
             blocks.intakeLollipop(
-                new Pose2d(1.583, 5.392, Rotation2d.fromDegrees(128.05))
+                new Pose2d(1.769, 4.241, Rotation2d.fromDegrees(-158.929))
                     .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
-            blocks.scoreL4(ReefPipe.PIPE_L, RobotScoringSide.LEFT),
+            blocks.scoreL4(ReefPipe.PIPE_A, RobotScoringSide.LEFT)),
+        autoCommands.intakeLollipopCommand(),
+        // LOLLIPOP 3
+        timing.time(
+            "Piece 3",
+            blocks.intakeLollipop(
+                new Pose2d(1.583, 2.658, Rotation2d.fromDegrees(-128.05))
+                    .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
+            blocks.scoreL4(ReefPipe.PIPE_B, RobotScoringSide.LEFT),
             Commands.none()));
   }
 }
