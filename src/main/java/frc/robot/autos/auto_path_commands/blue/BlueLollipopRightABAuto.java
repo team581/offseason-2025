@@ -46,29 +46,29 @@ public class BlueLollipopRightABAuto extends BaseAuto {
                                     ReefPipe.PIPE_B, RobotScoringSide.LEFT))))),
                 blocks.scoreL4(ReefPipe.PIPE_B, RobotScoringSide.LEFT),
                 autoCommands.intakeLollipopCommand())),
-     // LOLLIPOP 2 (MIDDLE)
-     timing.time(
-      "Piece 1",
-      blocks.intakeLollipop(
-          new Pose2d(1.85, 4.05, Rotation2d.fromDegrees(180))
-              .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
-      blocks.scoreL4(ReefPipe.PIPE_A, RobotScoringSide.LEFT)),
-  autoCommands.intakeLollipopCommand(),
-  // LOLLIPOP 3
-  timing.time(
-      "Piece 3",
-      blocks.intakeLollipop(
-          new Pose2d(1.583, 2.658, Rotation2d.fromDegrees(-128.05))
-              .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
-      blocks.scoreL2(ReefPipe.PIPE_B, RobotScoringSide.LEFT),
-      Commands.none()),
-  // LOLLIPOP 1
-  timing.time(
-      "Piece 2",
-      blocks.intakeLollipop(
-          new Pose2d(1.583, 5.392, Rotation2d.fromDegrees(128.05))
-              .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
-      blocks.scoreL2(ReefPipe.PIPE_A, RobotScoringSide.LEFT),
-      autoCommands.intakeLollipopCommand()));
+        // LOLLIPOP 2 (MIDDLE)
+        timing.time(
+            "Piece 1",
+            blocks.intakeLollipop(
+                new Pose2d(1.85, 4.05, Rotation2d.fromDegrees(180))
+                    .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
+            blocks.scoreL4(ReefPipe.PIPE_A, RobotScoringSide.LEFT)),
+        autoCommands.intakeLollipopCommand(),
+        // LOLLIPOP 3
+        timing.time(
+            "Piece 3",
+            blocks.intakeLollipop(
+                new Pose2d(1.583, 2.658, Rotation2d.fromDegrees(-128.05))
+                    .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
+            blocks.scoreL2(ReefPipe.PIPE_B, RobotScoringSide.LEFT),
+            Commands.none()),
+        // LOLLIPOP 1
+        timing.time(
+            "Piece 2",
+            blocks.intakeLollipop(
+                new Pose2d(1.583, 5.392, Rotation2d.fromDegrees(128.05))
+                    .transformBy(AutoBlocks.LOLLIPOP_OFFSET)),
+            blocks.scoreL2(ReefPipe.PIPE_A, RobotScoringSide.LEFT),
+            autoCommands.intakeLollipopCommand()));
   }
 }

@@ -19,7 +19,6 @@ public enum AutoSelection {
   LOLLIPOP_RIGHT_FRONT_SIDE(RedLollipopRightABAuto::new, BlueLollipopRightABAuto::new),
   LOLLIPOP_4_L4(RedLollipop4L4Auto::new, BlueLollipop4L4Auto::new);
 
-
   public final BiFunction<RobotManager, Trailblazer, BaseAuto> redAuto;
   public final BiFunction<RobotManager, Trailblazer, BaseAuto> blueAuto;
 
