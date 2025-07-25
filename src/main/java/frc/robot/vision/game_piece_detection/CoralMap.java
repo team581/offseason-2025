@@ -117,12 +117,13 @@ public class CoralMap extends StateMachine<CoralMapState> {
                   Rotation2d.fromDegrees(newPose.getRotation().getDegrees())));
       lastLollipopTime = Timer.getFPGATimestamp();
     } else {
-      if (!isLollipopInSafeSpotForAuto(newPose.getTranslation()))
-        {if (Timer.getFPGATimestamp() - lastLollipopTime >= LOLLIPOP_LIFTEIME_SECONDS) {
+      if (!isLollipopInSafeSpotForAuto(newPose.getTranslation())) {
+        if (Timer.getFPGATimestamp() - lastLollipopTime >= LOLLIPOP_LIFTEIME_SECONDS) {
           filteredLollipopPose = Optional.empty();
           lollipopXFilter.reset();
           lollipopYFilter.reset();
-        }}
+        }
+      }
     }
   }
 
