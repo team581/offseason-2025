@@ -264,7 +264,9 @@ public class AutoBlocks {
                     new AutoPoint(
                         () ->
                             pipe.getPose(
-                                ReefPipeLevel.BACK_AWAY_AUTO, FmsSubsystem.isRedAlliance(), scoringSide),
+                                ReefPipeLevel.BACK_AWAY_AUTO,
+                                FmsSubsystem.isRedAlliance(),
+                                scoringSide),
                         Commands.waitSeconds(0.15).andThen(onFinish)))))
         .onlyIf(() -> robotManager.claw.getHasGP() || robotManager.groundManager.hasCoral());
   }

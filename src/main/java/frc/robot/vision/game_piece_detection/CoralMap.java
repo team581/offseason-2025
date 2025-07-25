@@ -118,11 +118,11 @@ public class CoralMap extends StateMachine<CoralMapState> {
       lastLollipopTime = Timer.getFPGATimestamp();
     } else {
       if (!isLollipopInSafeSpotForAuto(newPose.getTranslation()))
-      if (Timer.getFPGATimestamp() - lastLollipopTime >= LOLLIPOP_LIFTEIME_SECONDS) {
-        filteredLollipopPose = Optional.empty();
-        lollipopXFilter.reset();
-        lollipopYFilter.reset();
-      }
+        {if (Timer.getFPGATimestamp() - lastLollipopTime >= LOLLIPOP_LIFTEIME_SECONDS) {
+          filteredLollipopPose = Optional.empty();
+          lollipopXFilter.reset();
+          lollipopYFilter.reset();
+        }}
     }
   }
 
@@ -217,8 +217,8 @@ public class CoralMap extends StateMachine<CoralMapState> {
 
     if ((FmsSubsystem.isRedAlliance()
             && (coralPose.getX() < Units.inchesToMeters(603) || coralPose.getX() > 16.4))
-        || (!FmsSubsystem.isRedAlliance()
-                && (coralPose.getX() > Units.inchesToMeters(72) || coralPose.getX() < 1.1)
+        || ((!FmsSubsystem.isRedAlliance()
+                && (coralPose.getX() > Units.inchesToMeters(72) || coralPose.getX() < 1.1))
             || coralPose.getY() > 6.5
             || coralPose.getY() < 1.5)) {
       return false;
