@@ -25,7 +25,7 @@ public class AutoBlocks {
    * scoring L4.
    */
   private static final PoseErrorTolerance AFTER_SCORE_POSITION_TOLERANCE =
-      new PoseErrorTolerance(0.1, 25);
+      new PoseErrorTolerance(0.6, 25);
 
   private static final PoseErrorTolerance LOLLIPOP_APPROACH_TOLERANCE =
       new PoseErrorTolerance(0.6, 10);
@@ -41,9 +41,9 @@ public class AutoBlocks {
       new Transform2d(0, Units.inchesToMeters(-60), Rotation2d.kZero);
 
   private static final Transform2d CENTER_LOLLIPOP_OFFSET =
-      new Transform2d(0, Units.inchesToMeters(15), Rotation2d.kZero);
+      new Transform2d(0, Units.inchesToMeters(5), Rotation2d.kZero);
   private static final Transform2d APPROACH_LOLLIPOP_OFFSET =
-      new Transform2d(0, Units.inchesToMeters(15), Rotation2d.kZero);
+      new Transform2d(0, Units.inchesToMeters(35), Rotation2d.kZero);
 
   public static final Transform2d LOLLIPOP_OFFSET =
       new Transform2d(
@@ -64,7 +64,7 @@ public class AutoBlocks {
   private static final AutoConstraintOptions L2_SCORING_CONSTRAINTS =
       BASE_CONSTRAINTS.withMaxLinearVelocity(3.3).withMaxLinearAcceleration(2.15);
   private static final AutoConstraintOptions LOLLIPOP_CONSTRAINTS =
-      BASE_CONSTRAINTS.withMaxLinearAcceleration(2.0).withMaxLinearVelocity(3.0);
+      BASE_CONSTRAINTS.withMaxLinearAcceleration(2.0).withMaxLinearVelocity(1.5);
 
   private static final AutoConstraintOptions SUPER_FAST_LOLLIPOP_CONSTRAINTS =
       BASE_CONSTRAINTS.withMaxLinearAcceleration(3.0).withMaxLinearVelocity(4.5);
@@ -161,7 +161,7 @@ public class AutoBlocks {
                     new AutoPoint(
                         () ->
                             pipe.getPose(
-                                ReefPipeLevel.BACK_AWAY,
+                                ReefPipeLevel.BACK_AWAY_AUTO,
                                 FmsSubsystem.isRedAlliance(),
                                 scoringSide)))))
         .onlyIf(() -> robotManager.claw.getHasGP() || robotManager.groundManager.hasCoral());
@@ -194,7 +194,7 @@ public class AutoBlocks {
                     new AutoPoint(
                         () ->
                             pipe.getPose(
-                                ReefPipeLevel.BACK_AWAY,
+                                ReefPipeLevel.BACK_AWAY_AUTO,
                                 FmsSubsystem.isRedAlliance(),
                                 scoringSide)))))
         .onlyIf(() -> robotManager.claw.getHasGP() || robotManager.groundManager.hasCoral());
@@ -264,7 +264,7 @@ public class AutoBlocks {
                     new AutoPoint(
                         () ->
                             pipe.getPose(
-                                ReefPipeLevel.BACK_AWAY, FmsSubsystem.isRedAlliance(), scoringSide),
+                                ReefPipeLevel.BACK_AWAY_AUTO, FmsSubsystem.isRedAlliance(), scoringSide),
                         Commands.waitSeconds(0.15).andThen(onFinish)))))
         .onlyIf(() -> robotManager.claw.getHasGP() || robotManager.groundManager.hasCoral());
   }
@@ -299,7 +299,7 @@ public class AutoBlocks {
                     new AutoPoint(
                         () ->
                             pipe.getPose(
-                                ReefPipeLevel.BACK_AWAY,
+                                ReefPipeLevel.BACK_AWAY_AUTO,
                                 FmsSubsystem.isRedAlliance(),
                                 scoringSide)))))
         .onlyIf(() -> robotManager.claw.getHasGP() || robotManager.groundManager.hasCoral());
@@ -317,13 +317,13 @@ public class AutoBlocks {
             trailblazer
                 .followSegment(
                     new AutoSegment(
-                        BASE_CONSTRAINTS,
+                        LOLLIPOP_CONSTRAINTS,
                         new AutoPoint(defaultIntakingPoint.transformBy(APPROACH_LOLLIPOP_OFFSET))),
                     false)
                 .withDeadline(autoCommands.waitForElevatorAndArmNearLollipop()),
             trailblazer.followSegment(
                 new AutoSegment(
-                    BASE_CONSTRAINTS,
+                    LOLLIPOP_CONSTRAINTS,
                     LOLLIPOP_APPROACH_TOLERANCE,
                     new AutoPoint(defaultIntakingPoint.transformBy(APPROACH_LOLLIPOP_OFFSET))),
                 true),
@@ -340,7 +340,7 @@ public class AutoBlocks {
                                     .transformBy(CENTER_LOLLIPOP_OFFSET)
                                     .getTranslation(),
                                 defaultIntakingPoint.getRotation()),
-                        BASE_CONSTRAINTS),
+                        LOLLIPOP_CONSTRAINTS),
                     new AutoPoint(
                         () ->
                             new Pose2d(
