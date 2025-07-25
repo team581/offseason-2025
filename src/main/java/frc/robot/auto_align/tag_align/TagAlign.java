@@ -70,7 +70,6 @@ public class TagAlign {
     alignmentCostUtil = new AlignmentCostUtil(localization, swerve, reefState, robotScoringSide);
     ROTATION_CONTROLLER.enableContinuousInput(-Math.PI, Math.PI);
     ROTATION_CONTROLLER.setTolerance(0.01);
-
   }
 
   public void setLevel(ReefPipeLevel level, ReefPipeLevel preferredLevel, RobotScoringSide side) {
@@ -246,8 +245,9 @@ public class TagAlign {
       driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
     }
 
-    var rotationSpeed =ROTATION_CONTROLLER.calculate(
-      currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+    var rotationSpeed =
+        ROTATION_CONTROLLER.calculate(
+            currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
 
     driveVelocityMagnitude = MathUtil.clamp(driveVelocityMagnitude, -MAX_SPEED, MAX_SPEED);
 
@@ -255,17 +255,14 @@ public class TagAlign {
       rotationSpeed = MathUtil.clamp(rotationSpeed, -MAX_ROTATION_SPEED, MAX_ROTATION_SPEED);
     }
 
-
     DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
     DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
-
 
     var speeds =
         new PolarChassisSpeeds(
             driveVelocityMagnitude,
             MathHelpers.getDriveDirection(currentPose, targetPose),
-            rotationSpeed
-            );
+            rotationSpeed);
 
     return speeds;
   }
