@@ -43,7 +43,7 @@ public class AutoBlocks {
   private static final Transform2d CENTER_LOLLIPOP_OFFSET =
       new Transform2d(0, Units.inchesToMeters(5), Rotation2d.kZero);
   private static final Transform2d APPROACH_LOLLIPOP_OFFSET =
-      new Transform2d(0, Units.inchesToMeters(35), Rotation2d.kZero);
+      new Transform2d(0, Units.inchesToMeters(15), Rotation2d.kZero);
 
   public static final Transform2d LOLLIPOP_OFFSET =
       new Transform2d(
@@ -319,13 +319,13 @@ public class AutoBlocks {
             trailblazer
                 .followSegment(
                     new AutoSegment(
-                        LOLLIPOP_CONSTRAINTS,
+                        BASE_CONSTRAINTS,
                         new AutoPoint(defaultIntakingPoint.transformBy(APPROACH_LOLLIPOP_OFFSET))),
                     false)
                 .withDeadline(autoCommands.waitForElevatorAndArmNearLollipop()),
             trailblazer.followSegment(
                 new AutoSegment(
-                    LOLLIPOP_CONSTRAINTS,
+                    BASE_CONSTRAINTS,
                     LOLLIPOP_APPROACH_TOLERANCE,
                     new AutoPoint(defaultIntakingPoint.transformBy(APPROACH_LOLLIPOP_OFFSET))),
                 true),

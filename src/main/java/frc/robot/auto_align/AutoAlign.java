@@ -95,7 +95,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
         < thresholdMeters;
   }
 
-  private final Debouncer isAlignedDebouncer = new Debouncer(0.15, DebounceType.kRising);
+  private final Debouncer isAlignedDebouncer = new Debouncer(0.0, DebounceType.kRising);
   private final VisionSubsystem vision;
   private final LocalizationSubsystem localization;
   private final TagAlign tagAlign;
@@ -105,6 +105,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private ChassisSpeeds tagAlignSpeeds = new ChassisSpeeds();
   private ChassisSpeeds algaeAlignSpeeds = new ChassisSpeeds();
   private boolean isAligned = false;
+  private boolean isNearRotation = false;
   private boolean isAlignedDebounced = false;
   private RobotScoringSide robotScoringSide = RobotScoringSide.RIGHT;
   private ReefPipe bestReefPipe = ReefPipe.PIPE_A;
@@ -136,6 +137,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     bestReefPipe = tagAlign.getBestPipe();
     usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
     isAligned = tagAlign.isAligned(bestReefPipe);
+    isNearRotation = tagAlign.isNearRotationGoal(bestReefPipe);
     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
     tagAlignSpeeds =
         tagAlign.getPoseAlignmentChassisSpeeds(
@@ -156,6 +158,10 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   public boolean isNearRaisingPoint() {
     return positionTolerance.atPose(
         bestReefPipe.getPose(ReefPipeLevel.RAISING, robotScoringSide, robotPose), robotPose);
+  }
+
+  public boolean isNearRotationGoal() {
+    return isNearRotation;
   }
 
   @Override

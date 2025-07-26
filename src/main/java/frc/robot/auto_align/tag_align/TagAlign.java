@@ -33,6 +33,9 @@ public class TagAlign {
   private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedRotation", 3.0);
 
+  private static final DoubleSubscriber NEAR_ROTATION_GOAL =
+      DogLog.tunable("AutoAlign/IsAlignedRotation", 10.0);
+
   private static final DoubleSubscriber NEED_TO_MOVE_TRANSLATION_THRESHOLD =
       DogLog.tunable("AutoAlign/NeedMoveTranslation", Units.inchesToMeters(1.5));
   private static final DoubleSubscriber NEED_TO_MOVE_ROTATION_THRESHOLD =
@@ -143,6 +146,19 @@ public class TagAlign {
             -180.0,
             180.0);
     return translationGood && rotationGood;
+  }
+
+  public boolean isNearRotationGoal(ReefPipe pipe) {
+    var robotPose = localization.getPose();
+    var scoringPoseFieldRelative = getUsedScoringPose(pipe);
+    var rotationGood =
+        MathUtil.isNear(
+            scoringPoseFieldRelative.getRotation().getDegrees(),
+            robotPose.getRotation().getDegrees(),
+            NEAR_ROTATION_GOAL.get(),
+            -180.0,
+            180.0);
+    return rotationGood;
   }
 
   public boolean needToMove(Pose2d goal) {
