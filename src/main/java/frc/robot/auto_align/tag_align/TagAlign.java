@@ -145,8 +145,8 @@ public class TagAlign {
             -180.0,
             180.0);
 
-              DogLog.log("AutoAlign/TranslationGood",translationGood);
-              DogLog.log("AutoAlign/RotationGood",rotationGood);
+    DogLog.log("AutoAlign/TranslationGood", translationGood);
+    DogLog.log("AutoAlign/RotationGood", rotationGood);
 
     return translationGood && rotationGood;
   }
