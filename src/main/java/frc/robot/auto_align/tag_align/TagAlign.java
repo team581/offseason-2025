@@ -33,7 +33,7 @@ public class TagAlign {
   private static final DoubleSubscriber ROTATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedRotation", 3.0);
 
-      private static final DoubleSubscriber NEAR_ROTATION_GOAL  =
+  private static final DoubleSubscriber NEAR_ROTATION_GOAL =
       DogLog.tunable("AutoAlign/IsAlignedRotation", 10.0);
 
   private static final DoubleSubscriber NEED_TO_MOVE_TRANSLATION_THRESHOLD =
@@ -147,7 +147,6 @@ public class TagAlign {
             180.0);
     return translationGood && rotationGood;
   }
-
 
   public boolean isNearRotationGoal(ReefPipe pipe) {
     var robotPose = localization.getPose();

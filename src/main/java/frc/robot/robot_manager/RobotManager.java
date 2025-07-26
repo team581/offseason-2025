@@ -208,7 +208,6 @@ public class RobotManager extends StateMachine<RobotState> {
                 && arm.nearGoal(ArmState.CORAL_SCORE_LEFT_LINEUP_L3)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
                 && autoAlign.isNearRotationGoal()
-
             ? currentState.getLeftApproachToLineupState()
             : currentState;
       }
@@ -217,7 +216,6 @@ public class RobotManager extends StateMachine<RobotState> {
                 && arm.nearGoal(ArmState.CORAL_SCORE_LEFT_LINEUP_L4)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
                 && autoAlign.isNearRotationGoal()
-
             ? currentState.getLeftApproachToLineupState()
             : currentState;
       }
@@ -227,7 +225,6 @@ public class RobotManager extends StateMachine<RobotState> {
                 && arm.nearGoal(ArmState.CORAL_SCORE_RIGHT_LINEUP_L2)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
                 && autoAlign.isNearRotationGoal()
-
             ? currentState.getRightApproachToLineupState()
             : currentState;
       }
@@ -236,7 +233,6 @@ public class RobotManager extends StateMachine<RobotState> {
                 && arm.nearGoal(ArmState.CORAL_SCORE_RIGHT_LINEUP_L3)
                 && (!FeatureFlags.APPROACH_TAG_CHECK.getAsBoolean() || vision.seeingTag())
                 && autoAlign.isNearRotationGoal()
-
             ? currentState.getRightApproachToLineupState()
             : currentState;
       }
