@@ -16,6 +16,7 @@ public class PidPathFollower implements PathFollower {
     this.thetaController = thetaController;
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    thetaController.setTolerance(0.01);
   }
 
   @Override
