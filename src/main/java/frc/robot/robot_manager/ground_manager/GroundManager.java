@@ -100,6 +100,7 @@ public class GroundManager extends StateMachine<GroundState> {
   public void intakeRequest() {
     switch (getState()) {
       case L1_WAIT -> setState(GroundState.L1_HARD_SCORE);
+      case HANDOFF_WAIT, HANDOFF_RELEASE -> intakeThenHandoffRequest();
       default -> setState(GroundState.INTAKING);
     }
   }
@@ -147,7 +148,10 @@ public class GroundManager extends StateMachine<GroundState> {
   }
 
   public void intakeThenHandoffRequest() {
-    if (getState() == GroundState.INTAKING || DriverStation.isAutonomous()) {
+    if (getState() == GroundState.INTAKING
+        || DriverStation.isAutonomous()
+        || getState() == GroundState.HANDOFF_WAIT
+        || getState() == GroundState.HANDOFF_RELEASE) {
       setState(GroundState.INTAKE_THEN_HANDOFF_WAIT);
     } else {
       setState(GroundState.HANDOFF_WAIT);
