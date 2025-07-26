@@ -47,7 +47,7 @@ public class FeatureFlags {
   public static final BooleanSupplier AUTO_ALIGN_DRIVE_DIRECTION_COST =
       FeatureFlag.of("AutoAlign/Costs/DriveDirection", true);
   public static final BooleanSupplier AUTO_ALIGN_HEADING_COST =
-      FeatureFlag.of("AutoAlign/Costs/Heading", true);
+      FeatureFlag.of("AutoAlign/Costs/Heading", false);
   public static final BooleanSupplier AUTO_ALIGN_REEF_STATE_COST =
       FeatureFlag.of("AutoAlign/Costs/ReefState", true);
 
