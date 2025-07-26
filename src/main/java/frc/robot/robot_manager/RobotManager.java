@@ -149,7 +149,7 @@ public class RobotManager extends StateMachine<RobotState> {
           CORAL_L4_RIGHT_LINEUP -> {
         if (((FeatureFlags.AUTO_ALIGN_AUTO_SCORE.getAsBoolean() && scoringAlignActive)
                 || DriverStation.isAutonomous())
-            && autoAlign.isTagAlignedDebounced()
+            && (autoAlign.isTagAlignedDebounced()||(DriverStation.isAutonomous()&&timeout(3.0)))
             && arm.atGoal()
             && elevator.atGoal()) {
           yield currentState.getLineupToPlaceState();

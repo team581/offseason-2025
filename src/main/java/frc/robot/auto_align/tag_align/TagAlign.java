@@ -124,7 +124,6 @@ public class TagAlign {
             case PIPE_L -> ReefPipe.PIPE_K;
           };
       reefState.remove(partnerPipe, preferedScoringLevel);
-      reefState.markScored(storedPipe, preferedScoringLevel);
       setPipeOveride(partnerPipe);
     }
   }
@@ -145,6 +144,10 @@ public class TagAlign {
             ROTATION_GOOD_THRESHOLD.get(),
             -180.0,
             180.0);
+
+              DogLog.log("AutoAlign/TranslationGood",translationGood);
+              DogLog.log("AutoAlign/RotationGood",rotationGood);
+
     return translationGood && rotationGood;
   }
 
