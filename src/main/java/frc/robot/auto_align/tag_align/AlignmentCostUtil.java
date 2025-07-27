@@ -15,7 +15,7 @@ import frc.robot.util.MathHelpers;
 import java.util.Comparator;
 
 public class AlignmentCostUtil {
-  private static final double REEF_STATE_COST = 0.8;
+  private static final double REEF_STATE_COST = 1.2;
   private static final double DRIVE_DIRECTION_SCALAR = 0.02;
   private static final double ANGLE_ERROR_SCALAR = 0.3;
 

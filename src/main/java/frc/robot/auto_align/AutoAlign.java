@@ -147,7 +147,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
             new PolarChassisSpeeds(swerve.getFieldRelativeSpeeds()));
     algaeAlignSpeeds =
         tagAlign.getPoseAlignmentChassisSpeeds(
-            ReefSide.fromPipe(bestReefPipe).getPose(reefSideOffset, robotScoringSide, robotPose),
+            ReefSide.fromPipe(tagAlign.getClosestPipe()).getPose(reefSideOffset, robotScoringSide, robotPose),
             robotPose,
             CONSTRAINTS,
             new PolarChassisSpeeds(swerve.getFieldRelativeSpeeds()));
