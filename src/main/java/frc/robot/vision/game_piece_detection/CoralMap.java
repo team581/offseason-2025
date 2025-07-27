@@ -217,9 +217,9 @@ public class CoralMap extends StateMachine<CoralMapState> {
   public static boolean isLollipopInSafeSpotForAuto(Translation2d coralPose) {
 
     if ((FmsSubsystem.isRedAlliance()
-            && (coralPose.getX() < Units.inchesToMeters(603) || coralPose.getX() > 16.4))
+            && (coralPose.getX() < Units.inchesToMeters(603) || coralPose.getX() > 16.5))
         || ((!FmsSubsystem.isRedAlliance()
-                && (coralPose.getX() > Units.inchesToMeters(72) || coralPose.getX() < 1.1))
+                && (coralPose.getX() > Units.inchesToMeters(72) || coralPose.getX() < 1.0))
             || coralPose.getY() > 6.5
             || coralPose.getY() < 1.5)) {
       return false;
