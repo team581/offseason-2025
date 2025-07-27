@@ -5,15 +5,19 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
+import frc.robot.auto_align.ReefSide;
 import frc.robot.auto_align.ReefState;
 import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.config.FeatureFlags;
+import frc.robot.fms.FmsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.MathHelpers;
@@ -108,21 +112,45 @@ public class TagAlign {
       var storedPipe = getBestPipe();
       pipeSwitchActive = true;
       lastPipeSwitchTimestamp = Timer.getFPGATimestamp();
-      ReefPipe partnerPipe =
+
+      Translation2d inputVector = new Translation2d(rawControllerXValue, -rawControllerYValue);
+      var viewOffset = 0;
+      if (FmsSubsystem.isRedAlliance()) {
+        viewOffset = 180;
+      }
+
+      var sideAngle = ReefSide.fromPipe(storedPipe).getPose(FmsSubsystem.isRedAlliance());
+
+      var rotatedVector =
+      inputVector.rotateBy(
+              Rotation2d.fromDegrees((viewOffset-sideAngle.getRotation().getDegrees())));
+      var rotatedVectorLeft = rotatedVector.getX() < 0;
+      ReefPipe leftPipe =
           switch (storedPipe) {
-            case PIPE_A -> ReefPipe.PIPE_B;
-            case PIPE_B -> ReefPipe.PIPE_A;
-            case PIPE_C -> ReefPipe.PIPE_D;
-            case PIPE_D -> ReefPipe.PIPE_C;
-            case PIPE_E -> ReefPipe.PIPE_F;
-            case PIPE_F -> ReefPipe.PIPE_E;
-            case PIPE_G -> ReefPipe.PIPE_H;
-            case PIPE_H -> ReefPipe.PIPE_G;
-            case PIPE_I -> ReefPipe.PIPE_J;
-            case PIPE_J -> ReefPipe.PIPE_I;
-            case PIPE_K -> ReefPipe.PIPE_L;
-            case PIPE_L -> ReefPipe.PIPE_K;
+            case PIPE_A, PIPE_B -> ReefPipe.PIPE_A;
+            case PIPE_C, PIPE_D -> ReefPipe.PIPE_C;
+            case PIPE_E, PIPE_F -> ReefPipe.PIPE_E;
+            case PIPE_G, PIPE_H -> ReefPipe.PIPE_G;
+            case PIPE_I, PIPE_J -> ReefPipe.PIPE_I;
+            case PIPE_K, PIPE_L -> ReefPipe.PIPE_K;
           };
+      ReefPipe rightPipe =
+          switch (storedPipe) {
+            case PIPE_A, PIPE_B -> ReefPipe.PIPE_B;
+            case PIPE_C, PIPE_D -> ReefPipe.PIPE_D;
+            case PIPE_E, PIPE_F -> ReefPipe.PIPE_F;
+            case PIPE_G, PIPE_H -> ReefPipe.PIPE_H;
+            case PIPE_I, PIPE_J -> ReefPipe.PIPE_J;
+            case PIPE_K, PIPE_L -> ReefPipe.PIPE_L;
+          };
+      var partnerPipe = ReefPipe.PIPE_A;
+      if (rotatedVectorLeft) {
+        DogLog.timestamp("AutoAlign/PipeSwitch/Left");
+        partnerPipe = leftPipe;
+      } else {
+        DogLog.timestamp("AutoAlign/PipeSwitch/Right");
+        partnerPipe = rightPipe;
+      }
       reefState.remove(partnerPipe, preferedScoringLevel);
       setPipeOveride(partnerPipe);
     }
