@@ -113,7 +113,7 @@ public class TagAlign {
       pipeSwitchActive = true;
       lastPipeSwitchTimestamp = Timer.getFPGATimestamp();
 
-      Translation2d inputVector = new Translation2d(rawControllerXValue, -rawControllerYValue);
+      var inputVector = new Translation2d(rawControllerXValue, -rawControllerYValue);
       var viewOffset = 0;
       if (FmsSubsystem.isRedAlliance()) {
         viewOffset = 180;
@@ -122,8 +122,8 @@ public class TagAlign {
       var sideAngle = ReefSide.fromPipe(storedPipe).getPose(FmsSubsystem.isRedAlliance());
 
       var rotatedVector =
-      inputVector.rotateBy(
-              Rotation2d.fromDegrees((viewOffset-sideAngle.getRotation().getDegrees())));
+          inputVector.rotateBy(
+              Rotation2d.fromDegrees((viewOffset - sideAngle.getRotation().getDegrees())));
       var rotatedVectorLeft = rotatedVector.getX() < 0;
       ReefPipe leftPipe =
           switch (storedPipe) {
