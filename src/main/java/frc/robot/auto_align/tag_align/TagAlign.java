@@ -265,19 +265,18 @@ public class TagAlign {
         .orElseThrow();
   }
 
-
   public ReefPipe getClosestPipe() {
     var robotPose = localization.getPose();
     return ALL_REEF_PIPES.stream()
-          .min(
-              Comparator.comparingDouble(
-                  pipe ->
-                      robotPose
-                          .getTranslation()
-                          .getDistance(
-                              pipe.getPose(ReefPipeLevel.BACK_AWAY, robotScoringSide, robotPose)
-                                  .getTranslation())))
-          .orElseThrow();
+        .min(
+            Comparator.comparingDouble(
+                pipe ->
+                    robotPose
+                        .getTranslation()
+                        .getDistance(
+                            pipe.getPose(ReefPipeLevel.BACK_AWAY, robotScoringSide, robotPose)
+                                .getTranslation())))
+        .orElseThrow();
   }
 
   public PolarChassisSpeeds getPoseAlignmentChassisSpeeds(
