@@ -1159,7 +1159,6 @@ public class RobotManager extends StateMachine<RobotState> {
             lights.setState(getLightStateForScoring());
           } else {
             swerve.snapsDriveRequest(SnapUtil.getNearestReefAngle(robotPose));
-
           }
         } else {
           lights.setState(LightsState.IDLE_EMPTY);
