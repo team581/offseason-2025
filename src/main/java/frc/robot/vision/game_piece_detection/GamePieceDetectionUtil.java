@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.config.RobotConfig;
-import frc.robot.intake_assist.IntakeAssistUtil;
+import frc.robot.util.MathHelpers;
 import frc.robot.vision.results.GamePieceResult;
 
 public final class GamePieceDetectionUtil {
@@ -52,14 +52,14 @@ public final class GamePieceDetectionUtil {
       Pose2d robotPoseAtCapture, GamePieceResult visionResult) {
     var gamePiecePose =
         calculateFieldRelativeCoralTranslationFromCamera(robotPoseAtCapture, visionResult);
-    return IntakeAssistUtil.getIntakeAssistAngle(gamePiecePose, robotPoseAtCapture);
+    return MathHelpers.getDriveDirection(gamePiecePose, robotPoseAtCapture).getDegrees();
   }
 
   public static double getFieldRelativeAngleToLollipop(
       Pose2d robotPoseAtCapture, GamePieceResult visionResult) {
     var gamePiecePose =
         calculateFieldRelativeLollipopTranslationFromCamera(robotPoseAtCapture, visionResult);
-    return IntakeAssistUtil.getIntakeAssistAngle(gamePiecePose, robotPoseAtCapture);
+    return MathHelpers.getDriveDirection(gamePiecePose, robotPoseAtCapture).getDegrees();
   }
 
   public static Translation2d calculateRobotRelativeLollipopTranslationFromCamera(

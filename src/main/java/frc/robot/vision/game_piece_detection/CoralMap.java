@@ -18,6 +18,7 @@ import frc.robot.fms.FmsSubsystem;
 import frc.robot.intake_assist.IntakeAssistUtil;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
+import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.limelight.Limelight;
@@ -189,11 +190,8 @@ public class CoralMap extends StateMachine<CoralMapState> {
             .map(coral -> new Pose2d(coral.coralTranslation(), Rotation2d.kZero))
             .min(bestCoralComparator);
     if (bestCoral.isPresent()) {
-      var rotation =
-          IntakeAssistUtil.getIntakeAssistAngle(
-              bestCoral.get().getTranslation(), localization.getPose());
-      var coralPoseWithIntakeRotation =
-          new Pose2d(bestCoral.get().getTranslation(), Rotation2d.fromDegrees(rotation));
+      var rotation = MathHelpers.getDriveDirection(bestCoral.get(), localization.getPose());
+      var coralPoseWithIntakeRotation = new Pose2d(bestCoral.get().getTranslation(), rotation);
       DogLog.log("CoralMap/BestCoralPose", coralPoseWithIntakeRotation);
       return Optional.of(coralPoseWithIntakeRotation);
     }

@@ -1,6 +1,7 @@
 package frc.robot.intake_assist;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -12,7 +13,7 @@ import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.vision.results.GamePieceResult;
 
 public final class IntakeAssistUtil {
-  private static final double CORAL_ASSIST_KP = 3.0;
+  private static final double ASSIST_KP = 3.7;
   private static final double INTAKE_OFFSET = Units.inchesToMeters(18);
   private static final double LOLLIPOP_INTAKE_OFFSET = Units.inchesToMeters(29.0);
 
@@ -23,19 +24,12 @@ public final class IntakeAssistUtil {
             .getTranslation()
             .minus(robotPose.getTranslation())
             .rotateBy(Rotation2d.fromDegrees(360 - robotPose.getRotation().getDegrees()));
-    var sidewaysSpeed = robotRelativePose.getY();
-    var forwardError = Math.hypot(teleopSpeeds.vxMetersPerSecond, teleopSpeeds.vyMetersPerSecond);
-    var robotRelativeError = new Translation2d(forwardError, sidewaysSpeed * CORAL_ASSIST_KP);
+    var sidewaysSpeed = MathUtil.clamp(robotRelativePose.getY() * ASSIST_KP, -1.0, 1.0);
+    var robotRelativeError = new Translation2d(0, sidewaysSpeed);
     var fieldRelativeError = robotRelativeError.rotateBy(robotPose.getRotation());
-    var assistSpeeds =
-        new ChassisSpeeds(fieldRelativeError.getX(), fieldRelativeError.getY(), 0.0).times(0.8);
-    var scaledTeleopSpeeds = teleopSpeeds.times(0.2);
-    return assistSpeeds.plus(scaledTeleopSpeeds);
-  }
+    var assistSpeeds = new ChassisSpeeds(fieldRelativeError.getX(), fieldRelativeError.getY(), 0.0);
 
-  public static double getIntakeAssistAngle(Translation2d target, Pose2d robotPose) {
-    return Units.radiansToDegrees(
-        Math.atan2(target.getY() - robotPose.getY(), target.getX() - robotPose.getX()));
+    return assistSpeeds.plus(teleopSpeeds);
   }
 
   public static Pose2d getLollipopIntakePoseFromVisionResult(

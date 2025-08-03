@@ -92,7 +92,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
 
-  private ChassisSpeeds coralAssistSpeedsOffset = new ChassisSpeeds();
+  private ChassisSpeeds coralAssistSpeeds = new ChassisSpeeds();
 
   private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
 
@@ -148,8 +148,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         ChassisSpeeds.fromRobotRelativeSpeeds(speeds, drivetrainState.Pose.getRotation()));
   }
 
-  public void setFieldRelativeCoralAssistSpeedsOffset(ChassisSpeeds speeds) {
-    coralAssistSpeedsOffset = speeds;
+  public void setFieldRelativeCoralAssistSpeeds(ChassisSpeeds speeds) {
+    coralAssistSpeeds = speeds;
   }
 
   public void setAutoAlignSpeeds(ChassisSpeeds speeds) {
@@ -164,6 +164,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       case AUTO, TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP;
       case REEF_ALIGN_TELEOP ->
           DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.REEF_ALIGN_TELEOP;
+      case CORAL_ALIGN -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.CORAL_ALIGN;
       case AUTO_SNAPS, TELEOP_SNAPS ->
           DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.TELEOP_SNAPS;
       case CLIMBING -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.CLIMBING;
@@ -267,6 +268,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
+      case CORAL_ALIGN ->
+          drivetrain.setControl(
+              drive
+                  .withVelocityX(coralAssistSpeeds.vxMetersPerSecond)
+                  .withVelocityY(coralAssistSpeeds.vyMetersPerSecond)
+                  .withRotationalRate(coralAssistSpeeds.omegaRadiansPerSecond)
+                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       case REEF_ALIGN_TELEOP -> {
         drivetrain.setControl(
             drive
@@ -319,6 +327,14 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       setStateFromRequest(SwerveState.AUTO);
     } else {
       setStateFromRequest(SwerveState.TELEOP);
+    }
+  }
+
+  public void coralAlignDriveRequest() {
+    if (DriverStation.isAutonomous()) {
+      setStateFromRequest(SwerveState.AUTO);
+    } else {
+      setStateFromRequest(SwerveState.CORAL_ALIGN);
     }
   }
 

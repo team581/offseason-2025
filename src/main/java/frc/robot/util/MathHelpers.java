@@ -83,6 +83,18 @@ public class MathHelpers {
     return new Rotation2d(start.getX() - end.getX(), start.getY() - end.getY());
   }
 
+  public static Rotation2d getDriveDirection(Translation2d start, Pose2d end) {
+    return new Rotation2d(start.getX() - end.getX(), start.getY() - end.getY());
+  }
+
+  public static Rotation2d getDriveDirection(Pose2d start, Translation2d end) {
+    return new Rotation2d(start.getX() - end.getX(), start.getY() - end.getY());
+  }
+
+  public static Rotation2d getDriveDirection(Translation2d start, Translation2d end) {
+    return new Rotation2d(start.getX() - end.getX(), start.getY() - end.getY());
+  }
+
   /**
    * Returns the value that is closer from the two given values. If they are equal, the first value
    * is returned.

@@ -19,7 +19,7 @@ public class AlignmentCostUtil {
   private static final double DRIVE_DIRECTION_SCALAR = 0.02;
   private static final double ANGLE_ERROR_SCALAR = 0.3;
 
-  private static final double DRIVE_DIRECTION_SCALAR_CORAL = 0.07;
+  private static final double DRIVE_DIRECTION_SCALAR_CORAL = 0.02;
 
   /**
    * Returns the "cost" (a dimensionless number) of aligning to a given pose based on the robot's

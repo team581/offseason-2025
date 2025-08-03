@@ -142,7 +142,7 @@ public class VisionSubsystem extends StateMachine<VisionState> {
         leftBackLimelight.setState(LimelightState.TAGS);
         leftFrontLimelight.setState(LimelightState.TAGS);
         rightLimelight.setState(LimelightState.TAGS);
-        gamePieceDetectionLimelight.setState(LimelightState.HELD_CORAL);
+        gamePieceDetectionLimelight.setState(LimelightState.CORAL);
       }
       case HANDOFF -> {
         leftBackLimelight.setState(LimelightState.TAGS);
