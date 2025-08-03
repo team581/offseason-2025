@@ -21,6 +21,7 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 import frc.robot.vision.VisionSubsystem;
+import java.util.OptionalDouble;
 
 public class AutoAlign extends StateMachine<AutoAlignState> {
   private static final AutoConstraintOptions CONSTRAINTS =
@@ -59,6 +60,10 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   public static Translation2d getAllianceCenterOfReef(boolean isRedAliance) {
     return isRedAliance ? CENTER_OF_REEF_RED : CENTER_OF_REEF_BLUE;
+  }
+
+  public static Translation2d getAllianceCenterOfReef(Pose2d robotPose) {
+    return robotPose.getX() > 17.55 / 2 ? CENTER_OF_REEF_RED : CENTER_OF_REEF_BLUE;
   }
 
   public static RobotScoringSide getScoringSideFromRobotPose(
@@ -139,16 +144,16 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     isAligned = tagAlign.isAligned(bestReefPipe);
     isNearRotation = tagAlign.isNearRotationGoal(bestReefPipe);
     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
-    tagAlignSpeeds =
-        tagAlign.getPoseAlignmentChassisSpeeds(
-            usedScoringPose,
-            robotPose,
-            CONSTRAINTS,
-            new PolarChassisSpeeds(swerve.getFieldRelativeSpeeds()));
     algaeAlignSpeeds =
         tagAlign.getPoseAlignmentChassisSpeeds(
             ReefSide.fromPipe(tagAlign.getClosestPipe())
                 .getPose(reefSideOffset, robotScoringSide, robotPose),
+            robotPose,
+            CONSTRAINTS,
+            new PolarChassisSpeeds(swerve.getFieldRelativeSpeeds()));
+    tagAlignSpeeds =
+        tagAlign.getPoseAlignmentChassisSpeeds(
+            usedScoringPose,
             robotPose,
             CONSTRAINTS,
             new PolarChassisSpeeds(swerve.getFieldRelativeSpeeds()));
@@ -163,6 +168,14 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   public boolean isNearRotationGoal() {
     return isNearRotation;
+  }
+
+  public int getL1ScoredCount() {
+    return tagAlign.getL1ScoredCount(bestReefPipe);
+  }
+
+  public void setCoralL1Offset(OptionalDouble tx) {
+    tagAlign.setCoralL1Offset(tx);
   }
 
   @Override

@@ -240,8 +240,16 @@ public class Robot extends TimedRobot {
             .ignoringDisable(true)
             .withName("DefaultSwerveCommand"));
 
-    hardware.driverController.rightTrigger().onTrue(robotCommands.confirmScoreCommand());
-    hardware.driverController.leftTrigger().onTrue(robotCommands.floorIntakeCommand());
+    hardware
+        .driverController
+        .rightTrigger()
+        .onTrue(robotCommands.confirmScoreCommand())
+        .onFalse(robotCommands.scoringAlignOffCommand());
+    hardware
+        .driverController
+        .leftTrigger()
+        .onTrue(robotCommands.floorIntakeCommand())
+        .onFalse(robotCommands.l1HardOffCommand());
     hardware.driverController.leftBumper().onTrue(robotCommands.algaeIntakeGroundCommand());
     hardware.driverController.rightBumper().onTrue(robotCommands.stowCommand());
     hardware

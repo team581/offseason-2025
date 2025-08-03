@@ -41,8 +41,8 @@ public class ClawSubsystem extends StateMachine<ClawState> {
             case IDLE_NO_GP -> false;
             case IDLE_W_ALGAE, IDLE_W_CORAL -> true;
             case INTAKING_ALGAE -> timeout(1);
-            case SCORE_CORAL -> timeout(1);
-            case SCORE_ALGAE_NET, SCORE_ALGAE_PROCESSOR, OUTTAKING -> timeout(0.25);
+            case SCORE_CORAL -> !timeout(0.5);
+            case SCORE_ALGAE_NET, SCORE_ALGAE_PROCESSOR, OUTTAKING -> !timeout(0.25);
             case LOLLIPOP_CORAL_INTAKE -> timeout(1.7);
           };
     }

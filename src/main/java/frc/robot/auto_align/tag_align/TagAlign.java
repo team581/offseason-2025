@@ -4,9 +4,12 @@ import com.google.common.collect.ImmutableList;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -24,13 +27,20 @@ import frc.robot.util.MathHelpers;
 import frc.robot.util.kinematics.PolarChassisSpeeds;
 import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 public class TagAlign {
-  private static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
+  public static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
       ImmutableList.copyOf(ReefPipe.values());
+  public static final double L1_TRACKING_TIMEOUT = 2.0;
 
   private static final PIDController ROTATION_CONTROLLER = new PIDController(6.0, 0.0, 0.0);
+
+  private static final InterpolatingDoubleTreeMap CORAL_TX_TO_L1_OFFSET =
+      InterpolatingDoubleTreeMap.ofEntries(
+          Map.entry(2.66, 2.943), Map.entry(0.0, 0.0), Map.entry(-11.0, -2.943));
 
   private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedTranslation", Units.inchesToMeters(1.0));
@@ -49,6 +59,11 @@ public class TagAlign {
       DogLog.tunable("AutoAlign/InRangeTranslation", Units.inchesToMeters(1.5));
   private static final DoubleSubscriber IN_RANGE_ROTATION_THRESHOLD =
       DogLog.tunable("AutoAlign/InRangeRotation", 3.0);
+  private static final double IDEAL_L1_OFFSET = Units.inchesToMeters(1.0);
+  private static final Transform2d LEFT_L1_TRANSFORM =
+      new Transform2d(0, IDEAL_L1_OFFSET, Rotation2d.fromDegrees(0));
+  private static final Transform2d RIGHT_L1_TRANSFORM =
+      new Transform2d(0, -IDEAL_L1_OFFSET, Rotation2d.fromDegrees(0));
 
   private static final double MAX_SPEED = 2.0;
   private static final double MAX_ROTATION_SPEED = Units.rotationsToRadians(0.5);
@@ -67,10 +82,16 @@ public class TagAlign {
   private double rawControllerYValue = 0.0;
   private double lastPipeSwitchTimestamp = 0.0;
   private boolean aligned = false;
+  private double distanceToCentered = Double.MAX_VALUE;
+  private OptionalDouble coralL1Offset = OptionalDouble.empty();
+
+  private final LinearFilter l1AdjustmentFilter = LinearFilter.movingAverage(7);
 
   private static final DoubleSubscriber FEED_FORWARD = DogLog.tunable("AutoAlign/FeedForward", 0.0);
 
   private boolean pipeSwitchActive = false;
+
+  private double lastAddedTimestamp = 0.0;
 
   public TagAlign(SwerveSubsystem swerve, LocalizationSubsystem localization) {
     this.localization = localization;
@@ -94,6 +115,25 @@ public class TagAlign {
     rawControllerXValue = controllerXValue;
     rawControllerYValue = controllerYValue;
     checkControllerForSwitch();
+  }
+
+  public void setCoralL1Offset(OptionalDouble tx) {
+    var expired = Timer.getFPGATimestamp() - lastAddedTimestamp > L1_TRACKING_TIMEOUT;
+    if (expired) {
+      coralL1Offset = OptionalDouble.empty();
+    }
+    if (tx.isEmpty()) {
+      return;
+    }
+
+    var offset = CORAL_TX_TO_L1_OFFSET.get(tx.getAsDouble());
+    lastAddedTimestamp = Timer.getFPGATimestamp();
+    if (coralL1Offset.isEmpty()) {
+      for (int i = 0; i < 7; i++) {
+        l1AdjustmentFilter.calculate(offset);
+      }
+    }
+    coralL1Offset = OptionalDouble.of(l1AdjustmentFilter.calculate(offset));
   }
 
   private void checkControllerForSwitch() {
@@ -161,13 +201,14 @@ public class TagAlign {
       return false;
     }
     var robotPose = localization.getPose();
-    var scoringPoseFieldRelative = getUsedScoringPose(pipe);
+    var targetPose = getUsedScoringPose(pipe);
+
     var translationGood =
-        (robotPose.getTranslation().getDistance(scoringPoseFieldRelative.getTranslation())
+        (robotPose.getTranslation().getDistance(targetPose.getTranslation())
             <= TRANSLATION_GOOD_THRESHOLD.get());
     var rotationGood =
         MathUtil.isNear(
-            scoringPoseFieldRelative.getRotation().getDegrees(),
+            targetPose.getRotation().getDegrees(),
             robotPose.getRotation().getDegrees(),
             ROTATION_GOOD_THRESHOLD.get(),
             -180.0,
@@ -235,6 +276,27 @@ public class TagAlign {
   }
 
   public Pose2d getUsedScoringPose(ReefPipe pipe, RobotScoringSide side) {
+    if (preferedScoringLevel.equals(ReefPipeLevel.L1)) {
+      var reefPose = ReefSide.fromPipe(pipe).getPose(localization.getPose());
+      var pipePose = pipe.getPose(pipeLevel, side, localization.getPose());
+      var rotatedPipePose =
+          pipePose.rotateAround(
+              reefPose.getTranslation(),
+              Rotation2d.fromDegrees(360 - reefPose.getRotation().getDegrees()));
+      var isLeft = rotatedPipePose.getY() > reefPose.getY();
+      if (isLeft) {
+        return pipePose
+            .transformBy(LEFT_L1_TRANSFORM)
+            .transformBy(
+                new Transform2d(
+                    0, Units.inchesToMeters(coralL1Offset.orElse(0.0)), Rotation2d.fromDegrees(0)));
+      }
+      return pipePose
+          .transformBy(RIGHT_L1_TRANSFORM)
+          .transformBy(
+              new Transform2d(
+                  0, Units.inchesToMeters(coralL1Offset.orElse(0.0)), Rotation2d.fromDegrees(0)));
+    }
     return pipe.getPose(pipeLevel, side, localization.getPose());
   }
 
@@ -245,6 +307,22 @@ public class TagAlign {
     }
     var level = pipeLevel;
     var robotPose = localization.getPose();
+    if (pipeLevel.equals(ReefPipeLevel.L1)) {
+      var closestTwoPipes =
+          ALL_REEF_PIPES.stream()
+              .sorted(
+                  Comparator.comparingDouble(
+                      p ->
+                          p.getPose(pipeLevel, robotScoringSide, localization.getPose())
+                              .getTranslation()
+                              .getDistance(localization.getPose().getTranslation())))
+              .limit(2)
+              .toList();
+
+      return closestTwoPipes.stream()
+          .min(Comparator.comparingDouble(p -> reefState.getL1Count(p)))
+          .orElse(getClosestPipe());
+    }
     if (pipeLevel.equals(ReefPipeLevel.BACK_AWAY)) {
       return ALL_REEF_PIPES.stream()
           .min(
@@ -263,6 +341,10 @@ public class TagAlign {
     return ALL_REEF_PIPES.stream()
         .min(alignmentCostUtil.getReefPipeComparator(level))
         .orElseThrow();
+  }
+
+  public int getL1ScoredCount(ReefPipe pipe) {
+    return reefState.getL1Count(pipe);
   }
 
   public ReefPipe getClosestPipe() {
@@ -319,11 +401,39 @@ public class TagAlign {
     DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
     DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
 
-    var speeds =
-        new PolarChassisSpeeds(
-            driveVelocityMagnitude,
-            MathHelpers.getDriveDirection(currentPose, targetPose),
-            rotationSpeed);
+    double pathSlope = -1 / Math.tan(targetPose.getRotation().getRadians());
+
+    if (preferedScoringLevel.equals(ReefPipeLevel.L1)) {
+      pathSlope = Math.tan(targetPose.getRotation().getRadians());
+    }
+    double yInt = targetPose.getY() - pathSlope * targetPose.getX();
+
+    // Find the slope and y-int of the perpendicular line
+    double perpSlope = -1 / pathSlope;
+    double perpYInt = currentPose.getY() - perpSlope * currentPose.getX();
+
+    // Calculate the perpendicular intersection
+    double perpX = (perpYInt - yInt) / (pathSlope - perpSlope);
+    double perpY = pathSlope * perpX + yInt;
+
+    var closestPointOnLine = new Pose2d(perpX, perpY, targetPose.getRotation());
+    DogLog.log("AutoAlign/ClosestPointOnLine", closestPointOnLine);
+
+    if (MathUtil.isNear(0.0, targetPose.getRotation().getRadians(), 1e-6)) {
+      closestPointOnLine =
+          new Pose2d(currentPose.getX(), targetPose.getY(), targetPose.getRotation());
+    }
+
+    var midpoint =
+        new Pose2d(
+            (closestPointOnLine.getX() + targetPose.getX()) / 2.0,
+            (closestPointOnLine.getY() + targetPose.getY()) / 2.0,
+            currentPose.getRotation());
+    DogLog.log("AutoAlign/Midpoint", midpoint);
+
+    var driveDirection = MathHelpers.getDriveDirection(currentPose, midpoint);
+
+    var speeds = new PolarChassisSpeeds(driveVelocityMagnitude, driveDirection, rotationSpeed);
 
     return speeds;
   }

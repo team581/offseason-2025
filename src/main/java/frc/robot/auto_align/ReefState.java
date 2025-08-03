@@ -5,11 +5,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.config.RobotConfig;
 import java.util.EnumSet;
+import java.util.HashMap;
 
 public class ReefState {
   private final EnumSet<ReefPipe> scoredL2Pipes = EnumSet.noneOf(ReefPipe.class);
   private final EnumSet<ReefPipe> scoredL3Pipes = EnumSet.noneOf(ReefPipe.class);
   private final EnumSet<ReefPipe> scoredL4Pipes = EnumSet.noneOf(ReefPipe.class);
+  private final HashMap<ReefPipe, Integer> scoredL1Pipes = new HashMap<>();
 
   public ReefState() {
     if (RobotConfig.IS_DEVELOPMENT) {
@@ -18,6 +20,7 @@ public class ReefState {
   }
 
   public void clear() {
+    scoredL1Pipes.clear();
     scoredL2Pipes.clear();
     scoredL3Pipes.clear();
     scoredL4Pipes.clear();
@@ -29,6 +32,14 @@ public class ReefState {
 
   public void remove(ReefPipe pipe, ReefPipeLevel level) {
     switch (level) {
+      case L1 -> {
+        var currentCount = scoredL1Pipes.getOrDefault(pipe, 0);
+        if (currentCount == 0) {
+          return;
+        } else {
+          scoredL1Pipes.put(pipe, currentCount - 1);
+        }
+      }
       case L2 -> scoredL2Pipes.remove(pipe);
       case L3 -> scoredL3Pipes.remove(pipe);
       case L4 -> scoredL4Pipes.remove(pipe);
@@ -38,6 +49,10 @@ public class ReefState {
 
   public void markScored(ReefPipe pipe, ReefPipeLevel level) {
     switch (level) {
+      case L1 -> {
+        var currentCount = scoredL1Pipes.getOrDefault(pipe, 0);
+        scoredL1Pipes.put(pipe, currentCount + 1);
+      }
       case L2 -> scoredL2Pipes.add(pipe);
       case L3 -> scoredL3Pipes.add(pipe);
       case L4 -> scoredL4Pipes.add(pipe);
@@ -56,5 +71,9 @@ public class ReefState {
       case L4 -> scoredL4Pipes.contains(pipe);
       default -> false;
     };
+  }
+
+  public int getL1Count(ReefPipe pipe) {
+    return scoredL1Pipes.getOrDefault(pipe, 0);
   }
 }

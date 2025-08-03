@@ -46,7 +46,7 @@ public class GroundManager extends StateMachine<GroundState> {
         deploy.setState(DeployState.FLOOR_INTAKE);
         intake.setState(IntakeState.INTAKING);
       }
-      case L1_WAIT -> {
+      case L1_WAIT, L1_HARD_WAIT -> {
         deploy.setState(DeployState.L1_SCORE);
         intake.setState(IntakeState.IDLE_GP);
       }
@@ -99,22 +99,34 @@ public class GroundManager extends StateMachine<GroundState> {
 
   public void intakeRequest() {
     switch (getState()) {
-      case L1_WAIT -> setState(GroundState.L1_HARD_SCORE);
+      case L1_WAIT, L1_HARD_WAIT -> setState(GroundState.L1_HARD_SCORE);
+
       case HANDOFF_WAIT, HANDOFF_RELEASE -> intakeThenHandoffRequest();
       default -> setState(GroundState.INTAKING);
     }
   }
 
+  public void hardL1WaitRequest() {
+    switch (getState()) {
+      case L1_WAIT, L1_HARD_WAIT -> setState(GroundState.L1_HARD_WAIT);
+      default -> setState(GroundState.L1_WAIT);
+    }
+  }
+
+  public void l1WaitRequest() {
+    setState(GroundState.L1_WAIT);
+  }
+
   public void l1Request() {
     switch (getState()) {
-      case L1_WAIT -> setState(GroundState.L1_SCORE);
+      case L1_WAIT, L1_HARD_WAIT -> setState(GroundState.L1_SCORE);
       default -> setState(GroundState.L1_WAIT);
     }
   }
 
   public void hardL1Request() {
     switch (getState()) {
-      case L1_WAIT -> setState(GroundState.L1_HARD_SCORE);
+      case L1_WAIT, L1_HARD_WAIT -> setState(GroundState.L1_HARD_SCORE);
       default -> setState(GroundState.L1_WAIT);
     }
   }

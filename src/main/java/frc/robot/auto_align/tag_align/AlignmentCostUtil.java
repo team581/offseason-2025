@@ -15,7 +15,7 @@ import frc.robot.util.MathHelpers;
 import java.util.Comparator;
 
 public class AlignmentCostUtil {
-  private static final double REEF_STATE_COST = 1.2;
+  private static final double REEF_STATE_COST = 1.0;
   private static final double DRIVE_DIRECTION_SCALAR = 0.02;
   private static final double ANGLE_ERROR_SCALAR = 0.3;
 
@@ -93,6 +93,7 @@ public class AlignmentCostUtil {
   private final Comparator<ReefPipe> pipeL4Comparator = createReefPipeComparator(ReefPipeLevel.L4);
   private final Comparator<ReefPipe> pipeL3Comparator = createReefPipeComparator(ReefPipeLevel.L3);
   private final Comparator<ReefPipe> pipeL2Comparator = createReefPipeComparator(ReefPipeLevel.L2);
+  private final Comparator<ReefPipe> pipeL1Comparator = createReefPipeComparator(ReefPipeLevel.L1);
 
   public AlignmentCostUtil(
       LocalizationSubsystem localization,
@@ -110,6 +111,7 @@ public class AlignmentCostUtil {
       case L4 -> pipeL4Comparator;
       case L3 -> pipeL3Comparator;
       case L2 -> pipeL2Comparator;
+      case L1 -> pipeL1Comparator;
       // Shouldn't ever happen
       default -> pipeL2Comparator;
     };
@@ -121,15 +123,43 @@ public class AlignmentCostUtil {
 
   /** Helper function to create a singleton comparator for each level. */
   private Comparator<ReefPipe> createReefPipeComparator(ReefPipeLevel level) {
-    return Comparator.comparingDouble(
-        pipe ->
-            getAlignCost(
-                    pipe.getPose(level, side, localization.getPose()),
-                    localization.getPose(),
-                    swerve.getTeleopSpeeds())
-                + (reefState.isScored(pipe, level)
-                        && FeatureFlags.AUTO_ALIGN_REEF_STATE_COST.getAsBoolean()
-                    ? REEF_STATE_COST
-                    : 0.0));
+
+    return switch (level) {
+      case L1 -> {
+        yield Comparator.comparingDouble(
+            pipe -> {
+              var allPipes =
+                  TagAlign.ALL_REEF_PIPES; // Assuming reefState has a method to get all pipes
+              return allPipes.stream()
+                  .filter(p -> p.getPose(level, side, localization.getPose()) != null)
+                  .min(
+                      Comparator.comparingDouble(
+                          p ->
+                              p.getPose(level, side, localization.getPose())
+                                      .getTranslation()
+                                      .getDistance(localization.getPose().getTranslation())
+                                  + reefState.getL1Count(p)))
+                  .map(
+                      p ->
+                          getAlignCost(
+                              p.getPose(level, side, localization.getPose()),
+                              localization.getPose(),
+                              swerve.getTeleopSpeeds()))
+                  .orElse(Double.MAX_VALUE);
+            });
+      }
+      default -> {
+        yield Comparator.comparingDouble(
+            pipe ->
+                getAlignCost(
+                        pipe.getPose(level, side, localization.getPose()),
+                        localization.getPose(),
+                        swerve.getTeleopSpeeds())
+                    + (reefState.isScored(pipe, level)
+                            && FeatureFlags.AUTO_ALIGN_REEF_STATE_COST.getAsBoolean()
+                        ? REEF_STATE_COST
+                        : 0.0));
+      }
+    };
   }
 }

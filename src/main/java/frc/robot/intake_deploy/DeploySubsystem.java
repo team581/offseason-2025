@@ -10,6 +10,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.config.RobotConfig;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
@@ -29,7 +30,9 @@ public class DeploySubsystem extends StateMachine<DeployState> {
   private double filteredCurrent = 0.0;
 
   public DeploySubsystem(TalonFX motor) {
-    super(SubsystemPriority.DEPLOY, DeployState.UNHOMED);
+    super(
+        SubsystemPriority.DEPLOY,
+        RobotBase.isSimulation() ? DeployState.STOWED : DeployState.UNHOMED);
 
     motor.getConfigurator().apply(RobotConfig.get().deploy().motorConfig());
 

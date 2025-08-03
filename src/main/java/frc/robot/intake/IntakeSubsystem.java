@@ -33,18 +33,18 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
     sensorRaw =
         candi.getS2State().getValue()
             != (RobotConfig.IS_PRACTICE_BOT ? S2StateValue.Low : S2StateValue.High);
-    sensorDebounced = debouncer.calculate(sensorRaw);
 
     if (RobotBase.isSimulation()) {
       sensorRaw =
           switch (getState()) {
-            case CORAL_HANDOFF, UNJAM -> timeout(0.5);
+            case CORAL_HANDOFF, UNJAM -> !timeout(0.5);
             case IDLE_NO_GP -> false;
             case IDLE_GP -> true;
-            case INTAKING -> timeout(3);
-            case SCORING, HARD_SCORING -> timeout(3);
+            case INTAKING -> timeout(2);
+            case SCORING, HARD_SCORING -> !timeout(0.5);
           };
     }
+    sensorDebounced = debouncer.calculate(sensorRaw);
   }
 
   public boolean getHasGP() {

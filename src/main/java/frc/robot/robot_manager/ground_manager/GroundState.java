@@ -12,6 +12,8 @@ public enum GroundState {
   HANDOFF_RELEASE,
 
   L1_WAIT,
+  L1_HARD_WAIT,
+
   L1_SCORE,
   L1_HARD_SCORE,
 
