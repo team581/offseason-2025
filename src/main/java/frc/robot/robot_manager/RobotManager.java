@@ -1102,11 +1102,12 @@ public class RobotManager extends StateMachine<RobotState> {
               }
             }
             swerve.scoringAlignmentRequest(reefSnapAngle);
+            lights.setState(getLightStateForScoring());
           } else {
             swerve.snapsDriveRequest(SnapUtil.getNearestReefAngle(robotPose));
           }
-          lights.setState(getLightStateForScoring());
         } else {
+          lights.setState(LightsState.IDLE_EMPTY);
           if (groundManager.hasCoral() && vision.isAnyTagLimelightOnline()) {
             swerve.snapsDriveRequest(
                 MathHelpers.getDriveDirection(
@@ -1155,11 +1156,13 @@ public class RobotManager extends StateMachine<RobotState> {
               }
             }
             swerve.scoringAlignmentRequest(reefSnapAngle);
+            lights.setState(getLightStateForScoring());
           } else {
             swerve.snapsDriveRequest(SnapUtil.getNearestReefAngle(robotPose));
+
           }
-          lights.setState(getLightStateForScoring());
         } else {
+          lights.setState(LightsState.IDLE_EMPTY);
           if (!groundManager.hasCoral() && intakeAssistActive) {
             swerve.coralAlignDriveRequest();
           } else {
