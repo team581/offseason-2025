@@ -82,7 +82,7 @@ public class TagAlign {
   private double rawControllerYValue = 0.0;
   private double lastPipeSwitchTimestamp = 0.0;
   private boolean aligned = false;
-  private final double distanceToCentered = Double.MAX_VALUE;
+  private static final double DISTANCE_TO_CENTERED = Double.MAX_VALUE;
   private OptionalDouble coralL1Offset = OptionalDouble.empty();
 
   private final LinearFilter l1AdjustmentFilter = LinearFilter.movingAverage(7);
