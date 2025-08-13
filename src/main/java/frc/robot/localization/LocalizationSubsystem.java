@@ -36,10 +36,13 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private Pose2d robotPose = Pose2d.kZero;
   // Currently using default std devs for odometry
   private static final Vector<N3> ODOMETRY_STATE_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1);
-  private static Vector<N3> VISION_MEASURMENT_STD_DEVS = VecBuilder.fill(0, 0, 0);
+  private static final Vector<N3> VISION_MEASURMENT_STD_DEVS = VecBuilder.fill(0, 0, 0);
 
   public LocalizationSubsystem(
-      ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve, CustomOdometry customOdometry) {
+      ImuSubsystem imu,
+      VisionSubsystem vision,
+      SwerveSubsystem swerve,
+      CustomOdometry customOdometry) {
     super(SubsystemPriority.LOCALIZATION, LocalizationState.DEFAULT_STATE);
     this.swerve = swerve;
     this.imu = imu;

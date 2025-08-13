@@ -67,7 +67,8 @@ public class Robot extends TimedRobot {
       new VisionSubsystem(
           imu, leftBackLimelight, leftFrontLimelight, rightLimelight, gamePieceDetectionLimelight);
   private final CustomOdometry customOdometry = new CustomOdometry(imu, swerve);
-  private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve, customOdometry);
+  private final LocalizationSubsystem localization =
+      new LocalizationSubsystem(imu, vision, swerve, customOdometry);
   private final ElevatorSubsystem elevator =
       new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor);
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
