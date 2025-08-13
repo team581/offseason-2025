@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.config.FeatureFlags;
-import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.odometry.CustomOdometry;
@@ -29,33 +28,30 @@ import frc.robot.vision.results.TagResult;
 // Drivetrain class)
 
 public class LocalizationSubsystem extends StateMachine<LocalizationState> {
-  private static final Vector<N3> MT1_VISION_STD_DEVS =
-      VecBuilder.fill(
-          RobotConfig.get().vision().xyStdDev(),
-          RobotConfig.get().vision().xyStdDev(),
-          RobotConfig.get().vision().thetaStdDev());
-  private static final Vector<N3> MT2_VISION_STD_DEVS =
-      VecBuilder.fill(
-          RobotConfig.get().vision().xyStdDev(),
-          RobotConfig.get().vision().xyStdDev(),
-          Double.MAX_VALUE);
   private final ImuSubsystem imu;
   private final VisionSubsystem vision;
   private final SwerveSubsystem swerve;
-  private final CustomOdometry odometry;
-  private final PoseEstimator estimator;
+  private final CustomOdometry customOdometry;
+  private final PoseEstimator<?> poseEstimator;
   private Pose2d robotPose = Pose2d.kZero;
+  // Currently using default std devs for odometry
+  private static final Vector<N3> ODOMETRY_STATE_STD_DEVS = VecBuilder.fill(0.1, 0.1, 0.1);
+  private static Vector<N3> VISION_MEASURMENT_STD_DEVS = VecBuilder.fill(0, 0, 0);
 
   public LocalizationSubsystem(
-      ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve, CustomOdometry odometry) {
+      ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve, CustomOdometry customOdometry) {
     super(SubsystemPriority.LOCALIZATION, LocalizationState.DEFAULT_STATE);
     this.swerve = swerve;
     this.imu = imu;
     this.vision = vision;
-    this.odometry = odometry;
+    this.customOdometry = customOdometry;
 
-    // TODO: Finish initializing pose estimator
-    this.estimator = new PoseEstimator<>(odometry.getKinematics(), odometry, null, null);
+    this.poseEstimator =
+        new PoseEstimator<>(
+            customOdometry.getKinematics(),
+            customOdometry,
+            ODOMETRY_STATE_STD_DEVS,
+            VISION_MEASURMENT_STD_DEVS);
 
     if (FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
       SmartDashboard.putData(
@@ -81,7 +77,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
         .ifPresent(this::ingestTagResult);
     vision.getRightTagResult().ifPresent(this::ingestTagResult);
 
-    robotPose = swerve.drivetrain.getState().Pose;
+    robotPose = poseEstimator.getEstimatedPosition();
   }
 
   public Pose2d getPose() {
@@ -90,7 +86,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
 
   public Pose2d getPose(double timestamp) {
     var newTimestamp = Utils.fpgaToCurrentTime(timestamp);
-    return swerve.drivetrain.samplePoseAt(newTimestamp).orElseGet(this::getPose);
+    return poseEstimator.sampleAt(newTimestamp).orElseGet(this::getPose);
   }
 
   public Pose2d getLookaheadPose(double lookahead) {
@@ -110,13 +106,12 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     if (!vision.seenTagRecentlyForReset() && FeatureFlags.MT_VISION_METHOD.getAsBoolean()) {
       resetPose(visionPose);
     }
-    swerve.drivetrain.addVisionMeasurement(
-        visionPose, Utils.fpgaToCurrentTime(result.timestamp()), result.standardDevs());
+    poseEstimator.addVisionMeasurement(visionPose, result.timestamp(), result.standardDevs());
   }
 
   private void resetGyro(Rotation2d gyroAngle) {
     imu.setAngle(gyroAngle.getDegrees());
-    swerve.drivetrain.resetRotation(gyroAngle);
+    poseEstimator.resetRotation(gyroAngle);
   }
 
   public void resetPose(Pose2d estimatedPose) {
@@ -128,7 +123,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
       imu.setAngle(estimatedPose.getRotation().getDegrees());
     }
 
-    swerve.drivetrain.resetPose(estimatedPose);
+    poseEstimator.resetPose(estimatedPose);
   }
 
   public Command getZeroCommand() {

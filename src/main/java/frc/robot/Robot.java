@@ -28,6 +28,7 @@ import frc.robot.intake.IntakeSubsystem;
 import frc.robot.intake_deploy.DeploySubsystem;
 import frc.robot.lights.LightsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
+import frc.robot.odometry.CustomOdometry;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.robot_manager.collision_avoidance.CollisionAvoidance;
@@ -65,7 +66,8 @@ public class Robot extends TimedRobot {
   private final VisionSubsystem vision =
       new VisionSubsystem(
           imu, leftBackLimelight, leftFrontLimelight, rightLimelight, gamePieceDetectionLimelight);
-  private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve);
+  private final CustomOdometry customOdometry = new CustomOdometry(imu, swerve);
+  private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve, customOdometry);
   private final ElevatorSubsystem elevator =
       new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor);
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
