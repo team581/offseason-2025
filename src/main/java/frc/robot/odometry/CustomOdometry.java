@@ -38,7 +38,8 @@ public class CustomOdometry extends Odometry<SwerveModulePosition[]> {
     return kinematics;
   }
 
-  @Override public void resetPose(Pose2d newPose) {
+  @Override
+  public void resetPose(Pose2d newPose) {
     resetPosition(
         Rotation2d.fromDegrees(imu.getRobotHeading()),
         swerve.drivetrain.getState().ModulePositions,
