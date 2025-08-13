@@ -69,7 +69,8 @@ public class VisionSubsystem extends StateMachine<VisionState> {
 
     if (leftBackTagResult.isPresent()
         || leftFrontTagResult.isPresent()
-        || rightTagResult.isPresent()||gamePieceTagResult.isPresent()) {
+        || rightTagResult.isPresent()
+        || gamePieceTagResult.isPresent()) {
       hasSeenTag = true;
       seeingTag = true;
     } else {
@@ -100,7 +101,7 @@ public class VisionSubsystem extends StateMachine<VisionState> {
   }
 
   public OptionalTagResult getGamePieceTagResult() {
-    if (leftBackTagResult.isEmpty()&&rightTagResult.isEmpty()&&leftFrontTagResult.isEmpty()) {
+    if (leftBackTagResult.isEmpty() && rightTagResult.isEmpty() && leftFrontTagResult.isEmpty()) {
 
       return gamePieceTagResult;
     }

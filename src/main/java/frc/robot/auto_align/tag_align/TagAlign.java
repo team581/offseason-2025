@@ -264,7 +264,7 @@ public class TagAlign {
 
   public void markScored(ReefPipe pipe) {
     if (preferedScoringLevel.equals(ReefPipeLevel.L1)) {
-resetL1Offset();
+      resetL1Offset();
     }
     reefState.markScored(pipe, preferedScoringLevel);
   }

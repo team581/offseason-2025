@@ -176,7 +176,6 @@ class CompConfig {
                       Units.degreesToRadians(0.0),
                       Units.degreesToRadians(-10.0),
                       Units.degreesToRadians(-87.0))),
-
               new Pose3d(
                   Units.inchesToMeters(-8.0),
                   Units.inchesToMeters(10.78),
