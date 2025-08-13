@@ -177,15 +177,12 @@ class CompConfig {
                       Units.degreesToRadians(-10.0),
                       Units.degreesToRadians(-87.0))),
 
-              // Game Piece Limelight
-              // Forward: 0.0, Right: 0.0, Up: 0.0, Roll: 0.0, Pitch: 0.0, Yaw:
-              // 0.0
               new Pose3d(
                   Units.inchesToMeters(-8.0),
                   Units.inchesToMeters(10.78),
                   Units.inchesToMeters(32.75),
                   new Rotation3d(
-                      Units.degreesToRadians(5.0),
+                      Units.degreesToRadians(-5.0),
                       Units.degreesToRadians(28.0),
                       Units.degreesToRadians(-10.0)))),
           new ArmConfig(

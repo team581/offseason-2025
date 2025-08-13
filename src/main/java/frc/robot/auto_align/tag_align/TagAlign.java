@@ -34,7 +34,7 @@ import java.util.OptionalDouble;
 public class TagAlign {
   public static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
       ImmutableList.copyOf(ReefPipe.values());
-  public static final double L1_TRACKING_TIMEOUT = 2.0;
+  public static final double L1_TRACKING_TIMEOUT = 15.0;
 
   private static final PIDController ROTATION_CONTROLLER = new PIDController(6.0, 0.0, 0.0);
 
@@ -263,7 +263,14 @@ public class TagAlign {
   }
 
   public void markScored(ReefPipe pipe) {
+    if (preferedScoringLevel.equals(ReefPipeLevel.L1)) {
+resetL1Offset();
+    }
     reefState.markScored(pipe, preferedScoringLevel);
+  }
+
+  private void resetL1Offset() {
+    coralL1Offset = OptionalDouble.empty();
   }
 
   public void clearReefState() {

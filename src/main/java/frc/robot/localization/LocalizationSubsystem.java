@@ -68,7 +68,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
         .or(vision::getLeftBackTagResult)
         .ifPresent(this::ingestTagResult);
     vision.getRightTagResult().ifPresent(this::ingestTagResult);
-
+    vision.getGamePieceTagResult().ifPresent(this::ingestTagResult);
     robotPose = swerve.drivetrain.getState().Pose;
   }
 

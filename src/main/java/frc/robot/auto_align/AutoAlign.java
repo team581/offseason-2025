@@ -268,7 +268,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
     if (vision.getLeftBackTagResult().isPresent()
         || vision.getLeftFrontTagResult().isPresent()
-        || vision.getRightTagResult().isPresent()) {
+        || vision.getRightTagResult().isPresent()||vision.getGamePieceTagResult().isPresent()) {
       if (isAligned) {
         return ReefAlignState.HAS_TAGS_IN_POSITION;
       }

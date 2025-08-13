@@ -43,7 +43,7 @@ public class FeatureFlags {
   public static final BooleanSupplier AUTO_ALIGN_AUTO_SCORE =
       FeatureFlag.of("AutoAlign/AutoScore", true);
   public static final BooleanSupplier AUTO_ALIGN_MAX_ROTATION_LIMIT =
-      FeatureFlag.of("AutoAlign/MaxRotationLimit", false);
+      FeatureFlag.of("AutoAlign/MaxRotationLimit", true);
 
   public static final BooleanSupplier AUTO_ALIGN_DISTANCE_COST =
       FeatureFlag.of("AutoAlign/Costs/Distance", true);
