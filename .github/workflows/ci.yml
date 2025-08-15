@@ -43,6 +43,14 @@ jobs:
           cache: "gradle"
       - name: Run tests
         run: ./gradlew test
+      - name: Notify Slack if tests fail
+        if: failure() && github.ref == 'refs/heads/main'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,ref,author,message
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   style:
     name: Check formatting
 
