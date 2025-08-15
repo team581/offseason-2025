@@ -55,5 +55,5 @@ public class Robot extends TimedRobot {
   @Override
   public void testExit() {}
 
-  private void configureBindings() {}
+  private static void configureBindings() {}
 }
