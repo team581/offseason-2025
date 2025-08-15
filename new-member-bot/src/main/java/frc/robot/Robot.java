@@ -7,14 +7,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private String mAutoSelected;
+  private final SendableChooser<String> mChooser = new SendableChooser<>();
 
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    mChooser.setDefaultOption("Default Auto", kDefaultAuto);
+    mChooser.addOption("My Auto", kCustomAuto);
+    SmartDashboard.putData("Auto choices", mChooser);
   }
 
   @Override
@@ -22,13 +22,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    System.out.println("Auto selected: " + m_autoSelected);
+    mAutoSelected = mChooser.getSelected();
+    System.out.println("Auto selected: " + mAutoSelected);
   }
 
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
+    switch (mAutoSelected) {
       case kCustomAuto:
         break;
       case kDefaultAuto:
