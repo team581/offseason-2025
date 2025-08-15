@@ -162,7 +162,7 @@ logs/
 ctre_sim/
 
 # Generated code
-src/main/java/frc/robot/generated/BuildConstants.java
+**/generated/BuildConstants.java
 
 # Simulator files
 networktables.json

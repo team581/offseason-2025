@@ -30,15 +30,15 @@ jobs:
           java-version: 17
           cache: "gradle"
 
-      - name: Format with Spotless
+      - name: Format all modules with Spotless
         run: ./gradlew spotlessApply
         continue-on-error: true
 
-      - name: Fix Error Prone issues and regenerate collision avoidance graph
+      - name: Fix Error Prone issues for all modules
         run: ./gradlew build
         continue-on-error: true
         env:
             ERRORPRONE_AUTOFIX: 1
 
       - name: Run autofix.ci
-        uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
+        uses: autofix-ci/action@v1
