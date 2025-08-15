@@ -31,6 +31,13 @@ This repository is organized as a Gradle monorepo with the following projects:
 ./gradlew comp-bot:deploy
 ```
 
+### Running the simulator
+
+```sh
+# Run simulator for specific project
+./gradlew comp-bot:simulateJava
+```
+
 ### Running tests
 
 ```sh
