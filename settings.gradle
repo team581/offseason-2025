@@ -31,7 +31,7 @@ props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ig
 
 rootProject.name = 'team581-offseason-2025'
 
-// Include all modules
+// Include all projects
 include 'shared'
 include 'comp-bot'
 include 'offseason-bot'

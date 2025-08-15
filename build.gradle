@@ -1,5 +1,3 @@
-// Root project build.gradle for monorepo
-
 plugins {
 	id 'com.diffplug.spotless' version '7.0.4'
 }
@@ -10,7 +8,7 @@ repositories {
 
 allprojects {
 	group = 'frc.team581'
-	version = '1.0.0'
+	version = '2025.0.0'
 }
 
 subprojects {
@@ -37,7 +35,7 @@ subprojects {
 	}
 }
 
-// Spotless configuration applied to all modules
+// Spotless configuration applied to all projects
 
 spotless {
 	enforceCheck = false

@@ -25,7 +25,7 @@ jobs:
           distribution: "temurin"
           java-version: 17
           cache: "gradle"
-      - name: Assemble all modules
+      - name: Assemble
         run: ./gradlew assemble
   test:
     name: Run tests
@@ -41,7 +41,7 @@ jobs:
           distribution: "temurin"
           java-version: 17
           cache: "gradle"
-      - name: Run tests for all modules
+      - name: Run tests
         run: ./gradlew test
   style:
     name: Check formatting
@@ -57,5 +57,5 @@ jobs:
           distribution: "temurin"
           java-version: 17
           cache: "gradle"
-      - name: Check formatting for all modules
+      - name: Check formatting
         run: ./gradlew spotlessCheck
