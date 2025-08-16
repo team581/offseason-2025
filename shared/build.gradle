@@ -1,6 +1,6 @@
 plugins {
 	id "edu.wpi.first.GradleRIO" version "2025.3.2"
-	id "net.ltgt.errorprone" version "4.2.0"
+	id "net.ltgt.errorprone" version "4.3.0"
 }
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
