@@ -421,10 +421,7 @@ public class CollisionAvoidanceTest {
                 ElevatorState.LOLLIPOP_CORAL_INTAKE_INTAKE, ArmState.LOLLIPOP_CORAL_INTAKE_INTAKE),
             ObstructionKind.LEFT_OBSTRUCTED);
     var expected =
-        List.of(
-            Waypoint.L2_LEFT_PLACE,
-            Waypoint.L2_LEFT_ARM,
-            Waypoint.LOLLIPOP_INTAKE_RIGHT);
+        List.of(Waypoint.L2_LEFT_PLACE, Waypoint.L2_LEFT_ARM, Waypoint.LOLLIPOP_INTAKE_RIGHT);
 
     assertEquals(expected, result.orElseThrow());
   }
