@@ -10,7 +10,7 @@ dependencies {
 	implementation wpi.java.deps.wpilib()
 	implementation wpi.java.vendor.java()
 
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.13.1'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	errorprone "com.google.errorprone:error_prone_core:2.38.0"
