@@ -209,9 +209,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/LeftX", leftX);
     DogLog.log("Swerve/LeftY", leftY);
     DogLog.log("Swerve/RightX", rightX);
+
     Translation2d mappedpose = ControllerHelpers.fromCircularDiscCoordinates(leftX, leftY);
     double mappedX = mappedpose.getX();
     double mappedY = mappedpose.getY();
+
+    DogLog.log("Swerve/MappedX", mappedX);
+    DogLog.log("Swerve/MappedY", mappedY);
 
     teleopSpeeds =
         new ChassisSpeeds(
@@ -346,7 +350,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         ControllerHelpers.fromCircularDiscCoordinates(rawControllerXValue, rawControllerYValue);
     var deadbandX = ControllerHelpers.deadbandJoystickValue(mappedValues.getX(), LEFT_X_DEADBAND);
     var deadbandY = ControllerHelpers.deadbandJoystickValue(mappedValues.getY(), LEFT_Y_DEADBAND);
-
     return new Translation2d(deadbandX, deadbandY);
   }
 
