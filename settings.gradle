@@ -28,3 +28,11 @@ pluginManagement {
 
 Properties props = System.getProperties();
 props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
+
+rootProject.name = 'team581-offseason-2025'
+
+// Include all projects
+include 'shared'
+include 'comp-bot'
+include 'offseason-bot'
+include 'new-member-bot'

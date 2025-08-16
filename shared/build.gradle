@@ -1,0 +1,33 @@
+plugins {
+	id "edu.wpi.first.GradleRIO" version "2025.3.2"
+	id "net.ltgt.errorprone" version "4.2.0"
+}
+
+// Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
+// Also defines JUnit 5.
+dependencies {
+	annotationProcessor wpi.java.deps.wpilibAnnotations()
+	implementation wpi.java.deps.wpilib()
+	implementation wpi.java.vendor.java()
+
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.13.1'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	errorprone "com.google.errorprone:error_prone_core:2.38.0"
+
+	// https://central.sonatype.com/artifact/com.google.guava/guava
+	implementation 'com.google.guava:guava:33.4.8-jre'
+}
+
+// Error Prone configs
+tasks.withType(JavaCompile).configureEach {
+	options.errorprone.disable("InlineMeSuggester", "ImmutableEnumChecker", "UnusedVariable", "InconsistentCapitalization", "Var", "BooleanParameter", "Java8ApiChecker", "ImmutableMemberCollection", "ReturnMissingNullable", "FieldMissingNullable", "ParameterMissingNullable", "EqualsMissingNullable")
+
+	// Set the ERRORPRONE_AUTOFIX environment variable to fix files in place
+	if (System.getenv().containsKey("ERRORPRONE_AUTOFIX")) {
+		options.errorprone.errorproneArgs.add "-XepPatchLocation:IN_PLACE"
+	}
+}
+
+// Enable desktop support for shared library
+wpi.java.configureTestTasks(test)
