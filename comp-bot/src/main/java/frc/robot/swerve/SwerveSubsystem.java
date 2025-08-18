@@ -6,6 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
+import com.team581.ControllerHelpers;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -23,20 +24,17 @@ import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.CompBotTunerConstants;
 import frc.robot.generated.PracticeBotTunerConstants;
 import frc.robot.generated.PracticeBotTunerConstants.TunerSwerveDrivetrain;
-import frc.robot.util.ControllerHelpers;
-import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import java.util.Map;
 
 public class SwerveSubsystem extends StateMachine<SwerveState> {
+  private static final double LEFT_JOYSTICK_EXPONENT = 2;
+  private static final double RIGHT_JOYSTICK_EXPONENT = 2;
+
   public static final double MaxSpeed = 4.75;
   private static final double maxAngularRate = Units.rotationsToRadians(4);
   private static final Rotation2d TELEOP_MAX_ANGULAR_RATE = Rotation2d.fromRotations(2);
-
-  private static final double LEFT_X_DEADBAND = 0.05;
-  private static final double LEFT_Y_DEADBAND = 0.05;
-  private static final double RIGHT_X_DEADBAND = 0.15;
 
   private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
 
@@ -179,15 +177,17 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       DogLog.log("Swerve/RawJoystickInput", new Translation2d(x, y));
     }
 
-    double leftY =
-        -1.0
-            * MathHelpers.signedExp(
-                ControllerHelpers.deadbandJoystickValue(y, LEFT_Y_DEADBAND), 2.0);
-    double leftX =
-        MathHelpers.signedExp(ControllerHelpers.deadbandJoystickValue(x, LEFT_X_DEADBAND), 2.0);
-    double rightX =
-        MathHelpers.signedExp(
-            ControllerHelpers.deadbandJoystickValue(theta, RIGHT_X_DEADBAND), 2.0);
+    var leftJoystickMagnitude =
+        ControllerHelpers.getJoystickMagnitude(x, y, LEFT_JOYSTICK_EXPONENT);
+    var rightJoystickMagnitude =
+        ControllerHelpers.getJoystickMagnitude(theta, 0, RIGHT_JOYSTICK_EXPONENT);
+
+    var translation = new Translation2d(leftJoystickMagnitude, new Rotation2d(x, y));
+    var rotation = new Translation2d(rightJoystickMagnitude, new Rotation2d(theta, 0));
+
+    var leftX = translation.getX();
+    var leftY = translation.getY();
+    var rightX = rotation.getX();
 
     if (RobotConfig.get().swerve().invertRotation()) {
       rightX *= -1.0;
@@ -206,17 +206,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       leftY *= -1.0;
     }
 
-    DogLog.log("Swerve/LeftX", leftX);
-    DogLog.log("Swerve/LeftY", leftY);
-    DogLog.log("Swerve/RightX", rightX);
-    Translation2d mappedpose = ControllerHelpers.fromCircularDiscCoordinates(leftX, leftY);
-    double mappedX = mappedpose.getX();
-    double mappedY = mappedpose.getY();
-
     teleopSpeeds =
         new ChassisSpeeds(
-            -1.0 * mappedY * MaxSpeed * teleopSlowModePercent,
-            mappedX * MaxSpeed * teleopSlowModePercent,
+            -1.0 * leftY * MaxSpeed * teleopSlowModePercent,
+            leftX * MaxSpeed * teleopSlowModePercent,
             rightX * TELEOP_MAX_ANGULAR_RATE.getRadians() * teleopSlowModePercent);
 
     sendSwerveRequest();
@@ -342,12 +335,11 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     if (getState() != SwerveState.REEF_ALIGN_TELEOP) {
       return Translation2d.kZero;
     }
-    var mappedValues =
-        ControllerHelpers.fromCircularDiscCoordinates(rawControllerXValue, rawControllerYValue);
-    var deadbandX = ControllerHelpers.deadbandJoystickValue(mappedValues.getX(), LEFT_X_DEADBAND);
-    var deadbandY = ControllerHelpers.deadbandJoystickValue(mappedValues.getY(), LEFT_Y_DEADBAND);
 
-    return new Translation2d(deadbandX, deadbandY);
+    return new Translation2d(
+        ControllerHelpers.getJoystickMagnitude(
+            rawControllerXValue, rawControllerYValue, LEFT_JOYSTICK_EXPONENT),
+        new Rotation2d(rawControllerXValue, rawControllerYValue));
   }
 
   public void snapsDriveRequest(double snapAngle) {
