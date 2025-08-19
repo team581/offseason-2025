@@ -1,12 +1,12 @@
 package frc.robot.imu;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.team581.util.state_machines.StateMachine;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.util.scheduling.SubsystemPriority;
-import frc.robot.util.state_machines.StateMachine;
 
 public class ImuSubsystem extends StateMachine<ImuState> {
   private static final double IS_TILTED_THRESHOLD = 4.0;

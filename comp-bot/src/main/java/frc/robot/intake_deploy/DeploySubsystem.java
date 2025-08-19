@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.team581.GlobalConfig;
+import com.team581.util.state_machines.StateMachine;
 import com.team581.util.tuning.TunablePid;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
@@ -15,7 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.config.RobotConfig;
 import frc.robot.util.scheduling.SubsystemPriority;
-import frc.robot.util.state_machines.StateMachine;
 
 public class DeploySubsystem extends StateMachine<DeployState> {
   private static final double TOLERANCE = 1.0;

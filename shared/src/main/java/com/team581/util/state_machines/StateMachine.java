@@ -1,12 +1,12 @@
-package frc.robot.util.state_machines;
+package com.team581.util.state_machines;
 
+import com.team581.util.scheduling.LifecycleSubsystem;
+import com.team581.util.scheduling.LifecycleSubsystemManager;
+import com.team581.util.scheduling.SubsystemPriorityBase;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.util.scheduling.LifecycleSubsystem;
-import frc.robot.util.scheduling.LifecycleSubsystemManager;
-import frc.robot.util.scheduling.SubsystemPriority;
 import java.util.Set;
 
 /** A state machine backed by {@link LifecycleSubsystem}. */
@@ -23,7 +23,7 @@ public abstract class StateMachine<S extends Enum<S>> extends LifecycleSubsystem
    * @param priority The subsystem priority of this subsystem in {@link LifecycleSubsystemManager}.
    * @param initialState The initial/default state of the state machine.
    */
-  protected StateMachine(SubsystemPriority priority, S initialState) {
+  protected StateMachine(SubsystemPriorityBase priority, S initialState) {
     super(priority);
     state = initialState;
     manager.register(this);

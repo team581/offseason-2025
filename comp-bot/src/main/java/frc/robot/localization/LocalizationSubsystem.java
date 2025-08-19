@@ -3,6 +3,7 @@ package frc.robot.localization;
 import com.ctre.phoenix6.Utils;
 import com.team581.math.MathHelpers;
 import com.team581.trailblazer.LocalizationBase;
+import com.team581.util.state_machines.StateMachine;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -20,7 +21,6 @@ import frc.robot.fms.FmsSubsystem;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
-import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.results.TagResult;
 

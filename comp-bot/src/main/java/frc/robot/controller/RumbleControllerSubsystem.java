@@ -1,5 +1,6 @@
 package frc.robot.controller;
 
+import com.team581.util.state_machines.StateMachine;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -8,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.scheduling.SubsystemPriority;
-import frc.robot.util.state_machines.StateMachine;
 
 public class RumbleControllerSubsystem extends StateMachine<RumbleControllerState> {
   private final Timer matchTimer = new Timer();

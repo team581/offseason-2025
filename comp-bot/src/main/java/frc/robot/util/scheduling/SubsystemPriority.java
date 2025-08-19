@@ -1,10 +1,8 @@
 package frc.robot.util.scheduling;
 
-public enum SubsystemPriority {
-  // Ensures that state machine inputs are gathered at the right time
-  // Subsystem inputs are collected in reverse order of priority (so lowest priority first)
-  STATE_MACHINE_INPUT_MANAGER(999),
+import com.team581.util.scheduling.SubsystemPriorityBase;
 
+public enum SubsystemPriority implements SubsystemPriorityBase {
   // 20-30 is for manager subsystems
   AUTOS(30),
   ROBOT_MANAGER(29),
@@ -34,5 +32,10 @@ public enum SubsystemPriority {
 
   private SubsystemPriority(int priority) {
     this.value = priority;
+  }
+
+  @Override
+  public int getValue() {
+    return value;
   }
 }

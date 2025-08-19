@@ -1,6 +1,7 @@
 package frc.robot.vision.game_piece_detection;
 
 import com.team581.math.MathHelpers;
+import com.team581.util.state_machines.StateMachine;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,7 +21,6 @@ import frc.robot.intake_assist.IntakeAssistUtil;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
-import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.limelight.Limelight;
 import frc.robot.vision.limelight.LimelightHelpers;
 import frc.robot.vision.limelight.LimelightState;

@@ -9,6 +9,7 @@ import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.team581.GlobalConfig;
 import com.team581.math.ControllerHelpers;
 import com.team581.trailblazer.SwerveBase;
+import com.team581.util.state_machines.StateMachine;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -27,7 +28,6 @@ import frc.robot.generated.CompBotTunerConstants;
 import frc.robot.generated.PracticeBotTunerConstants;
 import frc.robot.generated.PracticeBotTunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.scheduling.SubsystemPriority;
-import frc.robot.util.state_machines.StateMachine;
 import java.util.Map;
 
 public class SwerveSubsystem extends StateMachine<SwerveState> implements SwerveBase {

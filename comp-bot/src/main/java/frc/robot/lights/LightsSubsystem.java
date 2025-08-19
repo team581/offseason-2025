@@ -1,12 +1,12 @@
 package frc.robot.lights;
 
 import com.ctre.phoenix.led.CANdle;
+import com.team581.util.state_machines.StateMachine;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.util.scheduling.SubsystemPriority;
-import frc.robot.util.state_machines.StateMachine;
 
 public class LightsSubsystem extends StateMachine<LightsState> {
   private final CANdle candle;

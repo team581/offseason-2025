@@ -1,9 +1,9 @@
 package frc.robot.fms;
 
+import com.team581.util.scheduling.LifecycleSubsystem;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.util.scheduling.LifecycleSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 
 public class FmsSubsystem extends LifecycleSubsystem {

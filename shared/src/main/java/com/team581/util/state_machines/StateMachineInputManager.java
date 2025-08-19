@@ -1,7 +1,6 @@
-package frc.robot.util.state_machines;
+package com.team581.util.state_machines;
 
-import frc.robot.util.scheduling.LifecycleSubsystem;
-import frc.robot.util.scheduling.SubsystemPriority;
+import com.team581.util.scheduling.LifecycleSubsystem;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -10,10 +9,13 @@ import java.util.Queue;
 public class StateMachineInputManager extends LifecycleSubsystem {
   // Sort by lowest priority first
   private final Queue<StateMachine<?>> stateMachines =
-      new PriorityQueue<>(Comparator.comparingInt(stateMachine -> stateMachine.priority.value));
+      new PriorityQueue<>(
+          Comparator.comparingInt(stateMachine -> stateMachine.priority.getValue()));
 
   public StateMachineInputManager() {
-    super(SubsystemPriority.STATE_MACHINE_INPUT_MANAGER);
+    // Ensures that state machine inputs are gathered at the right time
+    // Subsystem inputs are collected in reverse order of priority (so lowest priority first)
+    super(() -> 999);
   }
 
   public void register(StateMachine<?> stateMachine) {

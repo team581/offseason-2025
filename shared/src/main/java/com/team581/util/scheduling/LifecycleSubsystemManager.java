@@ -1,4 +1,4 @@
-package frc.robot.util.scheduling;
+package com.team581.util.scheduling;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -39,7 +39,7 @@ public final class LifecycleSubsystemManager {
 
   private static final Queue<LifecycleSubsystem> subsystems =
       new PriorityQueue<>(
-          Comparator.comparingInt((LifecycleSubsystem subsystem) -> subsystem.priority.value)
+          Comparator.comparingInt((LifecycleSubsystem subsystem) -> subsystem.priority.getValue())
               .reversed());
   private static final CommandScheduler commandScheduler = CommandScheduler.getInstance();
   private static final Set<Command> scheduledCommands = getScheduledCommands();

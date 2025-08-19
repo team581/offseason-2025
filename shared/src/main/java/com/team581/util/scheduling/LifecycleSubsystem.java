@@ -1,16 +1,15 @@
-package frc.robot.util.scheduling;
+package com.team581.util.scheduling;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 
 /**
  * Extends {@link SubsystemBase} by adding in lifecycle methods for robotInit, teleopPeriodic, etc.,
- * similar to {@link Robot}.
+ * similar to a robot class.
  */
 public class LifecycleSubsystem extends SubsystemBase {
-  public final SubsystemPriority priority;
+  public final SubsystemPriorityBase priority;
 
   private final String loggerName;
 
@@ -18,7 +17,7 @@ public class LifecycleSubsystem extends SubsystemBase {
 
   private LifecycleStage previousStage = null;
 
-  public LifecycleSubsystem(SubsystemPriority priority) {
+  public LifecycleSubsystem(SubsystemPriorityBase priority) {
     this.priority = priority;
 
     LifecycleSubsystemManager.registerSubsystem(this);
