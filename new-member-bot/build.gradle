@@ -118,9 +118,21 @@ gversion {
 	indent       = "  "
 }
 
-// Configuration cache workaround for gversion plugin
+// Configuration cache exclusions
 tasks.configureEach {
-	if (name == 'createVersionFile') {
-		notCompatibleWithConfigurationCache('gversion plugin uses Project object')
+	switch (name) {
+		case 'createVersionFile':
+			notCompatibleWithConfigurationCache('gversion plugin uses Project object')
+			break
+		case 'simulateJava':
+		case 'simulateJavaRelease':
+			notCompatibleWithConfigurationCache('simulate Java tasks are not compatible with configuration cache')
+			break
+		case 'deploy':
+		case ~/.*roborio.*/:
+		case 'writeDebugInfo':
+		case ~/.*DebugInfo.*/:
+			notCompatibleWithConfigurationCache('GradleRIO tasks are not compatible with configuration cache')
+			break
 	}
 }
