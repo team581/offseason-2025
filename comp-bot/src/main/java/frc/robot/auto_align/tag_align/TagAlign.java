@@ -407,37 +407,7 @@ public class TagAlign {
     DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
     DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
 
-    double pathSlope = -1 / Math.tan(targetPose.getRotation().getRadians());
-
-    if (preferedScoringLevel.equals(ReefPipeLevel.L1)) {
-      pathSlope = Math.tan(targetPose.getRotation().getRadians());
-    }
-    double yInt = targetPose.getY() - pathSlope * targetPose.getX();
-
-    // Find the slope and y-int of the perpendicular line
-    double perpSlope = -1 / pathSlope;
-    double perpYInt = currentPose.getY() - perpSlope * currentPose.getX();
-
-    // Calculate the perpendicular intersection
-    double perpX = (perpYInt - yInt) / (pathSlope - perpSlope);
-    double perpY = pathSlope * perpX + yInt;
-
-    var closestPointOnLine = new Pose2d(perpX, perpY, targetPose.getRotation());
-    DogLog.log("AutoAlign/ClosestPointOnLine", closestPointOnLine);
-
-    if (MathUtil.isNear(0.0, targetPose.getRotation().getRadians(), 1e-6)) {
-      closestPointOnLine =
-          new Pose2d(currentPose.getX(), targetPose.getY(), targetPose.getRotation());
-    }
-
-    var midpoint =
-        new Pose2d(
-            (closestPointOnLine.getX() + targetPose.getX()) / 2.0,
-            (closestPointOnLine.getY() + targetPose.getY()) / 2.0,
-            currentPose.getRotation());
-    DogLog.log("AutoAlign/Midpoint", midpoint);
-
-    var driveDirection = MathHelpers.getDriveDirection(currentPose, midpoint);
+    var driveDirection = MathHelpers.getDriveDirection(currentPose, targetPose);
 
     var speeds = new PolarChassisSpeeds(driveVelocityMagnitude, driveDirection, rotationSpeed);
 
