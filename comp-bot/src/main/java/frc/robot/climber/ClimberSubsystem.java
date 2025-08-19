@@ -90,7 +90,6 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
         }
         grabMotor.disable();
       }
-      
     }
 
     if (GlobalConfig.IS_DEVELOPMENT) {
