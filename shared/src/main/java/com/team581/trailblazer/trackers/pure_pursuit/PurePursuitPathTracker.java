@@ -28,8 +28,8 @@ public class PurePursuitPathTracker implements PathTracker {
   private int currentLookaheadPointIndex = 0;
   private int currentRobotFollowedPointIndex = 0;
   private Rotation2d currentInterpolatedRotation = Rotation2d.kZero;
-  private boolean rotateImmediately;
-  private boolean useDynamicLookahead;
+  private final boolean rotateImmediately;
+  private final boolean useDynamicLookahead;
 
   public PurePursuitPathTracker(boolean rotateImmediately, boolean useDynamicLookahead) {
     this.rotateImmediately = rotateImmediately;
