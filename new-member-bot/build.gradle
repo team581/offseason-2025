@@ -124,4 +124,3 @@ tasks.configureEach {
 		notCompatibleWithConfigurationCache('gversion plugin uses Project object')
 	}
 }
-

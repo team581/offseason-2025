@@ -54,6 +54,8 @@ spotless {
 	groovyGradle {
 		target '**/*.gradle'
 		greclipse()
+		leadingSpacesToTabs()
+		endWithNewline()
 	}
 
 	json {
