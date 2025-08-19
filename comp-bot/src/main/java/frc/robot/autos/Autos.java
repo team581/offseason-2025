@@ -1,5 +1,6 @@
 package frc.robot.autos;
 
+import com.team581.autos.AutoChooser;
 import com.team581.trailblazer.Trailblazer;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,7 +13,7 @@ import frc.robot.util.scheduling.LifecycleSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 
 public class Autos extends LifecycleSubsystem {
-  private final AutoChooser autoChooser;
+  private final AutoChooser<AutoSelection> autoChooser;
   private final RobotManager robotManager;
   private final Trailblazer trailblazer;
   private boolean hasEnabledAuto = false;
@@ -23,7 +24,7 @@ public class Autos extends LifecycleSubsystem {
   public Autos(RobotManager robotManager, Trailblazer trailblazer) {
     super(SubsystemPriority.AUTOS);
 
-    autoChooser = new AutoChooser(robotManager, trailblazer);
+    autoChooser = new AutoChooser<>(AutoSelection.values(), AutoSelection.DO_NOTHING);
     this.robotManager = robotManager;
     this.trailblazer = trailblazer;
 
