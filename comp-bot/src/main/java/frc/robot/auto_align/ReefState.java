@@ -1,9 +1,9 @@
 package frc.robot.auto_align;
 
+import com.team581.GlobalConfig;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.config.RobotConfig;
 import java.util.EnumSet;
 import java.util.HashMap;
 
@@ -14,7 +14,7 @@ public class ReefState {
   private final HashMap<ReefPipe, Integer> scoredL1Pipes = new HashMap<>();
 
   public ReefState() {
-    if (RobotConfig.IS_DEVELOPMENT) {
+    if (GlobalConfig.IS_DEVELOPMENT) {
       SmartDashboard.putData("ReefState/Clear", Commands.runOnce(this::clear));
     }
   }

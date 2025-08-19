@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.team581.GlobalConfig;
 import com.team581.trailblazer.Trailblazer;
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
@@ -119,8 +120,8 @@ public class Robot extends TimedRobot {
     DogLog.setOptions(
         new DogLogOptions()
             .withCaptureDs(true)
-            .withNtPublish(RobotConfig.IS_DEVELOPMENT)
-            .withNtTunables(RobotConfig.IS_DEVELOPMENT));
+            .withNtPublish(GlobalConfig.IS_DEVELOPMENT)
+            .withNtTunables(GlobalConfig.IS_DEVELOPMENT));
     // DogLog.setPdh(hardware.pdh);
 
     // Record metadata
@@ -203,7 +204,7 @@ public class Robot extends TimedRobot {
     autonomousCommand.cancel();
 
     ElasticLayoutUtil.onEnable();
-    if (RobotConfig.IS_DEVELOPMENT) {
+    if (GlobalConfig.IS_DEVELOPMENT) {
       autoAlign.clearReefState();
     }
   }

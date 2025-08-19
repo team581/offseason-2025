@@ -1,5 +1,6 @@
 package frc.robot.robot_manager;
 
+import com.team581.GlobalConfig;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -40,7 +41,7 @@ public final class MechanismVisualizer {
               "arm", ArmSubsystem.ARM_LENGTH_METERS, 90, 10, new Color8Bit(Color.kFirstRed)));
 
   public static void log(SuperstructurePosition position, double deployAngle) {
-    if (!RobotConfig.IS_DEVELOPMENT) {
+    if (!GlobalConfig.IS_DEVELOPMENT) {
       return;
     }
 

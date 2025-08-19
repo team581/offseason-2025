@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.team581.GlobalConfig;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
@@ -92,7 +93,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
       default -> {}
     }
 
-    if (RobotConfig.IS_DEVELOPMENT) {
+    if (GlobalConfig.IS_DEVELOPMENT) {
       if (atGoal()) {
         DogLog.log("Climber/Status", "At goal");
       } else if (currentAngle < clamp(getState().angle)) {

@@ -2,12 +2,12 @@ package frc.robot.util.tuning;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.team581.GlobalConfig;
 import dev.doglog.DogLog;
-import frc.robot.config.RobotConfig;
 
 public class TunablePid {
   public static void of(String key, TalonFX motor, TalonFXConfiguration defaultConfig) {
-    if (!RobotConfig.IS_DEVELOPMENT) {
+    if (!GlobalConfig.IS_DEVELOPMENT) {
       return;
     }
 

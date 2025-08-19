@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.team581.GlobalConfig;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -39,7 +40,7 @@ public class DeploySubsystem extends StateMachine<DeployState> {
     this.motor = motor;
     TunablePid.of("Deploy", motor, RobotConfig.get().deploy().motorConfig());
 
-    if (RobotConfig.IS_DEVELOPMENT) {
+    if (GlobalConfig.IS_DEVELOPMENT) {
       DogLog.tunable(
           "Deploy/SetAngleDeg", 0.0, angle -> motor.setPosition(Units.degreesToRotations(angle)));
     }

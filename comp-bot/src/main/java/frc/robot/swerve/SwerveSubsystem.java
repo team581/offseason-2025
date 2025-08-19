@@ -6,6 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
+import com.team581.GlobalConfig;
 import com.team581.math.ControllerHelpers;
 import com.team581.trailblazer.SwerveBase;
 import dev.doglog.DogLog;
@@ -176,7 +177,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> implements Swerve
     rawControllerXValue = x;
     rawControllerYValue = y;
 
-    if (RobotConfig.IS_DEVELOPMENT) {
+    if (GlobalConfig.IS_DEVELOPMENT) {
       DogLog.log("Swerve/RawJoystickInput", new Translation2d(x, y));
     }
 

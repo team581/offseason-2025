@@ -1,5 +1,6 @@
 package frc.robot.autos;
 
+import com.team581.GlobalConfig;
 import com.team581.autos.NamedAuto;
 import com.team581.trailblazer.Trailblazer;
 import com.team581.trailblazer.TrailblazerPathLogger;
@@ -9,7 +10,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.config.RobotConfig;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
 
@@ -70,7 +70,7 @@ public abstract class BaseAuto implements NamedAuto {
               if (interrupted && DriverStation.isAutonomousEnabled()) {
                 DogLog.logFault("Auto command interrupted outside teleop");
 
-                if (RobotConfig.IS_DEVELOPMENT) {
+                if (GlobalConfig.IS_DEVELOPMENT) {
                   throw new IllegalStateException(
                       "The auto command was interrupted while still in auto mode, is there a command requirements conflict?");
                 }
