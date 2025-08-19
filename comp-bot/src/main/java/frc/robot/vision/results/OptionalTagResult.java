@@ -1,10 +1,10 @@
 package frc.robot.vision.results;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.team581.util.ReusableOptional;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N3;
-import frc.robot.util.ReusableOptional;
 
 public class OptionalTagResult extends ReusableOptional<TagResult> {
   public OptionalTagResult() {

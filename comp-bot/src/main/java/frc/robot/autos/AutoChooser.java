@@ -1,9 +1,9 @@
 package frc.robot.autos;
 
+import com.team581.trailblazer.Trailblazer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.robot_manager.RobotManager;
-import frc.robot.util.trailblazer.Trailblazer;
 
 public class AutoChooser {
   private final SendableChooser<AutoSelection> chooser = new SendableChooser<>();

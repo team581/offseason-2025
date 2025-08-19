@@ -1,5 +1,6 @@
 package frc.robot.autos;
 
+import com.team581.trailblazer.Trailblazer;
 import frc.robot.autos.auto_path_commands.blue.BlueDoNothingAuto;
 import frc.robot.autos.auto_path_commands.blue.BlueLollipop4L4Auto;
 import frc.robot.autos.auto_path_commands.blue.BlueLollipopLeftABAuto;
@@ -9,7 +10,6 @@ import frc.robot.autos.auto_path_commands.red.RedLollipop4L4Auto;
 import frc.robot.autos.auto_path_commands.red.RedLollipopLeftABAuto;
 import frc.robot.autos.auto_path_commands.red.RedLollipopRightABAuto;
 import frc.robot.robot_manager.RobotManager;
-import frc.robot.util.trailblazer.Trailblazer;
 import java.util.function.BiFunction;
 
 public enum AutoSelection {

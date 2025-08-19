@@ -1,7 +1,7 @@
 package frc.robot.vision.results;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import frc.robot.util.ReusableOptional;
+import com.team581.util.ReusableOptional;
 
 public class OptionalGamePieceResult extends ReusableOptional<GamePieceResult> {
   public OptionalGamePieceResult() {

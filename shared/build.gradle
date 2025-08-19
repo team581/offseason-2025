@@ -14,10 +14,10 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	errorprone "com.google.errorprone:error_prone_core:2.38.0"
-
-	// https://central.sonatype.com/artifact/com.google.guava/guava
-	implementation 'com.google.guava:guava:33.4.8-jre'
 }
+
+ext.wpilibVersion = "2025.+"
+
 
 // Error Prone configs
 tasks.withType(JavaCompile).configureEach {

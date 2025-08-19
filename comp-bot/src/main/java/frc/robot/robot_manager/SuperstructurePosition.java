@@ -1,5 +1,6 @@
 package frc.robot.robot_manager;
 
+import com.team581.math.MathHelpers;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -9,7 +10,6 @@ import frc.robot.arm.ArmState;
 import frc.robot.arm.ArmSubsystem;
 import frc.robot.config.RobotConfig;
 import frc.robot.elevator.ElevatorState;
-import frc.robot.util.MathHelpers;
 import java.util.Objects;
 
 public record SuperstructurePosition(

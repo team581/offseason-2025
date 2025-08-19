@@ -1,5 +1,8 @@
 package frc.robot.autos.auto_path_commands.red;
 
+import com.team581.trailblazer.AutoPoint;
+import com.team581.trailblazer.AutoSegment;
+import com.team581.trailblazer.Trailblazer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -10,9 +13,6 @@ import frc.robot.autos.AutoBlocks;
 import frc.robot.autos.BaseAuto;
 import frc.robot.autos.Points;
 import frc.robot.robot_manager.RobotManager;
-import frc.robot.util.trailblazer.AutoPoint;
-import frc.robot.util.trailblazer.AutoSegment;
-import frc.robot.util.trailblazer.Trailblazer;
 
 public class RedLollipop4L4Auto extends BaseAuto {
   public RedLollipop4L4Auto(RobotManager robotManager, Trailblazer trailblazer) {

@@ -1,5 +1,6 @@
 package frc.robot.autos;
 
+import com.team581.trailblazer.Trailblazer;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -9,7 +10,6 @@ import frc.robot.fms.FmsSubsystem;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.util.scheduling.LifecycleSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
-import frc.robot.util.trailblazer.Trailblazer;
 
 public class Autos extends LifecycleSubsystem {
   private final AutoChooser autoChooser;

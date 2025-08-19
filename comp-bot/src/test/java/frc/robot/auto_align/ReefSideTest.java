@@ -2,10 +2,10 @@ package frc.robot.auto_align;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.team581.math.MathHelpers;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.util.MathHelpers;
 import org.junit.jupiter.api.Test;
 
 public class ReefSideTest {

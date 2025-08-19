@@ -2,10 +2,10 @@ package frc.robot.autos.trackers.pure_pursuit;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.team581.trailblazer.AutoPoint;
+import com.team581.trailblazer.trackers.pure_pursuit.PurePursuitUtils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.util.trailblazer.AutoPoint;
-import frc.robot.util.trailblazer.trackers.pure_pursuit.PurePursuitUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;

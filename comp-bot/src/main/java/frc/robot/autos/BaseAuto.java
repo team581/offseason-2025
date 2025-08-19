@@ -1,5 +1,8 @@
 package frc.robot.autos;
 
+import com.team581.autos.NamedAuto;
+import com.team581.trailblazer.Trailblazer;
+import com.team581.trailblazer.TrailblazerPathLogger;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -9,9 +12,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.config.RobotConfig;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
-import frc.robot.util.trailblazer.Trailblazer;
 
-public abstract class BaseAuto {
+public abstract class BaseAuto implements NamedAuto {
   protected final RobotManager robotManager;
   protected final Trailblazer trailblazer;
   protected final RobotCommands actions;
@@ -40,6 +42,7 @@ public abstract class BaseAuto {
   protected abstract Command createAutoCommand();
 
   /** Returns the name of this auto. */
+  @Override
   public String name() {
     return autoName;
   }

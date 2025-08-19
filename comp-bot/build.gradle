@@ -131,3 +131,10 @@ gversion {
 	timeZone     = "America/Los_Angeles"
 	indent       = "  "
 }
+
+// Configuration cache workaround for gversion plugin
+tasks.configureEach {
+	if (name == 'createVersionFile') {
+		notCompatibleWithConfigurationCache('gversion plugin uses Project object')
+	}
+}

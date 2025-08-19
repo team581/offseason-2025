@@ -1,15 +1,9 @@
 package frc.robot.config;
 
-import frc.robot.util.FeatureFlag;
+import com.team581.util.FeatureFlag;
 import java.util.function.BooleanSupplier;
 
 public class FeatureFlags {
-  public static final BooleanSupplier PURE_PURSUIT_USE_DYNAMIC_LOOKAHEAD =
-      FeatureFlag.of("PurePursuit/UseDynamicLookahead", false);
-
-  public static final BooleanSupplier PURE_PURSUIT_ROTATE_IMMEDIATELY =
-      FeatureFlag.of("PurePursuit/RotateImmediately", false);
-
   public static final BooleanSupplier AUTO_ALIGN_DEADBAND =
       FeatureFlag.of("AutoAlign/Deadband", false);
 

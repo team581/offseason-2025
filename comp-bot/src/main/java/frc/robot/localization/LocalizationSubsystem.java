@@ -1,6 +1,8 @@
 package frc.robot.localization;
 
 import com.ctre.phoenix6.Utils;
+import com.team581.math.MathHelpers;
+import com.team581.trailblazer.LocalizationBase;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -17,13 +19,13 @@ import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
-import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.results.TagResult;
 
-public class LocalizationSubsystem extends StateMachine<LocalizationState> {
+public class LocalizationSubsystem extends StateMachine<LocalizationState>
+    implements LocalizationBase {
   private static final Vector<N3> MT1_VISION_STD_DEVS =
       VecBuilder.fill(
           RobotConfig.get().vision().xyStdDev(),
@@ -72,6 +74,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     robotPose = swerve.drivetrain.getState().Pose;
   }
 
+  @Override
   public Pose2d getPose() {
     return robotPose;
   }

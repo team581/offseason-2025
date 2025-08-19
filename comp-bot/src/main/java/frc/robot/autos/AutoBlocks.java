@@ -1,5 +1,10 @@
 package frc.robot.autos;
 
+import com.team581.math.PoseErrorTolerance;
+import com.team581.trailblazer.AutoPoint;
+import com.team581.trailblazer.AutoSegment;
+import com.team581.trailblazer.Trailblazer;
+import com.team581.trailblazer.constraints.AutoConstraintOptions;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -13,11 +18,6 @@ import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.robot_manager.RobotState;
-import frc.robot.util.PoseErrorTolerance;
-import frc.robot.util.trailblazer.AutoPoint;
-import frc.robot.util.trailblazer.AutoSegment;
-import frc.robot.util.trailblazer.Trailblazer;
-import frc.robot.util.trailblazer.constraints.AutoConstraintOptions;
 
 public class AutoBlocks {
   /**

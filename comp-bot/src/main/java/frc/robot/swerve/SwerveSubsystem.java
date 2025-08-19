@@ -6,7 +6,8 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
-import com.team581.ControllerHelpers;
+import com.team581.math.ControllerHelpers;
+import com.team581.trailblazer.SwerveBase;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -28,7 +29,7 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import java.util.Map;
 
-public class SwerveSubsystem extends StateMachine<SwerveState> {
+public class SwerveSubsystem extends StateMachine<SwerveState> implements SwerveBase {
   private static final double LEFT_JOYSTICK_EXPONENT = 2;
   private static final double RIGHT_JOYSTICK_EXPONENT = 2;
 
@@ -105,6 +106,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     return robotRelativeSpeeds;
   }
 
+  @Override
   public ChassisSpeeds getFieldRelativeSpeeds() {
     return fieldRelativeSpeeds;
   }
@@ -135,6 +137,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     timeSinceAutoSpeeds.start();
   }
 
+  @Override
   public void setFieldRelativeAutoSpeeds(ChassisSpeeds speeds) {
     autoSpeeds = speeds;
     timeSinceAutoSpeeds.reset();

@@ -1,5 +1,7 @@
 package frc.robot.vision.limelight;
 
+import com.team581.mechanisms.vision.CameraHealth;
+import com.team581.util.ReusableOptional;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,10 +13,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
-import frc.robot.util.ReusableOptional;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
-import frc.robot.vision.CameraHealth;
 import frc.robot.vision.results.OptionalGamePieceResult;
 import frc.robot.vision.results.OptionalTagResult;
 import java.util.OptionalDouble;

@@ -1,5 +1,6 @@
 package frc.robot.vision;
 
+import com.team581.mechanisms.vision.CameraHealth;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
