@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.team581.math.MathHelpers;
+import com.team581.util.tuning.TunablePid;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
@@ -28,7 +29,6 @@ import frc.robot.robot_manager.collision_avoidance.ObstructionKind;
 import frc.robot.robot_manager.collision_avoidance.ObstructionStrategy;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
-import frc.robot.util.tuning.TunablePid;
 import java.util.Map;
 import java.util.OptionalDouble;
 
