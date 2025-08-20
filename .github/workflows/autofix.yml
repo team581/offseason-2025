@@ -30,15 +30,15 @@ jobs:
           java-version: 17
           cache: "gradle"
 
-      - name: Format with Spotless
-        run: ./gradlew spotlessApply
-        continue-on-error: true
-
       - name: Fix Error Prone issues
         run: ./gradlew build
         continue-on-error: true
         env:
-            ERRORPRONE_AUTOFIX: 1
+          ERRORPRONE_AUTOFIX: 1
+
+      - name: Format with Spotless
+        run: ./gradlew spotlessApply
+        continue-on-error: true
 
       - name: Run autofix.ci
         uses: autofix-ci/action@v1
