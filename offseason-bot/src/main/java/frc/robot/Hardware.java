@@ -25,6 +25,6 @@ public class Hardware {
           RobotConfig.get().singulator().rightMotorId(),
           RobotConfig.get().singulator().canBusName());
 
-  public final CANdi intakeTopCANdi = new CANdi(RobotConfig.get().intake().topCANdiId());
-  public final CANdi intakeBottomCANdi = new CANdi(RobotConfig.get().intake().bottomCANdiId());
+  public final CANdi intakeTopCANdi = new CANdi(RobotConfig.get().intake().topCaNdiId());
+  public final CANdi intakeBottomCANdi = new CANdi(RobotConfig.get().intake().bottomCaNdiId());
 }
