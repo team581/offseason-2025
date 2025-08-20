@@ -73,9 +73,9 @@ task deploy {
 ❌ Running the deploy task without specifying a robot is disabled to prevent dangerous parallel deployments!
 
 Instead, deploy to a specific robot:
-  ./gradlew comp-bot:deploy       - Deploy to competition robot
-  ./gradlew offseason-bot:deploy  - Deploy to offseason robot
-  ./gradlew new-member-bot:deploy - Deploy to new member robot
+./gradlew comp-bot:deploy       - Deploy to competition robot
+./gradlew offseason-bot:deploy  - Deploy to offseason robot
+./gradlew new-member-bot:deploy - Deploy to new member robot
 
 This prevents race conditions where each robot tries to deploy at the same time, causing the wrong code to be deployed.
 		""".trim())
