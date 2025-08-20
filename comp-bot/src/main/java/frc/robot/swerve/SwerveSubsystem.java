@@ -190,7 +190,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> implements Swerve
     var rotation = new Translation2d(rightJoystickMagnitude, new Rotation2d(theta, 0));
 
     var leftX = translation.getX();
-    var leftY = -1*translation.getY();
+    var leftY = -1 * translation.getY();
     var rightX = rotation.getX();
 
     if (RobotConfig.get().swerve().invertRotation()) {

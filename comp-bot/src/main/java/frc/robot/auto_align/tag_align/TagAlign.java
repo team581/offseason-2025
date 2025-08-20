@@ -397,10 +397,11 @@ public class TagAlign {
       driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
     }
 
-    if (!MathUtil.isNear(targetPose.getRotation().getDegrees(), currentPose.getRotation().getDegrees(), 25) && preferedScoringLevel.equals(ReefPipeLevel.L1)) {
+    if (!MathUtil.isNear(
+            targetPose.getRotation().getDegrees(), currentPose.getRotation().getDegrees(), 25)
+        && preferedScoringLevel.equals(ReefPipeLevel.L1)) {
       driveVelocityMagnitude = 0.0;
     }
-
 
     var rotationSpeed =
         ROTATION_CONTROLLER.calculate(

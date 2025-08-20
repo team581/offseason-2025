@@ -103,7 +103,7 @@ public class RobotManager extends StateMachine<RobotState> {
   private Optional<RobotState> afterIntakingCoralState = Optional.empty();
   private boolean scoringAlignActive = false;
   private boolean canSkipCollisionAvoidanceForReefAlgae = false;
-  private Debouncer l1VisionAdjustReadyDebouncer = new Debouncer(0.2, DebounceType.kRising);
+  private final Debouncer l1VisionAdjustReadyDebouncer = new Debouncer(0.2, DebounceType.kRising);
 
   private boolean intakeAssistActive = false;
 
@@ -971,7 +971,8 @@ public class RobotManager extends StateMachine<RobotState> {
 
     switch (getState()) {
       case LOW_STOW, CLAW_ALGAE, STARTING_POSITION -> {
-        if (groundManager.hasCoral() && !l1VisionAdjustReadyDebouncer.calculate(groundManager.deploy.atGoal())) {
+        if (groundManager.hasCoral()
+            && !l1VisionAdjustReadyDebouncer.calculate(groundManager.deploy.atGoal())) {
           vision.setState(VisionState.HANDOFF);
         } else {
           vision.setState(VisionState.TAGS);
