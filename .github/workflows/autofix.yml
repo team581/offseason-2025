@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Validate Gradle wrappers
         uses: gradle/actions/wrapper-validation@v4
   autofix:
@@ -21,7 +21,7 @@ jobs:
       - validation
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -34,11 +34,11 @@ jobs:
         run: ./gradlew spotlessApply
         continue-on-error: true
 
-      - name: Fix Error Prone issues and regenerate collision avoidance graph
+      - name: Fix Error Prone issues
         run: ./gradlew build
         continue-on-error: true
         env:
             ERRORPRONE_AUTOFIX: 1
 
       - name: Run autofix.ci
-        uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
+        uses: autofix-ci/action@v1

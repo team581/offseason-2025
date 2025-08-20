@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Validate Gradle wrappers
         uses: gradle/actions/wrapper-validation@v4
   assemble:
@@ -18,14 +18,14 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: 17
           cache: "gradle"
-      - name: Assemble project
+      - name: Assemble
         run: ./gradlew assemble
   test:
     name: Run tests
@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -43,6 +43,14 @@ jobs:
           cache: "gradle"
       - name: Run tests
         run: ./gradlew test
+      - name: Notify Slack if tests fail
+        if: failure() && github.ref == 'refs/heads/main'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,author,message
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   style:
     name: Check formatting
 
@@ -50,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
