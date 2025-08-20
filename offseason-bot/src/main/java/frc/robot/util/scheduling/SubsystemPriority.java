@@ -5,6 +5,7 @@ import com.team581.util.scheduling.SubsystemPriorityBase;
 public enum SubsystemPriority implements SubsystemPriorityBase {
   // 20-30 is for manager subsystems
   AUTOS(30),
+  GROUND_MANAGER(28),
 
   // 10-19 is for sensor subsystems
   // Auto align inputs run after localization pose is updated
@@ -16,6 +17,8 @@ public enum SubsystemPriority implements SubsystemPriorityBase {
 
   // 0-9 is for actuator subsystems
   SWERVE(0),
+  DEPLOY(0),
+  SINGULATOR(0),
   INTAKE(0);
 
   public final int value;

@@ -19,11 +19,24 @@ import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.BuildConstants;
+import frc.robot.intake.IntakeSubsystem;
+import frc.robot.intake_deploy.DeploySubsystem;
+import frc.robot.robot_manager.RobotCommands;
+import frc.robot.robot_manager.ground_manager.GroundManager;
+import frc.robot.singulator.SingulatorSubsystem;
 
 public class Robot extends TimedRobot {
   private Command autonomousCommand = Commands.none();
   private final FmsSubsystem fms = new FmsSubsystem();
   private final Hardware hardware = new Hardware();
+
+  private final IntakeSubsystem intake = new IntakeSubsystem(hardware.intakeMotor);
+  private final DeploySubsystem deploy = new DeploySubsystem(hardware.deployMotor);
+  private final SingulatorSubsystem singulator = new SingulatorSubsystem(hardware.leftSingulatorMotor, hardware.rightSingulatorMotor);
+
+  private final GroundManager groundManager = new GroundManager(intake, deploy, singulator, hardware.intakeTopCANdi, hardware.intakeBottomCANdi);
+
+  private final RobotCommands actions = new RobotCommands(groundManager);
 
   public Robot() {
     System.out.println("roboRIO serial number: " + RobotConfig.SERIAL_NUMBER);
@@ -136,8 +149,6 @@ public class Robot extends TimedRobot {
   @Override
   public void testExit() {}
 
-  private void intake() {}
-
   private void configureBindings() {
     // swerve.setDefaultCommand(
     //     swerve
@@ -156,6 +167,10 @@ public class Robot extends TimedRobot {
     hardware
         .driverController
         .leftTrigger()
-        .onTrue(Commands.runOnce(() -> intake()));
+        .onTrue(actions.groundIntakeCommand());
+    hardware
+        .driverController
+        .leftTrigger()
+        .onTrue(actions.stowCommand());
   }
 }
