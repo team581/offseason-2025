@@ -19,8 +19,8 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
   @Override
   protected void afterTransition(IntakeState newState) {
     switch (newState) {
-      
-      case UNTUNED, STOPPED -> motor.disable();default -> motor.setVoltage(getState().volts);
+      case UNTUNED, STOPPED -> motor.disable();
+      default -> motor.setVoltage(getState().volts);
     }
   }
 
