@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.team581.GlobalConfig;
-import com.team581.trailblazer.Trailblazer;
 import com.team581.util.scheduling.LifecycleSubsystemManager;
 import com.team581.util.tuning.ElasticLayoutUtil;
 import dev.doglog.DogLog;
@@ -15,7 +14,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.BuildConstants;
@@ -26,7 +24,7 @@ import frc.robot.robot_manager.ground_manager.GroundManager;
 import frc.robot.singulator.SingulatorSubsystem;
 
 public class Robot extends TimedRobot {
-  private Command autonomousCommand = Commands.none();
+  private final Command autonomousCommand = Commands.none();
   private final FmsSubsystem fms = new FmsSubsystem();
   private final Hardware hardware = new Hardware();
 

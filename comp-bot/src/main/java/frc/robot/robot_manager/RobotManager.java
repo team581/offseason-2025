@@ -3,6 +3,8 @@ package frc.robot.robot_manager;
 import com.team581.math.MathHelpers;
 import com.team581.util.state_machines.StateMachine;
 import dev.doglog.DogLog;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -101,6 +103,7 @@ public class RobotManager extends StateMachine<RobotState> {
   private Optional<RobotState> afterIntakingCoralState = Optional.empty();
   private boolean scoringAlignActive = false;
   private boolean canSkipCollisionAvoidanceForReefAlgae = false;
+  private final Debouncer l1VisionAdjustReadyDebouncer = new Debouncer(0.2, DebounceType.kRising);
 
   private boolean intakeAssistActive = false;
 
@@ -968,7 +971,8 @@ public class RobotManager extends StateMachine<RobotState> {
 
     switch (getState()) {
       case LOW_STOW, CLAW_ALGAE, STARTING_POSITION -> {
-        if (groundManager.hasCoral() && !groundManager.deploy.atGoal()) {
+        if (groundManager.hasCoral()
+            && !l1VisionAdjustReadyDebouncer.calculate(groundManager.deploy.atGoal())) {
           vision.setState(VisionState.HANDOFF);
         } else {
           vision.setState(VisionState.TAGS);
