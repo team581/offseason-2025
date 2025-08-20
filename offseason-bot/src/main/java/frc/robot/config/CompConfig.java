@@ -53,9 +53,8 @@ class CompConfig {
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
                           .withNeutralMode(NeutralModeValue.Coast))),
-          new SingulatorConfig(CANIVORE_NAME, 99, 99, 99,
-          new TalonFXConfiguration(),
-          new TalonFXConfiguration()),
+          new SingulatorConfig(
+              CANIVORE_NAME, 99, 99, 99, new TalonFXConfiguration(), new TalonFXConfiguration()),
           new SwerveConfig(new PhoenixPIDController(5.75, 0, 0), true, true, true));
 
   private CompConfig() {}

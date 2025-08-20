@@ -13,6 +13,7 @@ public enum DeployState {
   L1_SCORE(UNTUNED);
 
   public final double angle;
+
   private DeployState(DeployState state) {
     this.angle = state.angle;
   }

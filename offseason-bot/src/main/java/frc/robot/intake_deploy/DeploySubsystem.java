@@ -4,7 +4,6 @@ import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.team581.util.state_machines.StateMachine;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.util.Units;
@@ -48,14 +47,15 @@ public class DeploySubsystem extends StateMachine<DeployState> {
 
   @Override
   protected void afterTransition(DeployState newState) {
-      switch (newState) {
-        case UNHOMED -> motor.setControl(coastRequest);
-        case REHOME -> {
-          positionRequest.withPosition(endPosition);
-          motor.setVoltage(homingVoltage);
-        }
-        default -> motor.setControl(positionRequest.withPosition(Units.degreesToRotations(newState.angle)));
+    switch (newState) {
+      case UNHOMED -> motor.setControl(coastRequest);
+      case REHOME -> {
+        positionRequest.withPosition(endPosition);
+        motor.setVoltage(homingVoltage);
       }
+      default ->
+          motor.setControl(positionRequest.withPosition(Units.degreesToRotations(newState.angle)));
+    }
   }
 
   @Override

@@ -3,6 +3,7 @@ package frc.robot.config;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
+
 public record RobotConfig(
     String robotName,
     IntakeConfig intake,
@@ -13,8 +14,8 @@ public record RobotConfig(
   public record IntakeConfig(
       String canBusName,
       int motorId,
-      int topCANdiId,
-      int bottomCANdiId,
+      int topCaNdiId,
+      int bottomCaNdiId,
       Debouncer topDebouncer,
       Debouncer bottomDebouncer,
       TalonFXConfiguration motorConfig) {}

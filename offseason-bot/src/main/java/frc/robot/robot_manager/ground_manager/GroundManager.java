@@ -3,7 +3,6 @@ package frc.robot.robot_manager.ground_manager;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.signals.S2StateValue;
 import com.team581.util.state_machines.StateMachine;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.Debouncer;
 import frc.robot.config.RobotConfig;
@@ -31,7 +30,12 @@ public class GroundManager extends StateMachine<GroundState> {
   private boolean topDebounced = false;
   private boolean bottomDebounced = false;
 
-  public GroundManager(IntakeSubsystem intake, DeploySubsystem deploy, SingulatorSubsystem singulator, CANdi topSensor, CANdi bottomSensor) {
+  public GroundManager(
+      IntakeSubsystem intake,
+      DeploySubsystem deploy,
+      SingulatorSubsystem singulator,
+      CANdi topSensor,
+      CANdi bottomSensor) {
     super(SubsystemPriority.GROUND_MANAGER, GroundState.DEPLOY_NOT_HOMED);
 
     this.intake = intake;
@@ -43,41 +47,43 @@ public class GroundManager extends StateMachine<GroundState> {
 
   @Override
   protected GroundState getNextState(GroundState currentState) {
-      return switch (currentState) {
-        case DEPLOY_HOMING -> deploy.getState() == DeployState.STOWED ? GroundState.IDLE_NO_GP : currentState;
-        case INTAKING -> getHasGP() ? GroundState.IDLE_GP : currentState;
-        default -> currentState;
-      };
+    return switch (currentState) {
+      case DEPLOY_HOMING ->
+          deploy.getState() == DeployState.STOWED ? GroundState.IDLE_NO_GP : currentState;
+      case INTAKING -> getHasGP() ? GroundState.IDLE_GP : currentState;
+      default -> currentState;
+    };
   }
 
   @Override
   protected void afterTransition(GroundState newState) {
-      switch (newState) {
-        case DEPLOY_HOMING -> {
-          intake.setState(IntakeState.STOPPED);
-          deploy.rehome();
-          singulator.setState(SingulatorState.IDLE);
-        }
-        case DEPLOY_NOT_HOMED -> {
-          intake.setState(IntakeState.STOPPED);
-          deploy.setState(DeployState.UNHOMED);
-          singulator.setState(SingulatorState.IDLE);
-        }
-        case IDLE_NO_GP, IDLE_GP -> {
-          intake.setState(IntakeState.IDLE);
-          deploy.setState(DeployState.STOWED);
-          singulator.setState(SingulatorState.IDLE);
-        }
-        case INTAKING -> {
-          intake.setState(IntakeState.INTAKING);
-          deploy.setState(DeployState.FLOOR_INTAKE);
-          singulator.setState(SingulatorState.INTAKING);
-        }
-        default -> {}
+    switch (newState) {
+      case DEPLOY_HOMING -> {
+        intake.setState(IntakeState.STOPPED);
+        deploy.rehome();
+        singulator.setState(SingulatorState.IDLE);
       }
+      case DEPLOY_NOT_HOMED -> {
+        intake.setState(IntakeState.STOPPED);
+        deploy.setState(DeployState.UNHOMED);
+        singulator.setState(SingulatorState.IDLE);
+      }
+      case IDLE_NO_GP, IDLE_GP -> {
+        intake.setState(IntakeState.IDLE);
+        deploy.setState(DeployState.STOWED);
+        singulator.setState(SingulatorState.IDLE);
+      }
+      case INTAKING -> {
+        intake.setState(IntakeState.INTAKING);
+        deploy.setState(DeployState.FLOOR_INTAKE);
+        singulator.setState(SingulatorState.INTAKING);
+      }
+      default -> {}
+    }
   }
 
   private boolean homingOrUnhomed = true;
+
   @Override
   protected void collectInputs() {
     topRaw = topSensor.getS2State().getValue() == S2StateValue.High;
@@ -85,7 +91,8 @@ public class GroundManager extends StateMachine<GroundState> {
     topDebounced = topDebouncer.calculate(topRaw);
     bottomDebounced = bottomDebouncer.calculate(bottomRaw);
 
-    homingOrUnhomed = getState() == GroundState.DEPLOY_HOMING || getState() == GroundState.DEPLOY_NOT_HOMED;
+    homingOrUnhomed =
+        getState() == GroundState.DEPLOY_HOMING || getState() == GroundState.DEPLOY_NOT_HOMED;
   }
 
   @Override

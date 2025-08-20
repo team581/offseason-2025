@@ -10,9 +10,11 @@ public enum SingulatorState {
   HANDOFF(UNTUNED);
 
   public final double volts;
+
   private SingulatorState(SingulatorState state) {
     this.volts = state.volts;
   }
+
   private SingulatorState(double volts) {
     this.volts = volts;
   }

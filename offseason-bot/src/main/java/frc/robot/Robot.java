@@ -30,9 +30,12 @@ public class Robot extends TimedRobot {
 
   private final IntakeSubsystem intake = new IntakeSubsystem(hardware.intakeMotor);
   private final DeploySubsystem deploy = new DeploySubsystem(hardware.deployMotor);
-  private final SingulatorSubsystem singulator = new SingulatorSubsystem(hardware.leftSingulatorMotor, hardware.rightSingulatorMotor);
+  private final SingulatorSubsystem singulator =
+      new SingulatorSubsystem(hardware.leftSingulatorMotor, hardware.rightSingulatorMotor);
 
-  private final GroundManager groundManager = new GroundManager(intake, deploy, singulator, hardware.intakeTopCANdi, hardware.intakeBottomCANdi);
+  private final GroundManager groundManager =
+      new GroundManager(
+          intake, deploy, singulator, hardware.intakeTopCANdi, hardware.intakeBottomCANdi);
 
   private final RobotCommands actions = new RobotCommands(groundManager);
 
@@ -162,13 +165,7 @@ public class Robot extends TimedRobot {
     //         .ignoringDisable(true)
     //         .withName("DefaultSwerveCommand"));
 
-    hardware
-        .driverController
-        .leftTrigger()
-        .onTrue(actions.groundIntakeCommand());
-    hardware
-        .driverController
-        .leftTrigger()
-        .onTrue(actions.stowCommand());
+    hardware.driverController.leftTrigger().onTrue(actions.groundIntakeCommand());
+    hardware.driverController.leftTrigger().onTrue(actions.stowCommand());
   }
 }
