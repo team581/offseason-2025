@@ -28,6 +28,7 @@ public class Limelight extends StateMachine<LimelightState> {
   private final String limelightTableName;
   private final String name;
   private final LimelightModel limelightModel;
+  private final boolean mt1Compatible;
 
   private final Timer limelightTimer = new Timer();
   private final Timer seedImuTimer = new Timer();
@@ -46,7 +47,7 @@ public class Limelight extends StateMachine<LimelightState> {
 
   private final int[] closestScoringReefTag = {0};
 
-  public Limelight(String name, LimelightState initialState, LimelightModel limelightModel) {
+  public Limelight(String name, LimelightState initialState, LimelightModel limelightModel, boolean mt1Compatible) {
     // TODO(jonahsnider): Make Limelight state logging work with multiple instances, not just
     // singleton
     super(SubsystemPriority.VISION, initialState);
@@ -54,6 +55,7 @@ public class Limelight extends StateMachine<LimelightState> {
     this.name = name;
     limelightTimer.start();
     this.limelightModel = limelightModel;
+    this.mt1Compatible= mt1Compatible;
   }
 
   public void sendImuData(
@@ -124,7 +126,7 @@ public class Limelight extends StateMachine<LimelightState> {
       return tagResult.empty();
     }
     var devs = VecBuilder.fill(0.01, 0.01, Double.MAX_VALUE);
-    if (FeatureFlags.MT_VISION_METHOD.getAsBoolean()) {
+    if (mt1Compatible&& FeatureFlags.MT_VISION_METHOD.getAsBoolean()) {
       var distance = mT2Estimate.avgTagDist;
       DogLog.log("Vision/" + name + "/Tags/DistanceFromTag", Units.metersToInches(distance));
 

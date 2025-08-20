@@ -40,7 +40,7 @@ public class TagAlign {
 
   private static final InterpolatingDoubleTreeMap CORAL_TX_TO_L1_OFFSET =
       InterpolatingDoubleTreeMap.ofEntries(
-          Map.entry(2.66, 2.943), Map.entry(0.0, 0.0), Map.entry(-11.0, -2.943));
+          Map.entry(2.66, 2.0), Map.entry(0.0, 0.0), Map.entry(-11.0, -2.0));
 
   private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedTranslation", Units.inchesToMeters(1.0));
@@ -59,14 +59,15 @@ public class TagAlign {
       DogLog.tunable("AutoAlign/InRangeTranslation", Units.inchesToMeters(1.5));
   private static final DoubleSubscriber IN_RANGE_ROTATION_THRESHOLD =
       DogLog.tunable("AutoAlign/InRangeRotation", 3.0);
-  private static final double IDEAL_L1_OFFSET = Units.inchesToMeters(1.0);
+
+  private static final double IDEAL_L1_OFFSET = Units.inchesToMeters(0.0);
   private static final Transform2d LEFT_L1_TRANSFORM =
       new Transform2d(0, IDEAL_L1_OFFSET, Rotation2d.fromDegrees(0));
   private static final Transform2d RIGHT_L1_TRANSFORM =
       new Transform2d(0, -IDEAL_L1_OFFSET, Rotation2d.fromDegrees(0));
 
   private static final double MAX_SPEED = 2.0;
-  private static final double MAX_ROTATION_SPEED = Units.rotationsToRadians(0.5);
+  private static final double MAX_ROTATION_SPEED = Units.rotationsToRadians(0.6);
   private static final PIDController VELOCITY_CONTROLLER = new PIDController(3.7, 0.0, 0.0);
   private static final double PIPE_SWITCH_TIMEOUT = 0.5;
 
@@ -82,6 +83,8 @@ public class TagAlign {
   private double rawControllerYValue = 0.0;
   private double lastPipeSwitchTimestamp = 0.0;
   private boolean aligned = false;
+  private boolean translationGood = false;
+  private boolean rotationGood = false;
   private OptionalDouble coralL1Offset = OptionalDouble.empty();
 
   private final LinearFilter l1AdjustmentFilter = LinearFilter.movingAverage(7);
@@ -202,10 +205,10 @@ public class TagAlign {
     var robotPose = localization.getPose();
     var targetPose = getUsedScoringPose(pipe);
 
-    var translationGood =
+    translationGood =
         (robotPose.getTranslation().getDistance(targetPose.getTranslation())
             <= TRANSLATION_GOOD_THRESHOLD.get());
-    var rotationGood =
+    rotationGood =
         MathUtil.isNear(
             targetPose.getRotation().getDegrees(),
             robotPose.getRotation().getDegrees(),
@@ -390,9 +393,14 @@ public class TagAlign {
 
     var driveVelocityMagnitude = VELOCITY_CONTROLLER.calculate(distanceToGoalMeters);
 
-    if (distanceToGoalMeters > TRANSLATION_GOOD_THRESHOLD.get()) {
+    if (!translationGood) {
       driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
     }
+
+    if (!MathUtil.isNear(targetPose.getRotation().getDegrees(), currentPose.getRotation().getDegrees(), 25) && preferedScoringLevel.equals(ReefPipeLevel.L1)) {
+      driveVelocityMagnitude = 0.0;
+    }
+
 
     var rotationSpeed =
         ROTATION_CONTROLLER.calculate(
