@@ -92,6 +92,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState>
         .ifPresent(this::ingestTagResult);
     vision.getRightTagResult().ifPresent(this::ingestTagResult);
 
+    customOdometry.updatePose();
     robotPose = poseEstimator.getEstimatedPosition();
   }
 
@@ -114,6 +115,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState>
     super.robotPeriodic();
 
     DogLog.log("Localization/EstimatedPose", getPose());
+    DogLog.log("Odometry/Pose", customOdometry.getPoseMeters());
   }
 
   private void ingestTagResult(TagResult result) {
