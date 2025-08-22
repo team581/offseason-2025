@@ -37,7 +37,8 @@ public class TagAlign {
       ImmutableList.copyOf(ReefPipe.values());
   public static final double L1_TRACKING_TIMEOUT = 15.0;
 
-  private static final PhoenixPIDController ROTATION_CONTROLLER = new PhoenixPIDController(5.75, 0.0, 0.0);
+  private static final PhoenixPIDController ROTATION_CONTROLLER =
+      new PhoenixPIDController(5.75, 0.0, 0.0);
 
   private static final InterpolatingDoubleTreeMap CORAL_TX_TO_L1_OFFSET =
       InterpolatingDoubleTreeMap.ofEntries(
@@ -398,14 +399,17 @@ public class TagAlign {
       driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
     }
 
-    if (!MathUtil.isNear(targetPose.getRotation().getDegrees(), currentPose.getRotation().getDegrees(), 25) && preferedScoringLevel.equals(ReefPipeLevel.L1)) {
+    if (!MathUtil.isNear(
+            targetPose.getRotation().getDegrees(), currentPose.getRotation().getDegrees(), 25)
+        && preferedScoringLevel.equals(ReefPipeLevel.L1)) {
       driveVelocityMagnitude = 0.0;
     }
 
-
     var rotationSpeed =
         ROTATION_CONTROLLER.calculate(
-            currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians(), Timer.getFPGATimestamp());
+            currentPose.getRotation().getRadians(),
+            targetPose.getRotation().getRadians(),
+            Timer.getFPGATimestamp());
 
     driveVelocityMagnitude = MathUtil.clamp(driveVelocityMagnitude, -MAX_SPEED, MAX_SPEED);
 
