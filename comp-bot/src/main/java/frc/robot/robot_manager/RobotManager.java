@@ -1841,7 +1841,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
       case CLAW_ALGAE -> {
         if (groundManager.hasCoral()) {
-          groundManager.l1Request();
+          groundManager.l1WaitRequest();
           scoringAlignActive = true;
         } else {
           setStateFromRequest(RobotState.ALGAE_OUTTAKE);
@@ -1850,7 +1850,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CLAW_EMPTY, STARTING_POSITION -> {
         if (groundManager.hasCoral()) {
           endgameStowRequest();
-          groundManager.l1Request();
+          groundManager.l1WaitRequest();
           scoringAlignActive = true;
         } else {
           setStateFromRequest(RobotState.ALGAE_OUTTAKE);
@@ -1859,7 +1859,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
       case CLAW_CORAL, STARTING_POSITION_CORAL -> l4CoralApproachRequest();
       case LOW_STOW -> {
-        groundManager.l1Request();
+        groundManager.l1WaitRequest();
         scoringAlignActive = true;
       }
 

@@ -99,7 +99,7 @@ public class GroundManager extends StateMachine<GroundState> {
 
   public void intakeRequest() {
     switch (getState()) {
-      case L1_WAIT, L1_HARD_WAIT -> setState(GroundState.L1_HARD_SCORE);
+      // case L1_WAIT, L1_HARD_WAIT -> setState(GroundState.L1_HARD_SCORE);
 
       case HANDOFF_WAIT, HANDOFF_RELEASE -> intakeThenHandoffRequest();
       default -> setState(GroundState.INTAKING);
