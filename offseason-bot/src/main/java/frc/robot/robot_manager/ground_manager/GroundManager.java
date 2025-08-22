@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.S2StateValue;
 import com.team581.util.state_machines.StateMachine;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.config.RobotConfig;
 import frc.robot.intake.IntakeState;
 import frc.robot.intake.IntakeSubsystem;
@@ -36,7 +37,9 @@ public class GroundManager extends StateMachine<GroundState> {
       SingulatorSubsystem singulator,
       CANdi topSensor,
       CANdi bottomSensor) {
-    super(SubsystemPriority.GROUND_MANAGER, GroundState.DEPLOY_NOT_HOMED);
+    super(
+        SubsystemPriority.GROUND_MANAGER,
+        RobotBase.isSimulation() ? GroundState.IDLE_NO_GP : GroundState.DEPLOY_NOT_HOMED);
 
     this.intake = intake;
     this.deploy = deploy;
@@ -97,6 +100,8 @@ public class GroundManager extends StateMachine<GroundState> {
 
   @Override
   public void robotPeriodic() {
+    super.robotPeriodic();
+
     DogLog.log("GroundManager/TopSensor/Debounced", topDebounced);
     DogLog.log("GroundManager/TopSensor/Raw", topRaw);
     DogLog.log("GroundManager/BottomSensor/Debounced", bottomDebounced);

@@ -67,6 +67,8 @@ public class DeploySubsystem extends StateMachine<DeployState> {
 
   @Override
   public void robotPeriodic() {
+    super.robotPeriodic();
+
     DogLog.log("Deploy/Motor/StatorCurrent", filteredCurrent);
     DogLog.log("Deploy/Angle", angle);
   }
