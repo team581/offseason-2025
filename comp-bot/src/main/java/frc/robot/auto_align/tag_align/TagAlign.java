@@ -1,5 +1,6 @@
 package frc.robot.auto_align.tag_align;
 
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.google.common.collect.ImmutableList;
 import com.team581.math.MathHelpers;
 import com.team581.math.PolarChassisSpeeds;
@@ -36,7 +37,7 @@ public class TagAlign {
       ImmutableList.copyOf(ReefPipe.values());
   public static final double L1_TRACKING_TIMEOUT = 15.0;
 
-  private static final PIDController ROTATION_CONTROLLER = new PIDController(6.0, 0.0, 0.0);
+  private static final PhoenixPIDController ROTATION_CONTROLLER = new PhoenixPIDController(5.75, 0.0, 0.0);
 
   private static final InterpolatingDoubleTreeMap CORAL_TX_TO_L1_OFFSET =
       InterpolatingDoubleTreeMap.ofEntries(
@@ -67,7 +68,7 @@ public class TagAlign {
       new Transform2d(0, -IDEAL_L1_OFFSET, Rotation2d.fromDegrees(0));
 
   private static final double MAX_SPEED = 2.0;
-  private static final double MAX_ROTATION_SPEED = Units.rotationsToRadians(0.6);
+  private static final double MAX_ROTATION_SPEED = Units.rotationsToRadians(3.0);
   private static final PIDController VELOCITY_CONTROLLER = new PIDController(3.7, 0.0, 0.0);
   private static final double PIPE_SWITCH_TIMEOUT = 0.5;
 
@@ -397,32 +398,29 @@ public class TagAlign {
       driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
     }
 
-    if (!MathUtil.isNear(
-            targetPose.getRotation().getDegrees(), currentPose.getRotation().getDegrees(), 25)
-        && preferedScoringLevel.equals(ReefPipeLevel.L1)) {
+    if (!MathUtil.isNear(targetPose.getRotation().getDegrees(), currentPose.getRotation().getDegrees(), 25) && preferedScoringLevel.equals(ReefPipeLevel.L1)) {
       driveVelocityMagnitude = 0.0;
     }
 
+
     var rotationSpeed =
         ROTATION_CONTROLLER.calculate(
-            currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+            currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians(), Timer.getFPGATimestamp());
 
     driveVelocityMagnitude = MathUtil.clamp(driveVelocityMagnitude, -MAX_SPEED, MAX_SPEED);
 
     if (FeatureFlags.AUTO_ALIGN_MAX_ROTATION_LIMIT.getAsBoolean()) {
       rotationSpeed = MathUtil.clamp(rotationSpeed, -MAX_ROTATION_SPEED, MAX_ROTATION_SPEED);
     }
+    var driveDirection = MathHelpers.getDriveDirection(currentPose, targetPose);
 
     DogLog.log("AutoAlign/DistanceToGoal", distanceToGoalMeters);
     DogLog.log("AutoAlign/DriveVelocityMagnitude", driveVelocityMagnitude);
-
-    var driveDirection = MathHelpers.getDriveDirection(currentPose, targetPose);
+    DogLog.log("AutoAlign/RotationSpeed", rotationSpeed);
+    DogLog.log("AutoAlign/DriveDirection", driveDirection.getDegrees());
 
     var speeds = new PolarChassisSpeeds(driveVelocityMagnitude, driveDirection, rotationSpeed);
 
     return speeds;
   }
-
-  private final double lastMaxLinearAcceleration =
-      new AutoConstraintOptions().maxLinearAcceleration();
 }
