@@ -12,10 +12,10 @@ import frc.robot.config.RobotConfig.DeployConfig;
 import frc.robot.config.RobotConfig.IntakeConfig;
 import frc.robot.config.RobotConfig.SingulatorConfig;
 import frc.robot.config.RobotConfig.SwerveConfig;
-import frc.robot.generated.CompBotTunerConstants;
+import frc.robot.generated.RobotTunerConstants;
 
 class CompConfig {
-  private static final String CANIVORE_NAME = CompBotTunerConstants.kCANBus.getName();
+  private static final String CANIVORE_NAME = RobotTunerConstants.kCANBus.getName();
   private static final String RIO_CAN_NAME = "rio";
 
   public static final RobotConfig competitionBot =

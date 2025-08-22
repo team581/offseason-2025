@@ -17,16 +17,23 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.BuildConstants;
+import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeSubsystem;
 import frc.robot.intake_deploy.DeploySubsystem;
+import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.ground_manager.GroundManager;
 import frc.robot.singulator.SingulatorSubsystem;
+import frc.robot.swerve.SwerveSubsystem;
 
 public class Robot extends TimedRobot {
   private final Command autonomousCommand = Commands.none();
   private final FmsSubsystem fms = new FmsSubsystem();
   private final Hardware hardware = new Hardware();
+
+  private final SwerveSubsystem swerve = new SwerveSubsystem();
+  private final ImuSubsystem imu = new ImuSubsystem(swerve.drivetrainPigeon);
+  private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, swerve);
 
   private final IntakeSubsystem intake = new IntakeSubsystem(hardware.intakeMotor);
   private final DeploySubsystem deploy = new DeploySubsystem(hardware.deployMotor);
@@ -151,21 +158,22 @@ public class Robot extends TimedRobot {
   public void testExit() {}
 
   private void configureBindings() {
-    // swerve.setDefaultCommand(
-    //     swerve
-    //         .run(
-    //             () -> {
-    //               if (DriverStation.isTeleop()) {
-    //                 swerve.driveTeleop(
-    //                     hardware.driverController.getLeftX(),
-    //                     hardware.driverController.getLeftY(),
-    //                     hardware.driverController.getRightX());
-    //               }
-    //             })
-    //         .ignoringDisable(true)
-    //         .withName("DefaultSwerveCommand"));
+    swerve.setDefaultCommand(
+        swerve
+            .run(
+                () -> {
+                  if (DriverStation.isTeleop()) {
+                    swerve.driveTeleop(
+                        hardware.driverController.getLeftX(),
+                        hardware.driverController.getLeftY(),
+                        hardware.driverController.getRightX());
+                  }
+                })
+            .ignoringDisable(true)
+            .withName("DefaultSwerveCommand"));
 
     hardware.driverController.leftTrigger().onTrue(actions.groundIntakeCommand());
     hardware.driverController.leftTrigger().onTrue(actions.stowCommand());
+    hardware.driverController.back().onTrue(localization.getZeroCommand());
   }
 }
