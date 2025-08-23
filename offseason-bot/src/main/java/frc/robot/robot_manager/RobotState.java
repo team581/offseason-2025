@@ -282,25 +282,13 @@ public enum RobotState {
     return handoffReleaseToAfterRelease.getOrDefault(this, this);
   }
 
-  public RobotState getHandoffAfterReleaseToApproachState(RobotScoringSide scoringSide) {
-    var map =
-        scoringSide == RobotScoringSide.LEFT
-            ? handoffAfterReleaseToLeftApproach
-            : handoffAfterReleaseToRightApproach;
-    return map.getOrDefault(this, this);
+  public RobotState getHandoffAfterReleaseToApproachState() {
+    return handoffAfterReleaseToLeftApproach.getOrDefault(this, this);
   }
 
   public RobotState getLeftApproachToLineupState() {
 
     return approachToLineupLeftStates.getOrDefault(this, this);
-  }
-
-  public RobotState getRightApproachToLineupState() {
-    return approachToLineupRightStates.getOrDefault(this, this);
-  }
-
-  public RobotState getRightToLeftApproachState() {
-    return rightToLeftApproachStates.getOrDefault(this, this);
   }
 
   public RobotState getLeftToRightApproachState() {

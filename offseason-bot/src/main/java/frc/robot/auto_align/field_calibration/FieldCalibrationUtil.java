@@ -45,7 +45,7 @@ public class FieldCalibrationUtil {
       double actualArm,
       Pose2d wantedPose,
       Pose2d actualPose) {
-    var elevatorError = wantedElevator.getHeight() - actualElevator;
+    var elevatorError = wantedElevator.height - actualElevator;
     var armError = wantedArm.getAngle() - actualArm;
     var alignError = wantedPose.getTranslation().getDistance(actualPose.getTranslation());
 
@@ -89,9 +89,9 @@ public class FieldCalibrationUtil {
 
   private static ElevatorState branchToElevator(ReefPipeLevel level) {
     return switch (level) {
-      case L2 -> ElevatorState.CORAL_SCORE_LINEUP_L2;
-      case L3 -> ElevatorState.CORAL_SCORE_LINEUP_L3;
-      case L4 -> ElevatorState.CORAL_SCORE_LINEUP_L4;
+      case L2 -> ElevatorState.L2_SCORE_LINEUP;
+      case L3 -> ElevatorState.L3_SCORE_LINEUP;
+      case L4 -> ElevatorState.L4_SCORE_LINEUP;
       default -> ElevatorState.UNTUNED;
     };
   }
@@ -131,7 +131,6 @@ public class FieldCalibrationUtil {
       var bestScoringPosition = getBestScoringPosition(level);
       DogLog.log(prefix + "/Alliance", bestScoringPosition.isRedAlliance() ? "Red" : "Blue");
       DogLog.log(prefix + "/Pipe", bestScoringPosition.pipe());
-      DogLog.log(prefix + "/Orientation", bestScoringPosition.side());
       DogLog.log(prefix + "/Pose", bestScoringPosition.getPose(level));
 
       var summary = createSummary(level, bestScoringPosition);
