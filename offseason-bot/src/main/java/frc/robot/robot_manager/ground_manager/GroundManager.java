@@ -53,7 +53,7 @@ public class GroundManager extends StateMachine<GroundState> {
     return switch (currentState) {
       case DEPLOY_HOMING ->
           deploy.getState() == DeployState.STOWED ? GroundState.IDLE_NO_GP : currentState;
-      case INTAKING -> getHasGP() ? GroundState.IDLE_GP : currentState;
+      case INTAKING -> getTopHasGP() ? GroundState.IDLE_GP : currentState;
       default -> currentState;
     };
   }
@@ -80,6 +80,16 @@ public class GroundManager extends StateMachine<GroundState> {
         intake.setState(IntakeState.INTAKING);
         deploy.setState(DeployState.FLOOR_INTAKE);
         singulator.setState(SingulatorState.INTAKING);
+      }
+      case UNJAM_LEFT -> {
+        intake.setState(IntakeState.OUTTAKING);
+        deploy.setState(DeployState.OUTTAKE);
+        singulator.setState(SingulatorState.UNJAM_LEFT_ONLY);
+      }
+      case UNJAM_RIGHT -> {
+        intake.setState(IntakeState.OUTTAKING);
+        deploy.setState(DeployState.OUTTAKE);
+        singulator.setState(SingulatorState.UNJAM_RIGHT_ONLY);
       }
       default -> {}
     }
@@ -108,8 +118,12 @@ public class GroundManager extends StateMachine<GroundState> {
     DogLog.log("GroundManager/BottomSensor/Raw", bottomRaw);
   }
 
-  public boolean getHasGP() {
-    return bottomDebounced || topDebounced;
+  public boolean getTopHasGP() {
+    return topDebounced;
+  }
+
+  public boolean getBottomHasGP() {
+    return bottomDebounced;
   }
 
   public void rehomeRequest() {
@@ -129,7 +143,7 @@ public class GroundManager extends StateMachine<GroundState> {
       return;
     }
 
-    if (getHasGP()) {
+    if (getTopHasGP()) {
       setStateFromRequest(GroundState.IDLE_GP);
       return;
     }

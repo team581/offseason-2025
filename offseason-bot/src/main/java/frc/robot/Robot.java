@@ -173,7 +173,7 @@ public class Robot extends TimedRobot {
             .withName("DefaultSwerveCommand"));
 
     hardware.driverController.leftTrigger().onTrue(actions.groundIntakeCommand());
-    hardware.driverController.leftTrigger().onTrue(actions.stowCommand());
+    hardware.driverController.rightBumper().onTrue(actions.stowCommand());
     hardware.driverController.back().onTrue(localization.getZeroCommand());
   }
 }

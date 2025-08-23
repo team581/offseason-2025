@@ -22,13 +22,21 @@ public class SingulatorSubsystem extends StateMachine<SingulatorState> {
   @Override
   protected void afterTransition(SingulatorState newState) {
     switch (newState) {
-      case UNTUNED -> {
+      case UNTUNED, STOPPED -> {
         leftMotor.disable();
         rightMotor.disable();
       }
+      case UNJAM_LEFT_ONLY -> {
+        leftMotor.setVoltage(newState.voltsLeft);
+        rightMotor.disable();
+      }
+      case UNJAM_RIGHT_ONLY -> {
+        leftMotor.disable();
+        rightMotor.setVoltage(newState.voltsRight);
+      }
       default -> {
-        leftMotor.setVoltage(getState().volts);
-        rightMotor.setVoltage(getState().volts);
+        leftMotor.setVoltage(newState.voltsLeft);
+        rightMotor.setVoltage(newState.voltsRight);
       }
     }
   }
