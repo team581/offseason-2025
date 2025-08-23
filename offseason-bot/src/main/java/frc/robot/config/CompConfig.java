@@ -59,7 +59,6 @@ class CompConfig {
                           .withNeutralMode(NeutralModeValue.Coast))),
           new SingulatorConfig(
               CANIVORE_NAME, 99, 99, 99, new TalonFXConfiguration(), new TalonFXConfiguration()),
-
           new VisionConfig(
               0.005,
               0.8,

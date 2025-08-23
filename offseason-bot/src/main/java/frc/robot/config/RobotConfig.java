@@ -38,6 +38,7 @@ public record RobotConfig(
       double homingCurrentThreshold,
       double homingEndPosition,
       TalonFXConfiguration motorConfig) {}
+
   public record VisionConfig(
       double xyStdDev,
       double thetaStdDev,
