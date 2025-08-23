@@ -10,6 +10,7 @@ public record RobotConfig(
     IntakeConfig intake,
     DeployConfig deploy,
     SingulatorConfig singulator,
+    ElevatorConfig elevator,
     VisionConfig vision,
     SwerveConfig swerve) {
 
@@ -38,6 +39,16 @@ public record RobotConfig(
       double homingCurrentThreshold,
       double homingEndPosition,
       TalonFXConfiguration motorConfig) {}
+
+  public record ElevatorConfig(
+    String canBusName,
+    int motorId,
+    double homingVoltage,
+    double homingCurrentThreshold,
+    double homingEndHeight,
+    double maxHeight,
+    double minHeight,
+    TalonFXConfiguration motorConfig) {}
   public record VisionConfig(
       double xyStdDev,
       double thetaStdDev,
