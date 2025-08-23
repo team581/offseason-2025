@@ -11,8 +11,6 @@ import frc.robot.arm.ArmSubsystem;
 import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.auto_align.ReefSide;
-import frc.robot.auto_align.ReefSideOffset;
-import frc.robot.auto_align.RobotScoringSide;
 import frc.robot.claw.ClawState;
 import frc.robot.claw.ClawSubsystem;
 import frc.robot.climber.ClimberState;

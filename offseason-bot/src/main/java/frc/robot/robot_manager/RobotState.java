@@ -1,7 +1,6 @@
 package frc.robot.robot_manager;
 
 import com.google.common.collect.ImmutableMap;
-import frc.robot.auto_align.RobotScoringSide;
 import java.util.Map;
 
 public enum RobotState {
