@@ -1,12 +1,10 @@
 package frc.robot.auto_align;
 
-import com.team581.math.MathHelpers;
 import com.team581.math.PolarChassisSpeeds;
 import com.team581.math.PoseErrorTolerance;
 import com.team581.trailblazer.constraints.AutoConstraintOptions;
 import com.team581.util.state_machines.StateMachine;
 import dev.doglog.DogLog;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -93,8 +91,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
     algaeAlignSpeeds =
         tagAlign.getPoseAlignmentChassisSpeeds(
-            ReefSide.fromPipe(tagAlign.getClosestPipe())
-                .getPose(robotPose),
+            ReefSide.fromPipe(tagAlign.getClosestPipe()).getPose(robotPose),
             robotPose,
             CONSTRAINTS,
             new PolarChassisSpeeds(swerve.getFieldRelativeSpeeds()));
@@ -150,8 +147,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     tagAlign.markScored(bestReefPipe);
   }
 
-  public void setScoringLevel(
-      ReefPipeLevel level, ReefPipeLevel preferredLevel) {
+  public void setScoringLevel(ReefPipeLevel level, ReefPipeLevel preferredLevel) {
     tagAlign.setLevel(level, preferredLevel);
   }
 
