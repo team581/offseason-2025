@@ -151,12 +151,7 @@ public class FieldCalibrationUtil {
     for (var pipe : ReefPipe.values()) {
       for (var level : LEVELS) {
         DogLog.log(
-            "FieldCalibration/"
-                + allianceLabel
-                + "/"
-                + pipe.toString()
-                + "/"
-                + level.toString(),
+            "FieldCalibration/" + allianceLabel + "/" + pipe.toString() + "/" + level.toString(),
             pipe.getPose(level, isRedAlliance));
       }
     }

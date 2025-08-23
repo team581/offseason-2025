@@ -94,9 +94,7 @@ public class AlignmentCostUtil {
   private final Comparator<ReefPipe> pipeL1Comparator = createReefPipeComparator(ReefPipeLevel.L1);
 
   public AlignmentCostUtil(
-      LocalizationSubsystem localization,
-      SwerveSubsystem swerve,
-      ReefState reefState) {
+      LocalizationSubsystem localization, SwerveSubsystem swerve, ReefState reefState) {
     this.localization = localization;
     this.swerve = swerve;
     this.reefState = reefState;
