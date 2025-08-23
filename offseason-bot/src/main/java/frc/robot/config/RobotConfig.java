@@ -41,14 +41,15 @@ public record RobotConfig(
       TalonFXConfiguration motorConfig) {}
 
   public record ElevatorConfig(
-    String canBusName,
-    int motorId,
-    double homingVoltage,
-    double homingCurrentThreshold,
-    double homingEndHeight,
-    double maxHeight,
-    double minHeight,
-    TalonFXConfiguration motorConfig) {}
+      String canBusName,
+      int motorId,
+      double homingVoltage,
+      double homingCurrentThreshold,
+      double homingEndHeight,
+      double maxHeight,
+      double minHeight,
+      TalonFXConfiguration motorConfig) {}
+
   public record VisionConfig(
       double xyStdDev,
       double thetaStdDev,

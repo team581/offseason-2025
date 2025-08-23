@@ -61,8 +61,17 @@ class CompConfig {
                           .withNeutralMode(NeutralModeValue.Coast))),
           new SingulatorConfig(
               CANIVORE_NAME, 99, 99, 99, new TalonFXConfiguration(), new TalonFXConfiguration()),
-              // TODO: add radius and sensor-mechanism ratio
-          new ElevatorConfig(CANIVORE_NAME, 999, 0.0, 0.0, 0.0, 9999.0, 0.0, new TalonFXConfiguration().withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(2*Math.PI))),
+          // TODO: add radius and sensor-mechanism ratio
+          new ElevatorConfig(
+              CANIVORE_NAME,
+              999,
+              0.0,
+              0.0,
+              0.0,
+              9999.0,
+              0.0,
+              new TalonFXConfiguration()
+                  .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(2 * Math.PI))),
           new VisionConfig(
               0.005,
               0.8,

@@ -21,9 +21,11 @@ public enum ElevatorState {
   L4_SCORE_RELEASE(UNTUNED);
 
   public final double height;
+
   private ElevatorState(double height) {
     this.height = height;
   }
+
   private ElevatorState(ElevatorState state) {
     this.height = state.height;
   }

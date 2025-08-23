@@ -3,7 +3,6 @@ package frc.robot.elevator;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.team581.util.state_machines.StateMachine;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -22,7 +21,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private double filteredCurrent = 0.0;
   final double homingEndHeight = RobotConfig.get().elevator().homingEndHeight();
 
-  private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(ElevatorState.STOWED.height);
+  private final MotionMagicVoltage positionRequest =
+      new MotionMagicVoltage(ElevatorState.STOWED.height);
 
   public ElevatorSubsystem(TalonFX motor) {
     super(SubsystemPriority.ELEVATOR, ElevatorState.STOWED);
@@ -32,42 +32,45 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   }
 
   private double clampHeight(double unclamped) {
-    return MathUtil.clamp(unclamped, RobotConfig.get().elevator().minHeight(), RobotConfig.get().elevator().maxHeight());
+    return MathUtil.clamp(
+        unclamped,
+        RobotConfig.get().elevator().minHeight(),
+        RobotConfig.get().elevator().maxHeight());
   }
 
   @Override
   protected ElevatorState getNextState(ElevatorState currentState) {
-      return switch (currentState) {
-        case REHOME -> {
-          if (filteredCurrent > RobotConfig.get().elevator().homingCurrentThreshold()) {
-            motor.setPosition(homingEndHeight);
-            yield ElevatorState.STOWED;
-          }
-          yield currentState;
+    return switch (currentState) {
+      case REHOME -> {
+        if (filteredCurrent > RobotConfig.get().elevator().homingCurrentThreshold()) {
+          motor.setPosition(homingEndHeight);
+          yield ElevatorState.STOWED;
         }
-        default -> currentState;
-      };
+        yield currentState;
+      }
+      default -> currentState;
+    };
   }
 
   @Override
   protected void afterTransition(ElevatorState newState) {
-      switch (newState) {
-        case REHOME -> motor.setVoltage(RobotConfig.get().elevator().homingVoltage());
-        default -> motor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
-      }
+    switch (newState) {
+      case REHOME -> motor.setVoltage(RobotConfig.get().elevator().homingVoltage());
+      default -> motor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
+    }
   }
 
   @Override
   public void robotPeriodic() {
-      DogLog.log("Elevator/Motor/Current", filteredCurrent);
-      DogLog.log("Elevator/Height", height);
+    DogLog.log("Elevator/Motor/Current", filteredCurrent);
+    DogLog.log("Elevator/Height", height);
 
-      if (DriverStation.isEnabled()) {
-       return;
-      }
-      if (height < homingEndHeight) {
-        motor.setPosition(homingEndHeight);
-      }
+    if (DriverStation.isEnabled()) {
+      return;
+    }
+    if (height < homingEndHeight) {
+      motor.setPosition(homingEndHeight);
+    }
   }
 
   @Override
@@ -83,8 +86,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   }
 
   public void setState(ElevatorState newState) {
-    if (getState() != ElevatorState.REHOME)
-    setStateFromRequest(newState);
+    if (getState() != ElevatorState.REHOME) setStateFromRequest(newState);
   }
 
   public boolean atGoal() {
