@@ -11,6 +11,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.config.RobotConfig.ClawConfig;
 import frc.robot.config.RobotConfig.DeployConfig;
 import frc.robot.config.RobotConfig.IntakeConfig;
 import frc.robot.config.RobotConfig.SingulatorConfig;
@@ -41,6 +42,7 @@ class CompConfig {
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
                           .withNeutralMode(NeutralModeValue.Coast))),
+         new ClawConfig(CANIVORE_NAME, 99, 99, false, new Debouncer(0), new TalonFXConfiguration()),
           new DeployConfig(
               CANIVORE_NAME,
               99,

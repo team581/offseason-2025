@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 public record RobotConfig(
     String robotName,
     IntakeConfig intake,
+    ClawConfig claw,
     DeployConfig deploy,
     SingulatorConfig singulator,
     VisionConfig vision,
@@ -21,6 +22,13 @@ public record RobotConfig(
       Debouncer topDebouncer,
       Debouncer bottomDebouncer,
       TalonFXConfiguration motorConfig) {}
+  public record ClawConfig(
+        String canBusName,
+        int motorId,
+        int candiId,
+        boolean sensorFlipped,
+        Debouncer debouncer,
+        TalonFXConfiguration motorConfig) {}
 
   public record SingulatorConfig(
       String canBusName,
