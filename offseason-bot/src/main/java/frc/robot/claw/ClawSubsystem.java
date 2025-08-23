@@ -1,4 +1,3 @@
-
 package frc.robot.claw;
 
 import com.ctre.phoenix6.hardware.CANdi;

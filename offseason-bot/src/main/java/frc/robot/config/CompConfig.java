@@ -42,7 +42,8 @@ class CompConfig {
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
                           .withNeutralMode(NeutralModeValue.Coast))),
-         new ClawConfig(CANIVORE_NAME, 99, 99, false, new Debouncer(0), new TalonFXConfiguration()),
+          new ClawConfig(
+              CANIVORE_NAME, 99, 99, false, new Debouncer(0), new TalonFXConfiguration()),
           new DeployConfig(
               CANIVORE_NAME,
               99,

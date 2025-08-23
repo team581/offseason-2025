@@ -22,13 +22,14 @@ public record RobotConfig(
       Debouncer topDebouncer,
       Debouncer bottomDebouncer,
       TalonFXConfiguration motorConfig) {}
+
   public record ClawConfig(
-        String canBusName,
-        int motorId,
-        int candiId,
-        boolean sensorFlipped,
-        Debouncer debouncer,
-        TalonFXConfiguration motorConfig) {}
+      String canBusName,
+      int motorId,
+      int candiId,
+      boolean sensorFlipped,
+      Debouncer debouncer,
+      TalonFXConfiguration motorConfig) {}
 
   public record SingulatorConfig(
       String canBusName,
