@@ -1816,7 +1816,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case CLAW_EMPTY, STARTING_POSITION -> {
         if (groundManager.hasCoral()) {
-          endgameStowRequest();
+          lowStowRequest();
           groundManager.l1WaitRequest();
           scoringAlignActive = true;
         } else {
@@ -1869,7 +1869,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
-  public void lowStowRequest() {
+  public void rehomeElevatorRequest() {
     if (!getState().climbingOrRehoming) {
       setStateFromRequest(RobotState.REHOME_ELEVATOR);
     }
@@ -1881,7 +1881,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
-  public void endgameStowRequest() {
+  public void lowStowRequest() {
     if (!getState().climbingOrRehoming) {
       setStateFromRequest(RobotState.LOW_STOW);
     }
