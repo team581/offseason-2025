@@ -100,7 +100,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
         < thresholdMeters;
   }
 
-  private final Debouncer isAlignedDebouncer = new Debouncer(0.0, DebounceType.kRising);
+  private final Debouncer isAlignedDebouncer = new Debouncer(0.5, DebounceType.kRising);
   private final VisionSubsystem vision;
   private final LocalizationSubsystem localization;
   private final TagAlign tagAlign;
@@ -116,6 +116,8 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private ReefPipe bestReefPipe = ReefPipe.PIPE_A;
   private Pose2d usedScoringPose = Pose2d.kZero;
   private ReefSideOffset reefSideOffset = ReefSideOffset.BASE;
+  private ReefSide bestAlgaeSide = ReefSide.SIDE_AB;
+  private ReefSide closestSide = ReefSide.SIDE_AB;
 
   public AutoAlign(
       VisionSubsystem vision, LocalizationSubsystem localization, SwerveSubsystem swerve) {
@@ -144,9 +146,10 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     isAligned = tagAlign.isAligned(bestReefPipe);
     isNearRotation = tagAlign.isNearRotationGoal(bestReefPipe);
     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
+    bestAlgaeSide = tagAlign.getBestAlgaeSide();
+    closestSide = getClosestReefSide();
     algaeAlignSpeeds =
-        tagAlign.getPoseAlignmentChassisSpeeds(
-            ReefSide.fromPipe(tagAlign.getClosestPipe())
+        tagAlign.getPoseAlignmentChassisSpeeds(bestAlgaeSide
                 .getPose(reefSideOffset, robotScoringSide, robotPose),
             robotPose,
             CONSTRAINTS,
@@ -221,6 +224,14 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     tagAlign.markScored(bestReefPipe);
   }
 
+  public void markAlgaeRemoved() {
+    tagAlign.markAlgaeRemoved(closestSide);
+  }
+
+  public boolean isAlgaeRemoved() {
+    return tagAlign.isAlgaeRemoved(closestSide);
+  }
+
   public void setScoringLevel(
       ReefPipeLevel level, ReefPipeLevel preferredLevel, RobotScoringSide side) {
     robotScoringSide = side;
@@ -235,7 +246,11 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     tagAlign.clearReefState();
   }
 
-  public boolean isTagAlignedDebounced() {
+  public boolean isAligned() {
+    return isAligned;
+  }
+
+  public boolean isAlignedDebounced() {
     return isAlignedDebounced;
   }
 

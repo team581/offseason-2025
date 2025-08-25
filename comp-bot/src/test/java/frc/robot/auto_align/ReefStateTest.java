@@ -14,13 +14,13 @@ public class ReefStateTest {
   public void markScoredTest() {
     var state = new ReefState();
 
-    assertFalse(state.isScored(ReefPipe.PIPE_A, ReefPipeLevel.L4));
+    assertFalse(state.isCoralScored(ReefPipe.PIPE_A, ReefPipeLevel.L4));
 
-    state.markScored(ReefPipe.PIPE_A, ReefPipeLevel.L4);
+    state.markCoralScored(ReefPipe.PIPE_A, ReefPipeLevel.L4);
 
     for (var pipe : ReefPipe.values()) {
       for (var level : TRACKED_LEVELS) {
-        var result = state.isScored(pipe, level);
+        var result = state.isCoralScored(pipe, level);
         if (pipe == ReefPipe.PIPE_A && level == ReefPipeLevel.L4) {
           assertTrue(result);
         } else {
@@ -36,7 +36,7 @@ public class ReefStateTest {
 
     for (var pipe : ReefPipe.values()) {
       for (var level : TRACKED_LEVELS) {
-        assertFalse(state.isScored(pipe, level));
+        assertFalse(state.isCoralScored(pipe, level));
       }
     }
   }
@@ -45,14 +45,14 @@ public class ReefStateTest {
   public void clearTest() {
     var state = new ReefState();
 
-    state.markScored(ReefPipe.PIPE_A, ReefPipeLevel.L4);
-    state.markScored(ReefPipe.PIPE_B, ReefPipeLevel.L4);
+    state.markCoralScored(ReefPipe.PIPE_A, ReefPipeLevel.L4);
+    state.markCoralScored(ReefPipe.PIPE_B, ReefPipeLevel.L4);
 
     state.clear();
 
     for (var pipe : ReefPipe.values()) {
       for (var level : TRACKED_LEVELS) {
-        assertFalse(state.isScored(pipe, level));
+        assertFalse(state.isCoralScored(pipe, level));
       }
     }
   }
@@ -61,11 +61,11 @@ public class ReefStateTest {
   public void doubleScoreTest() {
     var state = new ReefState();
 
-    state.markScored(ReefPipe.PIPE_A, ReefPipeLevel.L4);
-    assertTrue(state.isScored(ReefPipe.PIPE_A, ReefPipeLevel.L4));
+    state.markCoralScored(ReefPipe.PIPE_A, ReefPipeLevel.L4);
+    assertTrue(state.isCoralScored(ReefPipe.PIPE_A, ReefPipeLevel.L4));
 
     // Shouldn't change state
-    state.markScored(ReefPipe.PIPE_A, ReefPipeLevel.L4);
-    assertTrue(state.isScored(ReefPipe.PIPE_A, ReefPipeLevel.L4));
+    state.markCoralScored(ReefPipe.PIPE_A, ReefPipeLevel.L4);
+    assertTrue(state.isCoralScored(ReefPipe.PIPE_A, ReefPipeLevel.L4));
   }
 }

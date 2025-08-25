@@ -35,6 +35,8 @@ import java.util.OptionalDouble;
 public class TagAlign {
   public static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
       ImmutableList.copyOf(ReefPipe.values());
+      public static final ImmutableList<ReefSide> ALL_REEF_SIDES =
+      ImmutableList.copyOf(ReefSide.values());
   public static final double L1_TRACKING_TIMEOUT = 15.0;
 
   private static final PhoenixPIDController ROTATION_CONTROLLER =
@@ -42,7 +44,7 @@ public class TagAlign {
 
   private static final InterpolatingDoubleTreeMap CORAL_TX_TO_L1_OFFSET =
       InterpolatingDoubleTreeMap.ofEntries(
-          Map.entry(2.66, 2.0), Map.entry(0.0, 0.0), Map.entry(-11.0, -2.0));
+          Map.entry(2.66, 2.943), Map.entry(0.0, 0.0), Map.entry(-11.0, -2.943));
 
   private static final DoubleSubscriber TRANSLATION_GOOD_THRESHOLD =
       DogLog.tunable("AutoAlign/IsAlignedTranslation", Units.inchesToMeters(1.0));
@@ -62,7 +64,7 @@ public class TagAlign {
   private static final DoubleSubscriber IN_RANGE_ROTATION_THRESHOLD =
       DogLog.tunable("AutoAlign/InRangeRotation", 3.0);
 
-  private static final double IDEAL_L1_OFFSET = Units.inchesToMeters(0.0);
+  private static final double IDEAL_L1_OFFSET = Units.inchesToMeters(0.5);
   private static final Transform2d LEFT_L1_TRANSFORM =
       new Transform2d(0, IDEAL_L1_OFFSET, Rotation2d.fromDegrees(0));
   private static final Transform2d RIGHT_L1_TRANSFORM =
@@ -195,7 +197,7 @@ public class TagAlign {
         DogLog.timestamp("AutoAlign/PipeSwitch/Right");
         partnerPipe = rightPipe;
       }
-      reefState.remove(partnerPipe, preferedScoringLevel);
+      reefState.removeCoral(partnerPipe, preferedScoringLevel);
       setPipeOveride(partnerPipe);
     }
   }
@@ -269,12 +271,20 @@ public class TagAlign {
 
   public void markScored(ReefPipe pipe) {
     if (preferedScoringLevel.equals(ReefPipeLevel.L1)) {
-      resetL1Offset();
+      resetL1();
     }
-    reefState.markScored(pipe, preferedScoringLevel);
+    reefState.markCoralScored(pipe, preferedScoringLevel);
   }
 
-  private void resetL1Offset() {
+  public void markAlgaeRemoved(ReefSide side) {
+    reefState.markAlgaeRemoved(side);
+  }
+
+  public boolean isAlgaeRemoved(ReefSide side) {
+    return reefState.isAlgaeRemoved(side);
+  }
+
+  private void resetL1() {
     coralL1Offset = OptionalDouble.empty();
   }
 
@@ -367,8 +377,14 @@ public class TagAlign {
                     robotPose
                         .getTranslation()
                         .getDistance(
-                            pipe.getPose(ReefPipeLevel.BACK_AWAY, robotScoringSide, robotPose)
+                            pipe.getPose(pipeLevel, robotScoringSide, robotPose)
                                 .getTranslation())))
+        .orElseThrow();
+  }
+
+  public ReefSide getBestAlgaeSide() {
+    return ALL_REEF_SIDES.stream()
+        .min(alignmentCostUtil.getAlgaeComparator())
         .orElseThrow();
   }
 
@@ -399,19 +415,14 @@ public class TagAlign {
       driveVelocityMagnitude += Math.copySign(FEED_FORWARD.get(), driveVelocityMagnitude);
     }
 
-    if (!MathUtil.isNear(
-            targetPose.getRotation().getDegrees(), currentPose.getRotation().getDegrees(), 25)
-        && preferedScoringLevel.equals(ReefPipeLevel.L1)) {
-      driveVelocityMagnitude = 0.0;
-    }
-
     var rotationSpeed =
         ROTATION_CONTROLLER.calculate(
             currentPose.getRotation().getRadians(),
             targetPose.getRotation().getRadians(),
             Timer.getFPGATimestamp());
 
-    driveVelocityMagnitude = MathUtil.clamp(driveVelocityMagnitude, -MAX_SPEED, MAX_SPEED);
+            var maxSpeed = preferedScoringLevel.equals(ReefPipeLevel.L1)? 1.0:MAX_SPEED;
+    driveVelocityMagnitude = MathUtil.clamp(driveVelocityMagnitude, -maxSpeed, maxSpeed);
 
     if (FeatureFlags.AUTO_ALIGN_MAX_ROTATION_LIMIT.getAsBoolean()) {
       rotationSpeed = MathUtil.clamp(rotationSpeed, -MAX_ROTATION_SPEED, MAX_ROTATION_SPEED);
