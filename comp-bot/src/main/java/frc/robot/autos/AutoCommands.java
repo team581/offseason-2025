@@ -30,7 +30,7 @@ public class AutoCommands {
   }
 
   public boolean alignedForScore() {
-    return robotManager.autoAlign.isTagAlignedDebounced()
+    return robotManager.autoAlign.isAligned()
         && robotManager.imu.isFlatDebounced()
         && robotManager.elevator.atGoal()
         && robotManager.arm.atGoal();
