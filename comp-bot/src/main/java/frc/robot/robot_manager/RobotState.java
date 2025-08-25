@@ -269,7 +269,6 @@ public enum RobotState {
     return handoffPrepareToRelease.getOrDefault(this, this);
   }
 
-
   public RobotState getHandoffReleaseToApproachState(RobotScoringSide scoringSide) {
     var map =
         scoringSide == RobotScoringSide.LEFT

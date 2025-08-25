@@ -35,7 +35,7 @@ import java.util.OptionalDouble;
 public class TagAlign {
   public static final ImmutableList<ReefPipe> ALL_REEF_PIPES =
       ImmutableList.copyOf(ReefPipe.values());
-      public static final ImmutableList<ReefSide> ALL_REEF_SIDES =
+  public static final ImmutableList<ReefSide> ALL_REEF_SIDES =
       ImmutableList.copyOf(ReefSide.values());
   public static final double L1_TRACKING_TIMEOUT = 15.0;
 
@@ -377,15 +377,12 @@ public class TagAlign {
                     robotPose
                         .getTranslation()
                         .getDistance(
-                            pipe.getPose(pipeLevel, robotScoringSide, robotPose)
-                                .getTranslation())))
+                            pipe.getPose(pipeLevel, robotScoringSide, robotPose).getTranslation())))
         .orElseThrow();
   }
 
   public ReefSide getBestAlgaeSide() {
-    return ALL_REEF_SIDES.stream()
-        .min(alignmentCostUtil.getAlgaeComparator())
-        .orElseThrow();
+    return ALL_REEF_SIDES.stream().min(alignmentCostUtil.getAlgaeComparator()).orElseThrow();
   }
 
   public PolarChassisSpeeds getPoseAlignmentChassisSpeeds(
@@ -421,7 +418,7 @@ public class TagAlign {
             targetPose.getRotation().getRadians(),
             Timer.getFPGATimestamp());
 
-            var maxSpeed = preferedScoringLevel.equals(ReefPipeLevel.L1)? 1.0:MAX_SPEED;
+    var maxSpeed = preferedScoringLevel.equals(ReefPipeLevel.L1) ? 1.0 : MAX_SPEED;
     driveVelocityMagnitude = MathUtil.clamp(driveVelocityMagnitude, -maxSpeed, maxSpeed);
 
     if (FeatureFlags.AUTO_ALIGN_MAX_ROTATION_LIMIT.getAsBoolean()) {
